@@ -1,54 +1,187 @@
 ﻿@model Destined.Models.Ticket
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Детайли на билет";
 }
 
-<h1>Details</h1>
+<div class="ticket-wrapper">
+    <h1 class="page-title">Детайли на билет</h1>
 
-<div>
-    <h4>Ticket</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.From)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.From)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.To)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.To)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DepartureTime)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DepartureTime)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NumberOfPassengers)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NumberOfPassengers)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsPublic)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsPublic)
-        </dd>
-    </dl>
+    <div class="real-ticket">
+        <div class="ticket-left">
+            <h2>@Model.From ➔ @Model.To</h2>
+            <p><strong>Дата и час:</strong> @Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+            <p><strong>Пътници:</strong> @Model.NumberOfPassengers</p>
+        </div>
+        <div class="ticket-center">
+            <div class="perforation"></div>
+        </div>
+        <div class="ticket-right">
+            <div class="barcode"></div>
+            <div class="serial-number">ID: @Model.Id</div>
+            <div class="actions">
+                <a asp-action="Index" class="btn btn-detail">Обратно</a>
+                <a class="btn btn-info" href="@Url.Action("Page", "Journal", new { ticketId = Model.Id, readOnly = true })">Прегледай дневник</a>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+
+<style>
+    body {
+        background: #ececec;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    .ticket-wrapper {
+        max-width: 1000px;
+        margin: 50px auto;
+        padding: 0 20px;
+    }
+
+    .page-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+        color: #222;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+    }
+
+    .real-ticket {
+        display: flex;
+        background: linear-gradient(145deg, #fafafa, #e6e6e6);
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 0 8px rgba(255,255,255,0.7);
+        overflow: hidden;
+        cursor: default;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1.5px solid #bbb;
+        position: relative;
+        font-weight: 600;
+        user-select: none;
+    }
+
+        .real-ticket:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 30px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.9);
+            border-color: #4caf50;
+        }
+
+    .ticket-left, .ticket-right {
+        padding: 25px 30px;
+        flex: 1;
+        position: relative;
+        z-index: 10;
+    }
+
+    .ticket-left {
+        background: #e0f2f1;
+        border-right: 1.5px dashed #999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+        .ticket-left h2 {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            color: #00796b;
+            text-shadow: 0 1px 1px #a0d4cf;
+            letter-spacing: 1.2px;
+        }
+
+        .ticket-left p {
+            font-size: 1.1rem;
+            color: #004d40;
+            margin: 6px 0;
+        }
+
+    .ticket-center {
+        width: 30px;
+        background: repeating-linear-gradient( to bottom, transparent, transparent 8px, #999 8px, #999 10px );
+        position: relative;
+    }
+
+        .ticket-center::before,
+        .ticket-center::after {
+            content: "";
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #ececec;
+            border-radius: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: inset 3px 3px 5px rgba(255,255,255,0.9), inset -3px -3px 5px rgba(0,0,0,0.15);
+            z-index: 11;
+        }
+
+        .ticket-center::before {
+            top: -15px;
+        }
+
+        .ticket-center::after {
+            bottom: -15px;
+        }
+
+    .ticket-right {
+        background: #fff;
+        box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-left: 1.5px dashed #999;
+    }
+
+    .barcode {
+        width: 100%;
+        height: 60px;
+        background: repeating-linear-gradient( to right, #000, #000 3px, #fff 3px, #fff 6px, #000 6px, #000 9px, #fff 9px, #fff 12px, #000 12px, #000 15px, #fff 15px, #fff 18px );
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        margin-bottom: 18px;
+    }
+
+    .serial-number {
+        font-size: 0.9rem;
+        font-family: 'Courier New', Courier, monospace;
+        color: #666;
+        margin-bottom: 15px;
+        text-align: center;
+        user-select: text;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        padding-bottom: 10px;
+    }
+
+    .btn {
+        padding: 10px 22px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        user-select: none;
+        border: none;
+    }
+
+    .btn-detail {
+        background: #2196f3;
+        color: white;
+    }
+
+        .btn-detail:hover {
+            background: #1976d2;
+            transform: translateY(-3px);
+        }
+</style>

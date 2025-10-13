@@ -1,0 +1,208 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Регистрация";
+}
+
+<div class="passport-sheet">
+    <div class="passport-inner">
+        <div class="passport-left">
+            <div class="portrait-frame">
+                <div class="portrait-placeholder">
+                    <span>PHOTO</span>
+                </div>
+                <div class="portrait-caption">Ваш портрет</div>
+            </div>
+        </div>
+
+        <div class="passport-right">
+            <div class="doc-header">
+                <div class="doc-title">Welcome, fellow traveler</div>
+                <div class="doc-sub">Create your passport-style account</div>
+            </div>
+
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="passport-form">
+                <div asp-validation-summary="ModelOnly" class="validation text-danger" role="alert"></div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Email" class="form-control passport-input" autocomplete="username" placeholder="name@example.com" />
+                    <label asp-for="Input.Email">Email</label>
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.Password" class="form-control passport-input" autocomplete="new-password" placeholder="Password" />
+                    <label asp-for="Input.Password">Парола</label>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input asp-for="Input.ConfirmPassword" class="form-control passport-input" autocomplete="new-password" placeholder="Confirm Password" />
+                    <label asp-for="Input.ConfirmPassword">Потвърди паролата</label>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <div class="d-grid mb-2">
+                    <button id="registerSubmit" type="submit" class="btn passport-btn">Регистрация</button>
+                </div>
+
+                <div class="small-links">
+                    <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl">Вече имаш акаунт?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    .passport-sheet {
+        max-width: 920px;
+        margin: 40px auto;
+        padding: 28px;
+        background: linear-gradient(180deg, #f7f3ea 0%, #efe6d6 100%);
+        border: 1px solid rgba(30,20,10,0.12);
+        box-shadow: 0 12px 36px rgba(0,0,0,0.25);
+        font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+        color: #2e2a25;
+        border-radius: 8px;
+    }
+
+    .passport-inner {
+        display: flex;
+        gap: 22px;
+    }
+
+    .passport-left {
+        width: 38%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .portrait-frame {
+        width: 100%;
+        text-align: center;
+    }
+
+    .portrait-placeholder {
+        position: relative;
+        width: 100%;
+        height: 240px;
+        background: linear-gradient(180deg, #eef3f5 0%, #e6eded 100%);
+        border: 3px solid rgba(20,20,20,0.06);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b6b6b;
+        font-weight: 700;
+        letter-spacing: 2px;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
+        overflow: hidden;
+    }
+
+        .portrait-placeholder::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(0,0,0,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.01) 1px, transparent 1px);
+            background-size: 100% 6px, 6px 100%;
+            mix-blend-mode: multiply;
+            pointer-events: none;
+        }
+
+    .portrait-caption {
+        margin-top: 6px;
+        font-size: 0.85rem;
+        color: #4b4238;
+    }
+
+    .passport-right {
+        width: 62%;
+    }
+
+    .doc-header {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+    .doc-title {
+        font-weight: 700;
+        font-size: 1.25rem;
+        letter-spacing: 1px;
+        color: #3a2f27;
+    }
+
+    .doc-sub {
+        font-size: 0.9rem;
+        color: #645548;
+    }
+
+    .passport-form .form-floating {
+        position: relative;
+    }
+
+    .passport-input {
+        background: linear-gradient(180deg, #faf7f1 0%, #f3ebe0 100%);
+        border: 1px solid rgba(90,70,55,0.12);
+        color: #30261b;
+        padding: 1rem .75rem;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
+        border-radius: 4px;
+    }
+
+    .passport-form .form-floating label {
+        color: #5d4a3b;
+    }
+
+    .passport-btn {
+        background: #0d6efd;
+        color: white;
+        border: none;
+        padding: 12px;
+        font-weight: 700;
+        border-radius: 6px;
+        box-shadow: 0 4px 10px rgba(13,110,253,0.18);
+        cursor: pointer;
+    }
+
+        .passport-btn:hover {
+            transform: translateY(-1px);
+        }
+
+    .small-links {
+        margin-top: 8px;
+        font-size: 0.86rem;
+        color: #4f4239;
+    }
+
+        .small-links a {
+            color: #103a8b;
+            text-decoration: none;
+        }
+
+            .small-links a:hover {
+                text-decoration: underline;
+            }
+
+    @@media (max-width: 880px) {
+        .passport-inner {
+            flex-direction: column;
+        }
+
+        .passport-left,
+        .passport-right {
+            width: 100%;
+        }
+
+        .portrait-placeholder {
+            height: 200px;
+        }
+    }
+</style>

@@ -1,0 +1,298 @@
+﻿@model Destined.Models.JournalPage
+
+
+@{
+    ViewData["Title"] = "Journal Page";
+    bool readOnly = ViewBag.ReadOnly == true;
+}
+
+@if (readOnly && string.IsNullOrWhiteSpace(Model.Content))
+{
+    <div class="alert alert-info text-center" role="alert">
+         Този билет все още няма създаден дневник.
+    </div>
+}
+
+
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #ececec;
+        color: #222;
+        margin: 0;
+    }
+
+    .container {
+        padding-top: 40px;
+    }
+
+    h2 {
+        text-align: center;
+        font-weight: 600;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    #editor-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    #editor {
+        position: relative;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 40px;
+        width: 794px;
+        height: 1123px;
+        background-color: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        overflow: hidden;
+        font-size: 16px;
+        line-height: 1.6;
+        color: #444;
+        text-align: left;
+        overflow-y: auto;
+    }
+
+        #editor:focus-within {
+            box-shadow: 0 0 0 3px #007bff44;
+            outline: none;
+        }
+
+    .resizable-wrapper {
+        position: absolute;
+        resize: both;
+        overflow: hidden;
+        cursor: move;
+        width: 160px;
+        height: auto;
+        border-radius: 8px;
+        border: 2px dashed transparent;
+        background: #fafafa;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        user-select: none;
+    }
+
+        .resizable-wrapper:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 8px #007bff88;
+            background: #fff;
+        }
+
+        .resizable-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+            user-select: none;
+            border-radius: 6px;
+            display: block;
+        }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 22px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.25s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin: 5px;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+        .btn-secondary:hover {
+            background-color: #565e64;
+        }
+
+    form, .navigation {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .toolbar {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    input[type="file"] {
+        display: none;
+    }
+</style>
+
+<h2>Дневник за билет #@Model.TicketId – страница @Model.PageNumber</h2>
+
+<form asp-action="SavePage" enctype="multipart/form-data" method="post" id="journalForm">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="TicketId" />
+    <input type="hidden" asp-for="PageNumber" />
+
+    @if (!readOnly)
+    {
+        <div class="toolbar mb-3">
+            <button type="button" class="btn btn-secondary" onclick="document.execCommand('bold', false, null)">🅱️ Удебели</button>
+            <button type="button" class="btn btn-secondary" onclick="document.execCommand('removeFormat', false, null)">🔄 Нормален текст</button>
+            <button type="button" class="btn btn-secondary" onclick="document.execCommand('justifyLeft', false, null)">⬅ Ляво</button>
+            <button type="button" class="btn btn-secondary" onclick="document.execCommand('justifyCenter', false, null)">📍 Центрирай</button>
+            <label for="imageUpload" class="btn btn-secondary mb-0">➕ Добави снимка</label>
+            <input type="file" id="imageUpload" accept="image/*" />
+        </div>
+    }
+
+    <div id="editor-container">
+        @if (readOnly)
+        {
+            <div id="editor" contenteditable="false">
+                @Html.Raw(Model.Content)
+            </div>
+        }
+        else
+        {
+            <div id="editor" contenteditable="true" spellcheck="false">
+                @Html.Raw(Model.Content)
+            </div>
+        }
+    </div>
+
+    @if (!readOnly)
+    {
+        <button type="submit" class="btn btn-primary mt-2">Запази</button>
+    }
+</form>
+
+<div class="mt-4 navigation">
+    @if (Model.PageNumber > 1)
+    {
+        <a class="btn btn-secondary" href="@Url.Action("Page", "Journal", new { ticketId = Model.TicketId, page = Model.PageNumber - 1, readOnly = readOnly })">⬅ Предишна</a>
+    }
+
+    @if (Model.HasNextPage)
+    {
+        <a class="btn btn-secondary" href="@Url.Action("Page", "Journal", new { ticketId = Model.TicketId, page = Model.PageNumber + 1, readOnly = readOnly })">Следваща ➡</a>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        const isReadOnly = @readOnly.ToString().ToLower(); 
+        const editor = document.getElementById('editor');
+        let draggedWrapper = null;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        function makeDraggable(wrapper) {
+            wrapper.classList.add('resizable-wrapper');
+            wrapper.tabIndex = 0;
+
+            wrapper.addEventListener('mousedown', function (e) {
+                const buffer = 10;
+                const isInResizeZone =
+                    e.offsetX > wrapper.clientWidth - buffer ||
+                    e.offsetY > wrapper.clientHeight - buffer;
+
+                if (isInResizeZone) return;
+
+                draggedWrapper = wrapper;
+                offsetX = e.offsetX;
+                offsetY = e.offsetY;
+            });
+
+            wrapper.addEventListener('mousedown', () => wrapper.focus());
+        }
+
+        document.addEventListener('mousemove', function (e) {
+            if (draggedWrapper) {
+                const rect = editor.getBoundingClientRect();
+                let x = e.clientX - rect.left - offsetX;
+                let y = e.clientY - rect.top - offsetY;
+
+                x = Math.max(0, Math.min(x, editor.clientWidth - draggedWrapper.offsetWidth));
+                y = Math.max(0, Math.min(y, editor.clientHeight - draggedWrapper.offsetHeight));
+
+                draggedWrapper.style.left = x + 'px';
+                draggedWrapper.style.top = y + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', function () {
+            draggedWrapper = null;
+        });
+
+        const fileInput = document.getElementById('imageUpload');
+        if (fileInput) {
+            fileInput.addEventListener('change', function () {
+                const file = this.files[0];
+                if (!file) return;
+
+                const formData = new FormData();
+                formData.append('image', file);
+
+                fetch('/Journal/UploadImage', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.location) {
+                        const wrapper = document.createElement('div');
+                        wrapper.style.left = '10px';
+                        wrapper.style.top = '10px';
+
+                        const img = document.createElement('img');
+                        img.src = data.location;
+
+                        wrapper.appendChild(img);
+                        makeDraggable(wrapper);
+                        editor.appendChild(wrapper);
+                    } else {
+                        alert('Грешка при качване.');
+                    }
+                })
+                .catch(() => alert('Грешка при качване.'));
+
+                this.value = '';
+            });
+        }
+
+        document.getElementById('journalForm').addEventListener('submit', function () {
+            const content = editor.innerHTML;
+            const hiddenContentInput = document.createElement('textarea');
+            hiddenContentInput.name = "Content";
+            hiddenContentInput.style.display = 'none';
+            hiddenContentInput.value = content;
+            this.appendChild(hiddenContentInput);
+        });
+
+        window.onload = () => {
+            const wrappers = editor.querySelectorAll('.resizable-wrapper');
+
+            if (!isReadOnly) {
+                wrappers.forEach(makeDraggable);
+            } else {
+                wrappers.forEach(wrapper => {
+                    wrapper.style.pointerEvents = 'none';
+                });
+            }
+        };
+    </script>
+}

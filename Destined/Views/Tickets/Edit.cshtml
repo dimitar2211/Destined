@@ -1,59 +1,259 @@
 ﻿@model Destined.Models.Ticket
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Редактиране на билет";
 }
 
-<h1>Edit</h1>
+<div class="ticket-wrapper">
+    <h1 class="page-title">Редактиране на билет</h1>
 
-<h4>Ticket</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="From" class="control-label"></label>
-                <input asp-for="From" class="form-control" />
-                <span asp-validation-for="From" class="text-danger"></span>
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="real-ticket">
+            <div class="ticket-left">
+                <h2>
+                    <input asp-for="From" class="edit-input location-input" placeholder="От" required />
+                    ➔
+                    <input asp-for="To" class="edit-input location-input" placeholder="До" required />
+                </h2>
+
+                <p>
+                    <strong>Дата и час:</strong>
+                    <input asp-for="DepartureTime" type="datetime-local" class="edit-input" required />
+                    <span asp-validation-for="DepartureTime" class="text-danger"></span>
+                </p>
+
+                <p>
+                    <strong>Пътници:</strong>
+                    <input asp-for="NumberOfPassengers" type="number" min="1" class="edit-input small-input" required />
+                    <span asp-validation-for="NumberOfPassengers" class="text-danger"></span>
+                </p>
+
+                <div class="form-group form-check">
+                    <input asp-for="IsPublic" class="form-check-input" type="checkbox" />
+                    <label asp-for="IsPublic" class="form-check-label"></label>
+                    <span asp-validation-for="IsPublic" class="text-danger"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="To" class="control-label"></label>
-                <input asp-for="To" class="form-control" />
-                <span asp-validation-for="To" class="text-danger"></span>
+
+            <div class="ticket-center">
+                <div class="perforation"></div>
             </div>
-            <div class="form-group">
-                <label asp-for="DepartureTime" class="control-label"></label>
-                <input asp-for="DepartureTime" class="form-control" />
-                <span asp-validation-for="DepartureTime" class="text-danger"></span>
+
+            <div class="ticket-right">
+                <div class="barcode"></div>
+                <div class="serial-number">ID: @Model.Id</div>
+                <div class="actions">
+                    <button type="submit" class="btn btn-edit">Запази</button>
+                    <a asp-action="Index" class="btn btn-delete">Отказ</a>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="NumberOfPassengers" class="control-label"></label>
-                <input asp-for="NumberOfPassengers" class="form-control" />
-                <span asp-validation-for="NumberOfPassengers" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsPublic" /> @Html.DisplayNameFor(model => model.IsPublic)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
+
+<style>
+    body {
+        background: #ececec;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    .ticket-wrapper {
+        max-width: 1000px;
+        margin: 50px auto;
+        padding: 0 20px;
+    }
+
+    .page-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+        color: #222;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+    }
+
+    .real-ticket {
+        display: flex;
+        background: linear-gradient(145deg, #fafafa, #e6e6e6);
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 0 8px rgba(255,255,255,0.7);
+        overflow: hidden;
+        cursor: default;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: 1.5px solid #bbb;
+        position: relative;
+        font-weight: 600;
+        user-select: none;
+    }
+
+        .real-ticket:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 30px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.9);
+            border-color: #4caf50;
+        }
+
+    .ticket-left, .ticket-right {
+        padding: 25px 30px;
+        flex: 1;
+        position: relative;
+        z-index: 10;
+    }
+
+    .ticket-left {
+        background: #e0f2f1;
+        border-right: 1.5px dashed #999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+        .ticket-left h2 {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            color: #00796b;
+            text-shadow: 0 1px 1px #a0d4cf;
+            letter-spacing: 1.2px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ticket-left p {
+            font-size: 1.1rem;
+            color: #004d40;
+            margin: 6px 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+    .edit-input {
+        background: transparent;
+        border: none;
+        border-bottom: 1.5px dashed #004d40;
+        color: #004d40;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 6px 4px;
+        transition: border-color 0.3s ease;
+        max-width: 100%;
+    }
+
+        .edit-input:focus {
+            outline: none;
+            border-color: #4caf50;
+        }
+
+    .location-input {
+        width: 100%;
+    }
+
+    .small-input {
+        max-width: 150px;
+        font-size: 1.1rem;
+    }
+
+    .ticket-center {
+        width: 30px;
+        background: repeating-linear-gradient(to bottom, transparent, transparent 8px, #999 8px, #999 10px);
+        position: relative;
+    }
+
+        .ticket-center::before,
+        .ticket-center::after {
+            content: "";
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #ececec;
+            border-radius: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: inset 3px 3px 5px rgba(255,255,255,0.9), inset -3px -3px 5px rgba(0,0,0,0.15);
+            z-index: 11;
+        }
+
+        .ticket-center::before {
+            top: -15px;
+        }
+
+        .ticket-center::after {
+            bottom: -15px;
+        }
+
+    .ticket-right {
+        background: #fff;
+        box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-left: 1.5px dashed #999;
+    }
+
+    .barcode {
+        width: 100%;
+        height: 60px;
+        background: repeating-linear-gradient(to right, #000, #000 3px, #fff 3px, #fff 6px, #000 6px, #000 9px, #fff 9px, #fff 12px, #000 12px, #000 15px, #fff 15px, #fff 18px);
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        margin-bottom: 18px;
+    }
+
+    .serial-number {
+        font-size: 0.9rem;
+        font-family: 'Courier New', Courier, monospace;
+        color: #666;
+        margin-bottom: 15px;
+        text-align: center;
+        user-select: text;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: space-around;
+        padding-bottom: 10px;
+    }
+
+    .btn {
+        padding: 10px 22px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        user-select: none;
+        border: none;
+    }
+
+    .btn-edit {
+        background: #ff9800;
+        color: white;
+    }
+
+        .btn-edit:hover {
+            background: #ef6c00;
+            transform: translateY(-3px);
+        }
+
+    .btn-delete {
+        background: #f44336;
+        color: white;
+    }
+
+        .btn-delete:hover {
+            background: #d32f2f;
+            transform: translateY(-3px);
+        }
+</style>

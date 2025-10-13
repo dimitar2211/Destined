@@ -1,34 +1,53 @@
-﻿@model Destined.Models.Ticket
+﻿@model IEnumerable<Destined.Models.Ticket>
 
 @{
-    ViewData["Title"] = "Изтриване на билет";
+    ViewData["Title"] = "Публични билети";
+}
+
+@functions {
+    string ShortenUserName(string userName)
+    {
+        if (string.IsNullOrEmpty(userName))
+            return "Непознат";
+
+        int atIndex = userName.IndexOf('@');
+        if (atIndex == -1)
+            return userName;
+
+        return userName.Substring(0, atIndex);
+    }
 }
 
 <div class="ticket-wrapper">
-    <h1 class="page-title">Изтриване на билет</h1>
+    <h1 class="page-title">Публични билети</h1>
 
-    <form asp-action="Delete" method="post">
-        <input type="hidden" asp-for="Id" />
-
-        <div class="real-ticket">
-            <div class="ticket-left">
-                <h2>@Model.From ➔ @Model.To</h2>
-                <p><strong>Дата и час:</strong> @Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
-                <p><strong>Пътници:</strong> @Model.NumberOfPassengers</p>
-            </div>
-            <div class="ticket-center">
-                <div class="perforation"></div>
-            </div>
-            <div class="ticket-right">
-                <div class="barcode"></div>
-                <div class="serial-number">ID: @Model.Id</div>
-                <div class="actions">
-                    <button type="submit" class="btn btn-delete">Изтрий</button>
-                    <a asp-action="Index" class="btn btn-edit">Отказ</a>
+    @if (!Model.Any())
+    {
+        <p class="no-tickets">Все още няма публични билети.</p>
+    }
+    else
+    {
+        foreach (var ticket in Model)
+        {
+            <div class="real-ticket">
+                <div class="ticket-left">
+                    <h2>@ticket.From ➔ @ticket.To</h2>
+                    <p><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+                    <p><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
+                    <p><strong>Собственик:</strong> @ShortenUserName(ticket.User?.UserName)</p>
+                </div>
+                <div class="ticket-center">
+                    <div class="perforation"></div>
+                </div>
+                <div class="ticket-right">
+                    <div class="barcode"></div>
+                    <div class="actions">
+                        <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" asp-route-readOnly="true" class="btn btn-journal">Дневник (само за четене)</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </form>
+        }
+    }
 </div>
 
 <style>
@@ -52,6 +71,30 @@
         font-weight: 700;
         letter-spacing: 1.2px;
     }
+
+    .new-ticket {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .btn-create {
+        background: #4caf50;
+        color: white;
+        padding: 14px 36px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.1rem;
+        box-shadow: 0 6px 12px rgba(76,175,80,0.6);
+        transition: background 0.3s ease, transform 0.2s ease;
+        display: inline-block;
+    }
+
+        .btn-create:hover {
+            background: #388e3c;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(56,142,60,0.8);
+        }
 
     .real-ticket {
         display: flex;
@@ -175,16 +218,32 @@
         user-select: none;
     }
 
+    .btn-detail {
+        background: #2196f3;
+        color: white;
+        border: none;
+    }
+
+    .btn-edit {
+        background: #ff9800;
+        color: white;
+        border: none;
+    }
+
     .btn-delete {
         background: #f44336;
         color: white;
         border: none;
     }
 
-    .btn-edit {
-        background: #777;
-        color: white;
-        border: none;
+    .btn-detail:hover {
+        background: #1976d2;
+        transform: translateY(-3px);
+    }
+
+    .btn-edit:hover {
+        background: #ef6c00;
+        transform: translateY(-3px);
     }
 
     .btn-delete:hover {
@@ -192,8 +251,10 @@
         transform: translateY(-3px);
     }
 
-    .btn-edit:hover {
-        background: #444;
-        transform: translateY(-3px);
+    .no-tickets {
+        text-align: center;
+        font-size: 1.3rem;
+        color: #777;
+        margin-top: 40px;
     }
 </style>
