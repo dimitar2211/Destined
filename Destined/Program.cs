@@ -1,10 +1,11 @@
 using Destined.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Firebase.Database;
+using Firebase.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                       ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
@@ -19,6 +20,17 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 })
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddSingleton<FirebaseClient>(provider =>
+{
+    return new FirebaseClient("https://console.firebase.google.com/project/destined-25303/firestore/databases/-default-/data");
+});
+
+builder.Services.AddSingleton<FirebaseAuthProvider>(provider =>
+{
+    var apiKey = "\r\nAIzaSyATKFODAoYaeM2lL11H0yfiuET93hVm2vw";
+    return new FirebaseAuthProvider(new FirebaseConfig(apiKey));
+});
 
 builder.Services.AddControllersWithViews();
 
@@ -42,7 +54,7 @@ using (var scope = app.Services.CreateScope())
     }
 
     var adminEmail = "admin@site.com";
-    var adminPassword = "Admin123!"; 
+    var adminPassword = "Admin123!";
 
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
     if (adminUser == null)
@@ -62,7 +74,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -77,7 +88,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
