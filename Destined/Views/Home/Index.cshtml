@@ -1,8 +1,219 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Начало";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="homepage-wrapper">
+    <div class="content-wrapper">
+        <h1>Добре дошъл в „Destined“</h1>
+        <p>Тук можеш да записваш най‑ценните мигове от живота си — спомени, емоции и истории, които никога не искаш да забравиш.</p>
+        <p>Качи снимки, пиши дневник, връщай се назад във времето и усети отново магията на всеки миг.</p>
+
+        <h2>Какво можеш да правиш тук? ✨</h2>
+        <ul>
+            <li>Споделяй снимки от важни събития и пътувания.</li>
+            <li>Води личен дневник, в който да записваш мислите и чувствата си.</li>
+            <li>Организирай спомените си по дати и теми.</li>
+            <li>Върни се назад и се потопи в щастливите мигове.</li>
+        </ul>
+
+        <p>Започни своето пътешествие в света на спомените още днес — създай своя уютен дневник, който да те кара да се усмихваш всеки път, когато го отвориш.</p>
+    </div>
+
+    <div class="visual-wrapper">
+        <div id="globe-container"></div>
+        <p class="quote-text">„Спомените са безценни — пази ги с любов.“ ❤️</p>
+    </div>
 </div>
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #fff8f0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #4a403a;
+    }
+
+    .homepage-wrapper {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 60px 80px;
+        gap: 50px;
+        box-sizing: border-box;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .content-wrapper {
+        flex: 1;
+        max-width: 650px;
+    }
+
+        .content-wrapper h1 {
+            font-size: 3rem;
+            margin-bottom: 25px;
+            color: #6b4f4f;
+            font-weight: 700;
+            letter-spacing: 1.3px;
+            text-shadow: 0 1px 2px rgba(107, 79, 79, 0.4);
+        }
+
+        .content-wrapper h2 {
+            font-size: 1.8rem;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            color: #a16207;
+            font-weight: 600;
+        }
+
+        .content-wrapper p {
+            font-size: 1.2rem;
+            line-height: 1.65;
+            margin-bottom: 22px;
+            color: #5b4b3c;
+        }
+
+        .content-wrapper ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 30px;
+        }
+
+            .content-wrapper ul li {
+                font-size: 1.15rem;
+                margin-bottom: 12px;
+                padding-left: 28px;
+                position: relative;
+                color: #5b4b3c;
+            }
+
+                .content-wrapper ul li::before {
+                    content: '★'; position: absolute;
+                    left: 0;
+                    top: 0;
+                    font-size: 1.2rem;
+                }
+
+    .footer-text {
+        font-style: italic;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #7a5a4a;
+        margin-top: 40px;
+        text-align: right;
+    }
+
+    .visual-wrapper {
+        flex: 1;
+        max-width: 350px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #globe-container {
+        width: 350px;
+        height: 350px;
+        border-radius: 50%;
+        box-shadow: 0 10px 25px rgba(107, 79, 79, 0.3);
+        background: transparent;
+        margin-bottom: 10px;
+    }
+
+    .quote-text {
+        font-style: italic;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #7a5a4a;
+        text-align: center;
+        max-width: 320px;
+    }
+
+    /* Responsive */
+    @@media (max-width: 950px) {
+        .homepage-wrapper {
+            flex-direction: column;
+            padding: 40px 20px;
+        }
+
+        .visual-wrapper {
+            max-width: 100%;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        #globe-container {
+            width: 250px;
+            height: 250px;
+        }
+
+        .content-wrapper {
+            max-width: 100%;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .content-wrapper h1 {
+            font-size: 2.2rem;
+        }
+
+        .content-wrapper h2 {
+            font-size: 1.5rem;
+        }
+
+        .content-wrapper p,
+        .content-wrapper ul li {
+            font-size: 1rem;
+        }
+
+        .quote-text {
+            font-size: 1rem;
+            max-width: 90%;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.151.3/build/three.min.js"></script>
+
+<script>
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+    camera.position.z = 3;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(350, 350);
+    document.getElementById('globe-container').appendChild(renderer.domElement);
+
+    const geometry = new THREE.SphereGeometry(1, 64, 64);
+    const textureLoader = new THREE.TextureLoader();
+    const earthTexture = textureLoader.load('https://cdn.jsdelivr.net/gh/jeromeetienne/threex.planets@master/images/earthmap1k.jpg');
+    const material = new THREE.MeshStandardMaterial({ map: earthTexture });
+    const globe = new THREE.Mesh(geometry, material);
+    scene.add(globe);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 3, 5);
+    scene.add(directionalLight);
+
+    function animate() {
+        requestAnimationFrame(animate);
+        globe.rotation.y += 0.003;
+        renderer.render(scene, camera);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+        const container = document.getElementById('globe-container');
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        renderer.setSize(width, height);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+    });
+</script>
