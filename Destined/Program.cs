@@ -1,13 +1,12 @@
 using Destined.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Firebase.Database;
-using Firebase.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                      ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
@@ -21,21 +20,11 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddSingleton<FirebaseClient>(provider =>
-{
-    return new FirebaseClient("https://console.firebase.google.com/project/destined-25303/firestore/databases/-default-/data");
-});
-
-builder.Services.AddSingleton<FirebaseAuthProvider>(provider =>
-{
-    var apiKey = "\r\nAIzaSyATKFODAoYaeM2lL11H0yfiuET93hVm2vw";
-    return new FirebaseAuthProvider(new FirebaseConfig(apiKey));
-});
-
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+// Seed roles and admin user
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -57,6 +46,7 @@ using (var scope = app.Services.CreateScope())
     var adminPassword = "Admin123!";
 
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
     if (adminUser == null)
     {
         var newAdmin = new IdentityUser
@@ -67,6 +57,7 @@ using (var scope = app.Services.CreateScope())
         };
 
         var createResult = await userManager.CreateAsync(newAdmin, adminPassword);
+
         if (createResult.Succeeded)
         {
             await userManager.AddToRoleAsync(newAdmin, "Admin");
@@ -74,6 +65,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -88,6 +80,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
