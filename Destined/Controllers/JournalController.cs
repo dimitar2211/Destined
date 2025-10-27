@@ -18,7 +18,6 @@ namespace Destined.Controllers
             _env = env;
         }
 
-        // /Journal/Page?ticketId=5&page=1
         public async Task<IActionResult> Page(int ticketId, int page = 1, bool readOnly = false)
         {
             var ticket = await _context.Tickets.FirstOrDefaultAsync(t => t.Id == ticketId);
@@ -51,7 +50,6 @@ namespace Destined.Controllers
                 }
                 else
                 {
-                    ViewBag.NoJournalMessage = "Този билет все още няма създаден дневник.";
                     journalPage = new JournalPage
                     {
                         TicketId = ticketId,
@@ -64,7 +62,8 @@ namespace Destined.Controllers
             var nextPage = await _context.JournalPages
                 .FirstOrDefaultAsync(p => p.TicketId == ticketId && p.PageNumber == page + 1);
 
-            var hasNextPage = nextPage != null && !string.IsNullOrWhiteSpace(nextPage.Content);
+            bool hasContent = !string.IsNullOrWhiteSpace(journalPage.Content);
+            bool hasNextPage = hasContent || (nextPage != null && !string.IsNullOrWhiteSpace(nextPage.Content));
             journalPage.HasNextPage = hasNextPage;
 
             ViewBag.TicketId = ticketId;
@@ -72,7 +71,6 @@ namespace Destined.Controllers
 
             return View(journalPage);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> UploadImage(IFormFile image)
@@ -100,9 +98,7 @@ namespace Destined.Controllers
         public async Task<IActionResult> SavePage(JournalPage model, IFormFile? image)
         {
             if (Request.Query.ContainsKey("readOnly") && Request.Query["readOnly"] == "true")
-            {
                 return Forbid();
-            }
 
             var page = await _context.JournalPages
                 .FirstOrDefaultAsync(p => p.Id == model.Id);
