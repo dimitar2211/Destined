@@ -216,13 +216,13 @@
                 <div class="from-to-wrapper">
                     <label>
                         <strong>От:</strong>
-                        <input asp-for="From" class="fake-input" placeholder="Град на тръгване" required />
+                        <input asp-for="From" class="fake-input" placeholder="Град на тръгване" maxlength="22" required />
                         <span asp-validation-for="From" class="text-danger"></span>
                     </label>
                     <div class="arrow">→</div>
                     <label>
                         <strong>До:</strong>
-                        <input asp-for="To" class="fake-input" placeholder="Дестинация" required />
+                        <input asp-for="To" class="fake-input" placeholder="Дестинация" maxlength="22" required />
                         <span asp-validation-for="To" class="text-danger"></span>
                     </label>
                 </div>
@@ -251,6 +251,20 @@
 </div>
 
 @section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const maxLength = 22;
+            const inputs = document.querySelectorAll('input[asp-for="From"], input[asp-for="To"]');
+
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    if (input.value.length > maxLength) {
+                        input.value = input.value.slice(0, maxLength);
+                    }
+                });
+            });
+        });
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

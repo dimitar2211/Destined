@@ -23,7 +23,11 @@
         {
             <div class="real-ticket">
                 <div class="ticket-left">
-                    <h2>@ticket.From ➔ @ticket.To</h2>
+                    @{
+                        string shortFrom = ticket.From.Length > 10 ? ticket.From.Substring(0, 10) + "…" : ticket.From;
+                        string shortTo = ticket.To.Length > 10 ? ticket.To.Substring(0, 10) + "…" : ticket.To;
+                    }
+                    <h2>@shortFrom ➔ @shortTo</h2>
                     <p><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
                     <p><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
                 </div>

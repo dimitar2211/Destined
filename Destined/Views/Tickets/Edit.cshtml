@@ -13,9 +13,9 @@
         <div class="real-ticket">
             <div class="ticket-left">
                 <h2>
-                    <input asp-for="From" class="edit-input location-input" placeholder="От" required />
+                    <input asp-for="From" class="edit-input location-input" placeholder="От" maxlength="22" required />
                     ➔
-                    <input asp-for="To" class="edit-input location-input" placeholder="До" required />
+                    <input asp-for="To" class="edit-input location-input" placeholder="До" maxlength="22" required />
                 </h2>
 
                 <p>
@@ -58,6 +58,20 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const maxLength = 22;
+            const inputs = document.querySelectorAll('input[asp-for="From"], input[asp-for="To"]');
+
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    if (input.value.length > maxLength) {
+                        input.value = input.value.slice(0, maxLength);
+                    }
+                });
+            });
+        });
+    </script>
 }
 
 <style>
