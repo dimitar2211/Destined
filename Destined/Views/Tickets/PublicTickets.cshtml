@@ -29,17 +29,19 @@
     {
         foreach (var ticket in Model)
         {
+            string textColor = string.IsNullOrEmpty(ticket.TextColor) ? "#000000" : ticket.TextColor;
+
             <div class="real-ticket">
-                <div class="ticket-left">
-                    <h2>@ticket.From ➔ @ticket.To</h2>
-                    <p><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
-                    <p><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
-                    <p><strong>Собственик:</strong> @ShortenUserName(ticket.User?.UserName)</p>
+                <div class="ticket-left" style="background:@ticket.LeftColor;">
+                    <h2 style="color:@textColor">@ticket.From ➔ @ticket.To</h2>
+                    <p style="color:@textColor"><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+                    <p style="color:@textColor"><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
+                    <p style="color:@textColor"><strong>Собственик:</strong> @ShortenUserName(ticket.User?.UserName)</p>
                 </div>
                 <div class="ticket-center">
                     <div class="perforation"></div>
                 </div>
-                <div class="ticket-right">
+                <div class="ticket-right" style="background:@ticket.RightColor;">
                     <div class="barcode"></div>
                     <div class="actions">
                         <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" asp-route-readOnly="true" class="btn btn-journal">Дневник (само за четене)</a>

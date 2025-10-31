@@ -11,20 +11,22 @@
         <input type="hidden" asp-for="Id" />
 
         <div class="real-ticket">
-            <div class="ticket-left">
-                <h2>@Model.From ➔ @Model.To</h2>
-                <p><strong>Дата и час:</strong> @Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
-                <p><strong>Пътници:</strong> @Model.NumberOfPassengers</p>
+            <div class="ticket-left" style="background-color:@Model.LeftColor; --text-color:@Model.TextColor;">
+                <h2 style="color:@Model.TextColor;">@Model.From ➔ @Model.To</h2>
+                <p><strong style="color:@Model.TextColor;">Дата и час:</strong> <span style="color:@Model.TextColor;">@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</span></p>
+                <p><strong style="color:@Model.TextColor;">Пътници:</strong> <span style="color:@Model.TextColor;">@Model.NumberOfPassengers</span></p>
             </div>
+
             <div class="ticket-center">
                 <div class="perforation"></div>
             </div>
-            <div class="ticket-right">
+
+            <div class="ticket-right" style="background-color:@Model.RightColor; color:@Model.TextColor;">
                 <div class="barcode"></div>
                 <div class="serial-number">ID: @Model.Id</div>
                 <div class="actions">
                     <button type="submit" class="btn btn-delete">Изтрий</button>
-                    <a asp-action="Index" class="btn btn-edit">Отказ</a>
+                    <a asp-action="Index" class="btn btn-journal">Отказ</a>
                 </div>
             </div>
         </div>
@@ -82,7 +84,6 @@
     }
 
     .ticket-left {
-        background: #e0f2f1;
         border-right: 1.5px dashed #999;
         display: flex;
         flex-direction: column;
@@ -92,15 +93,15 @@
         .ticket-left h2 {
             font-size: 2rem;
             margin-bottom: 12px;
-            color: #00796b;
+            color: var(--text-color);
             text-shadow: 0 1px 1px #a0d4cf;
             letter-spacing: 1.2px;
         }
 
         .ticket-left p {
             font-size: 1.1rem;
-            color: #004d40;
             margin: 6px 0;
+            color: var(--text-color);
         }
 
     .ticket-center {
@@ -173,27 +174,28 @@
         transition: background 0.3s ease, transform 0.2s ease;
         box-shadow: 0 3px 8px rgba(0,0,0,0.15);
         user-select: none;
+        border: none;
     }
 
     .btn-delete {
         background: #f44336;
         color: white;
-        border: none;
     }
 
-    .btn-edit {
-        background: #777;
-        color: white;
-        border: none;
+        .btn-delete:hover {
+            background: #d32f2f;
+            transform: translateY(-3px);
+        }
+
+    .btn-journal {
+        background: transparent;
+        color: black;
+        box-shadow: none;
     }
 
-    .btn-delete:hover {
-        background: #d32f2f;
-        transform: translateY(-3px);
-    }
-
-    .btn-edit:hover {
-        background: #444;
-        transform: translateY(-3px);
-    }
+        .btn-journal:hover {
+            background: transparent;
+            color: black;
+            transform: translateY(-2px);
+        }
 </style>

@@ -10,7 +10,6 @@
     <div class="new-ticket">
         <a asp-action="Create" class="btn-create">Нов билет</a>
         <a asp-controller="Tickets" asp-action="PublicTickets" class="btn btn-primary">Публични билети</a>
-
     </div>
 
     @if (!Model.Any())
@@ -22,29 +21,30 @@
         foreach (var ticket in Model)
         {
             <div class="real-ticket">
-                <div class="ticket-left">
+                <div class="ticket-left" style="background:@ticket.LeftColor;">
                     @{
                         string shortFrom = ticket.From.Length > 10 ? ticket.From.Substring(0, 10) + "…" : ticket.From;
                         string shortTo = ticket.To.Length > 10 ? ticket.To.Substring(0, 10) + "…" : ticket.To;
+                        string textColor = string.IsNullOrEmpty(ticket.TextColor) ? "#000000" : ticket.TextColor;
                     }
-                    <h2>@shortFrom ➔ @shortTo</h2>
-                    <p><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
-                    <p><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
+                    <h2 style="color:@textColor">@shortFrom ➔ @shortTo</h2>
+                    <p style="color:@textColor"><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+                    <p style="color:@textColor"><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
                 </div>
+
                 <div class="ticket-center">
                     <div class="perforation"></div>
                 </div>
-                <div class="ticket-right">
+
+                <div class="ticket-right" style="background:@ticket.RightColor;">
                     <div class="barcode"></div>
                     <div class="serial-number">ID: @ticket.Id</div>
                     <div class="actions">
                         <a asp-action="Details" asp-route-id="@ticket.Id" class="btn btn-detail">Детайли</a>
                         <a asp-action="Edit" asp-route-id="@ticket.Id" class="btn btn-edit">Редактирай</a>
                         <a asp-action="Delete" asp-route-id="@ticket.Id" class="btn btn-delete">Изтрий</a>
-
                         <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" class="btn btn-journal">Дневник</a>
                     </div>
-
                 </div>
             </div>
         }
@@ -217,24 +217,27 @@
         transition: background 0.3s ease, transform 0.2s ease;
         box-shadow: 0 3px 8px rgba(0,0,0,0.15);
         user-select: none;
+        border: none;
     }
 
     .btn-detail {
         background: #2196f3;
         color: white;
-        border: none;
     }
 
     .btn-edit {
         background: #ff9800;
         color: white;
-        border: none;
     }
 
     .btn-delete {
         background: #f44336;
         color: white;
-        border: none;
+    }
+
+    .btn-journal {
+        background: #9c27b0;
+        color: white;
     }
 
     .btn-detail:hover {
@@ -249,6 +252,11 @@
 
     .btn-delete:hover {
         background: #d32f2f;
+        transform: translateY(-3px);
+    }
+
+    .btn-journal:hover {
+        background: #7b1fa2;
         transform: translateY(-3px);
     }
 

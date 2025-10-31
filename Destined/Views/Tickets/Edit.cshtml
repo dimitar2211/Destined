@@ -1,5 +1,4 @@
 ﻿@model Destined.Models.Ticket
-
 @{
     ViewData["Title"] = "Редактиране на билет";
 }
@@ -10,26 +9,31 @@
     <form asp-action="Edit" method="post">
         <input type="hidden" asp-for="Id" />
 
+        <!-- Контролите за цветовете извън билета -->
+        <div class="color-controls">
+            <label>Цвят лява част: <input asp-for="LeftColor" type="color" id="leftColorPicker" /></label>
+            <label>Цвят дясна част: <input asp-for="RightColor" type="color" id="rightColorPicker" /></label>
+            <label>Цвят на текста: <input asp-for="TextColor" type="color" id="textColorPicker" /></label>
+        </div>
+
+        <!-- Визуализация на билета -->
         <div class="real-ticket">
-            <div class="ticket-left">
+            <div class="ticket-left" id="ticketLeft" style="background:@Model.LeftColor; color:@Model.TextColor;">
                 <h2>
                     <input asp-for="From" class="edit-input location-input" placeholder="От" maxlength="22" required />
-                    ➔
+                    <span class="arrow">➔</span>
                     <input asp-for="To" class="edit-input location-input" placeholder="До" maxlength="22" required />
                 </h2>
-
-                <p>
+                <p class="date-time">
                     <strong>Дата и час:</strong>
                     <input asp-for="DepartureTime" type="datetime-local" class="edit-input" required />
                     <span asp-validation-for="DepartureTime" class="text-danger"></span>
                 </p>
-
-                <p>
+                <p class="passengers">
                     <strong>Пътници:</strong>
                     <input asp-for="NumberOfPassengers" type="number" min="1" class="edit-input small-input" required />
                     <span asp-validation-for="NumberOfPassengers" class="text-danger"></span>
                 </p>
-
                 <div class="form-group form-check">
                     <input asp-for="IsPublic" class="form-check-input" type="checkbox" />
                     <label asp-for="IsPublic" class="form-check-label"></label>
@@ -41,7 +45,7 @@
                 <div class="perforation"></div>
             </div>
 
-            <div class="ticket-right">
+            <div class="ticket-right" id="ticketRight" style="background:@Model.RightColor; color:@Model.TextColor;">
                 <div class="barcode"></div>
                 <div class="serial-number">ID: @Model.Id</div>
                 <div class="actions">
@@ -53,16 +57,13 @@
     </form>
 </div>
 
-
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const maxLength = 22;
             const inputs = document.querySelectorAll('input[asp-for="From"], input[asp-for="To"]');
 
+            // Ограничаване на дължината на входа
             inputs.forEach(input => {
                 input.addEventListener('input', () => {
                     if (input.value.length > maxLength) {
@@ -70,8 +71,83 @@
                     }
                 });
             });
+
+            const leftPicker = document.getElementById('leftColorPicker');
+            const rightPicker = document.getElementById('rightColorPicker');
+            const textPicker = document.getElementById('textColorPicker');
+
+            const ticketLeft = document.getElementById('ticketLeft');
+            const ticketRight = document.getElementById('ticketRight');
+
+            const arrow = ticketLeft.querySelector('.arrow');
+            const dateTimeLabel = ticketLeft.querySelector('.date-time strong');
+            const passengersLabel = ticketLeft.querySelector('.passengers strong');
+
+            const buttonTextColor = "#ffffff"; // Фиксиран цвят за бутоните
+
+            let currentTextColor = textPicker.value;
+            let currentLeftColor = leftPicker.value;
+            let currentRightColor = rightPicker.value;
+
+            function applyTextColor() {
+                // --- ЛЯВА ЧАСТ ---
+                const leftInputs = ticketLeft.querySelectorAll('input.edit-input');
+                const leftTextElements = [...leftInputs, arrow, dateTimeLabel, passengersLabel];
+                leftTextElements.forEach(el => {
+                    el.style.transition = "none";
+                    el.style.color = currentTextColor;
+                    if (el.tagName === 'INPUT') {
+                        el.style.borderColor = currentTextColor;
+                        el.style.setProperty('--placeholder-color', currentTextColor);
+                    }
+                });
+
+                // --- ДЯСНА ЧАСТ ---
+                // Всички текстови елементи, включително "Публичен билет"
+                const rightTextElements = ticketRight.querySelectorAll('*:not(.serial-number):not(.actions)');
+                rightTextElements.forEach(el => {
+                    if (el.tagName !== 'BUTTON' && el.tagName !== 'A' && el.tagName !== 'INPUT') {
+                        el.style.transition = "none";
+                        el.style.color = currentTextColor;
+                    }
+                });
+
+                // Бутоните си остават с фиксиран цвят
+                ticketRight.querySelectorAll('.actions button, .actions a').forEach(btn => {
+                    btn.style.transition = "none";
+                    btn.style.color = buttonTextColor;
+                });
+            }
+
+            // Слушатели за промяна на цветовете
+            leftPicker.addEventListener('input', () => {
+                currentLeftColor = leftPicker.value;
+                ticketLeft.style.backgroundColor = currentLeftColor;
+                applyTextColor();
+            });
+
+            rightPicker.addEventListener('input', () => {
+                currentRightColor = rightPicker.value;
+                ticketRight.style.backgroundColor = currentRightColor;
+                applyTextColor();
+            });
+
+            textPicker.addEventListener('input', () => {
+                currentTextColor = textPicker.value;
+                applyTextColor();
+            });
+
+            // Инициално задаване на цветовете
+            ticketLeft.style.backgroundColor = currentLeftColor;
+            ticketRight.style.backgroundColor = currentRightColor;
+            applyTextColor();
         });
     </script>
+
+
+
+
+
 }
 
 <style>
@@ -96,6 +172,11 @@
         letter-spacing: 1.2px;
     }
 
+    .color-controls label {
+        margin-right: 15px;
+        font-weight: 600;
+    }
+
     .real-ticket {
         display: flex;
         background: linear-gradient(145deg, #fafafa, #e6e6e6);
@@ -110,12 +191,6 @@
         font-weight: 600;
         user-select: none;
     }
-
-        .real-ticket:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 18px 30px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.9);
-            border-color: #4caf50;
-        }
 
     .ticket-left, .ticket-right {
         padding: 25px 30px;
@@ -151,6 +226,11 @@
             flex-direction: column;
         }
 
+        .ticket-left h2 .arrow {
+            font-size: 2rem;
+            transition: color 0.3s ease;
+        }
+
     .edit-input {
         background: transparent;
         border: none;
@@ -159,7 +239,7 @@
         font-weight: 600;
         font-size: 1.1rem;
         padding: 6px 4px;
-        transition: border-color 0.3s ease;
+        transition: border-color 0.3s ease, color 0.3s ease;
         max-width: 100%;
     }
 

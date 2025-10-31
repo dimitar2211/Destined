@@ -8,25 +8,25 @@
     <h1 class="page-title">Детайли на билет</h1>
 
     <div class="real-ticket">
-        <div class="ticket-left">
-            <h2>@Model.From ➔ @Model.To</h2>
-            <p><strong>Дата и час:</strong> @Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
-            <p><strong>Пътници:</strong> @Model.NumberOfPassengers</p>
+        <div class="ticket-left" style="background-color:@Model.LeftColor; --text-color:@Model.TextColor;">
+            <h2 style="color:@Model.TextColor;">@Model.From ➔ @Model.To</h2>
+            <p><strong style="color:@Model.TextColor;">Дата и час:</strong> <span style="color:@Model.TextColor;">@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</span></p>
+            <p><strong style="color:@Model.TextColor;">Пътници:</strong> <span style="color:@Model.TextColor;">@Model.NumberOfPassengers</span></p>
         </div>
+
         <div class="ticket-center">
             <div class="perforation"></div>
         </div>
-        <div class="ticket-right">
+
+        <div class="ticket-right" style="background-color:@Model.RightColor; color:@Model.TextColor;">
             <div class="barcode"></div>
             <div class="serial-number">ID: @Model.Id</div>
             <div class="actions">
-                <a asp-action="Index" class="btn btn-detail">Обратно</a>
-                <a class="btn btn-info" href="@Url.Action("Page", "Journal", new { ticketId = Model.Id, readOnly = true })">Прегледай дневник</a>
+                <a class="btn btn-journal" href="@Url.Action("Page", "Journal", new { ticketId = Model.Id, readOnly = true })">Прегледай дневник</a>
             </div>
         </div>
     </div>
 </div>
-
 
 <style>
     body {
@@ -89,16 +89,20 @@
         .ticket-left h2 {
             font-size: 2rem;
             margin-bottom: 12px;
-            color: #00796b;
+            color: var(--text-color);
             text-shadow: 0 1px 1px #a0d4cf;
             letter-spacing: 1.2px;
         }
 
         .ticket-left p {
             font-size: 1.1rem;
-            color: #004d40;
             margin: 6px 0;
         }
+
+            .ticket-left p strong,
+            .ticket-left p span {
+                color: var(--text-color);
+            }
 
     .ticket-center {
         width: 30px;
@@ -162,26 +166,23 @@
         padding-bottom: 10px;
     }
 
-    .btn {
+    /* Нов бутон за дневник, прозрачен с черен текст */
+    .btn-journal {
+        background: transparent;
+        color: black;
+        border: none;
+        box-shadow: none;
         padding: 10px 22px;
         border-radius: 25px;
-        text-decoration: none;
         font-size: 0.95rem;
         font-weight: 700;
         cursor: pointer;
-        transition: background 0.3s ease, transform 0.2s ease;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-        user-select: none;
-        border: none;
+        transition: transform 0.2s ease;
     }
 
-    .btn-detail {
-        background: #2196f3;
-        color: white;
-    }
-
-        .btn-detail:hover {
-            background: #1976d2;
-            transform: translateY(-3px);
+        .btn-journal:hover {
+            background: transparent;
+            color: black;
+            transform: translateY(-2px);
         }
 </style>
