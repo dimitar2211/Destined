@@ -9,14 +9,12 @@
     <form asp-action="Edit" method="post">
         <input type="hidden" asp-for="Id" />
 
-        <!-- Контролите за цветовете извън билета -->
         <div class="color-controls">
             <label>Цвят лява част: <input asp-for="LeftColor" type="color" id="leftColorPicker" /></label>
             <label>Цвят дясна част: <input asp-for="RightColor" type="color" id="rightColorPicker" /></label>
             <label>Цвят на текста: <input asp-for="TextColor" type="color" id="textColorPicker" /></label>
         </div>
 
-        <!-- Визуализация на билета -->
         <div class="real-ticket">
             <div class="ticket-left" id="ticketLeft" style="background:@Model.LeftColor; color:@Model.TextColor;">
                 <h2>
@@ -63,7 +61,6 @@
             const maxLength = 22;
             const inputs = document.querySelectorAll('input[asp-for="From"], input[asp-for="To"]');
 
-            // Ограничаване на дължината на входа
             inputs.forEach(input => {
                 input.addEventListener('input', () => {
                     if (input.value.length > maxLength) {
@@ -83,14 +80,13 @@
             const dateTimeLabel = ticketLeft.querySelector('.date-time strong');
             const passengersLabel = ticketLeft.querySelector('.passengers strong');
 
-            const buttonTextColor = "#ffffff"; // Фиксиран цвят за бутоните
+            const buttonTextColor = "#ffffff";
 
             let currentTextColor = textPicker.value;
             let currentLeftColor = leftPicker.value;
             let currentRightColor = rightPicker.value;
 
             function applyTextColor() {
-                // --- ЛЯВА ЧАСТ ---
                 const leftInputs = ticketLeft.querySelectorAll('input.edit-input');
                 const leftTextElements = [...leftInputs, arrow, dateTimeLabel, passengersLabel];
                 leftTextElements.forEach(el => {
@@ -102,8 +98,6 @@
                     }
                 });
 
-                // --- ДЯСНА ЧАСТ ---
-                // Всички текстови елементи, включително "Публичен билет"
                 const rightTextElements = ticketRight.querySelectorAll('*:not(.serial-number):not(.actions)');
                 rightTextElements.forEach(el => {
                     if (el.tagName !== 'BUTTON' && el.tagName !== 'A' && el.tagName !== 'INPUT') {
@@ -112,14 +106,12 @@
                     }
                 });
 
-                // Бутоните си остават с фиксиран цвят
                 ticketRight.querySelectorAll('.actions button, .actions a').forEach(btn => {
                     btn.style.transition = "none";
                     btn.style.color = buttonTextColor;
                 });
             }
 
-            // Слушатели за промяна на цветовете
             leftPicker.addEventListener('input', () => {
                 currentLeftColor = leftPicker.value;
                 ticketLeft.style.backgroundColor = currentLeftColor;
@@ -137,17 +129,11 @@
                 applyTextColor();
             });
 
-            // Инициално задаване на цветовете
             ticketLeft.style.backgroundColor = currentLeftColor;
             ticketRight.style.backgroundColor = currentRightColor;
             applyTextColor();
         });
     </script>
-
-
-
-
-
 }
 
 <style>

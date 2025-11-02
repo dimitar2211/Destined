@@ -5,7 +5,19 @@
 }
 
 <div class="ticket-wrapper">
-    <h1 class="page-title">Самолетни билети</h1>
+    <h1 class="page-title">Билети</h1>
+
+    <p class="animated-text" onclick="toggleText()">
+        <span id="first-word">Спомените...</span>
+        <span id="more-text">
+            са нещо безценно, което трябва да пазим и носим със себе си навсякъде, където отиваме.
+            Понякога именно в най-неочакваните места – докато обикаляме света или просто вървим по непозната улица с хората, които обичаме най-много – се случват най-незабравимите моменти.
+            Не поставяй граници на приключенията си!
+            Винаги можеш да създадеш нови спомени – без значение дали тръгваш от вкъщи до магазина на съседната пресечка или пътуваш към Париж.
+            Защо тогава да не вземеш едно малко билетче и да му позволиш да те отведе към следващата история, която си струва да запомниш?
+        </span>
+    </p>
+
 
     <div class="new-ticket">
         <a asp-action="Create" class="btn-create">Нов билет</a>
@@ -50,6 +62,25 @@
         }
     }
 </div>
+
+<script>
+    function toggleText() {
+        const moreText = document.getElementById("more-text");
+        const firstWord = document.getElementById("first-word");
+
+        moreText.classList.toggle("show");
+
+        firstWord.animate([
+            { transform: 'scale(1)', color: '#00796b' },
+            { transform: 'scale(1.2)', color: '#004d40' },
+            { transform: 'scale(1)', color: '#00796b' }
+        ], {
+            duration: 500,
+            easing: 'ease-in-out'
+        });
+    }
+</script>
+
 
 <style>
     body {
@@ -266,4 +297,45 @@
         color: #777;
         margin-top: 40px;
     }
+    .animated-text {
+        text-align: center;
+        font-size: 1.3rem;
+        color: #333;
+        margin-top: -10px;
+        margin-bottom: 25px;
+        position: relative;
+        cursor: pointer;
+    }
+
+    #first-word {
+        display: inline-block;
+        font-weight: 700;
+        color: #00796b;
+        transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+        #first-word:hover {
+            color: #004d40;
+            transform: scale(1.1);
+        }
+
+    #more-text {
+        display: block;
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+        transform: translateY(-10px);
+        transition: all 0.8s ease;
+        font-weight: 500;
+        color: #444;
+    }
+
+        #more-text.show {
+            opacity: 1;
+            max-height: 1000px; 
+            transform: translateY(0);
+            transition: all 1s ease;
+        }
+
+
 </style>

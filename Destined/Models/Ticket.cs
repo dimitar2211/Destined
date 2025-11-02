@@ -31,13 +31,12 @@ namespace Destined.Models
         [Display(Name = "Публичен билет")]
         public bool IsPublic { get; set; } = false;
 
-        // Нови свойства за цветовете на лявата и дясната част
         [Display(Name = "Цвят на лявата част")]
         public string LeftColor { get; set; } = "#e0f2f1";
 
         [Display(Name = "Цвят на дясната част")]
         public string RightColor { get; set; } = "#ffffff";
-        public string TextColor { get; set; } = "#000000"; // ново поле за цвета на текста
+        public string TextColor { get; set; } = "#000000"; 
 
     }
 }
