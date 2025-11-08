@@ -4,6 +4,8 @@
     ViewData["Title"] = "Билети";
 }
 
+@Html.AntiForgeryToken() 
+
 <div class="ticket-wrapper">
     <h1 class="page-title">Билети</h1>
 
@@ -18,7 +20,6 @@
         </span>
     </p>
 
-
     <div class="new-ticket">
         <a asp-action="Create" class="btn-create">Нов билет</a>
         <a asp-controller="Tickets" asp-action="PublicTickets" class="btn btn-primary">Публични билети</a>
@@ -30,36 +31,38 @@
     }
     else
     {
-        foreach (var ticket in Model)
-        {
-            <div class="real-ticket">
-                <div class="ticket-left" style="background:@ticket.LeftColor;">
-                    @{
-                        string shortFrom = ticket.From.Length > 10 ? ticket.From.Substring(0, 10) + "…" : ticket.From;
-                        string shortTo = ticket.To.Length > 10 ? ticket.To.Substring(0, 10) + "…" : ticket.To;
-                        string textColor = string.IsNullOrEmpty(ticket.TextColor) ? "#000000" : ticket.TextColor;
-                    }
-                    <h2 style="color:@textColor">@shortFrom ➔ @shortTo</h2>
-                    <p style="color:@textColor"><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
-                    <p style="color:@textColor"><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
-                </div>
+        <div id="ticket-list">
+            @foreach (var ticket in Model)
+            {
+                <div class="real-ticket" data-id="@ticket.Id">
+                    <div class="ticket-left" style="background:@ticket.LeftColor;">
+                        @{
+                            string shortFrom = ticket.From.Length > 10 ? ticket.From.Substring(0, 10) + "…" : ticket.From;
+                            string shortTo = ticket.To.Length > 10 ? ticket.To.Substring(0, 10) + "…" : ticket.To;
+                            string textColor = string.IsNullOrEmpty(ticket.TextColor) ? "#000000" : ticket.TextColor;
+                        }
+                        <h2 style="color:@textColor">@shortFrom ➔ @shortTo</h2>
+                        <p style="color:@textColor"><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+                        <p style="color:@textColor"><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
+                    </div>
 
-                <div class="ticket-center">
-                    <div class="perforation"></div>
-                </div>
+                    <div class="ticket-center">
+                        <div class="perforation"></div>
+                    </div>
 
-                <div class="ticket-right" style="background:@ticket.RightColor;">
-                    <div class="barcode"></div>
-                    <div class="serial-number">ID: @ticket.Id</div>
-                    <div class="actions">
-                        <a asp-action="Details" asp-route-id="@ticket.Id" class="btn btn-detail">Детайли</a>
-                        <a asp-action="Edit" asp-route-id="@ticket.Id" class="btn btn-edit">Редактирай</a>
-                        <a asp-action="Delete" asp-route-id="@ticket.Id" class="btn btn-delete">Изтрий</a>
-                        <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" class="btn btn-journal">Дневник</a>
+                    <div class="ticket-right" style="background:@ticket.RightColor;">
+                        <div class="barcode"></div>
+                        <div class="serial-number">ID: @ticket.Id</div>
+                        <div class="actions">
+                            <a asp-action="Details" asp-route-id="@ticket.Id" class="btn btn-detail">Детайли</a>
+                            <a asp-action="Edit" asp-route-id="@ticket.Id" class="btn btn-edit">Редактирай</a>
+                            <a asp-action="Delete" asp-route-id="@ticket.Id" class="btn btn-delete">Изтрий</a>
+                            <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" class="btn btn-journal">Дневник</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     }
 </div>
 
@@ -81,6 +84,35 @@
     }
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const ticketList = document.getElementById('ticket-list');
+
+        if (!ticketList) return;
+
+        new Sortable(ticketList, {
+            animation: 150,
+            handle: ".real-ticket",
+            onEnd: function () {
+                const orderedIds = Array.from(ticketList.children)
+                    .map(el => el.getAttribute('data-id'));
+
+                fetch('@Url.Action("UpdateOrder", "Tickets")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken':
+                            document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify(orderedIds)
+                }).then(r => {
+                    if (!r.ok) console.error("Неуспешно запазване на реда на билетите.");
+                });
+            }
+        });
+    });
+</script>
 
 <style>
     body {
@@ -297,6 +329,7 @@
         color: #777;
         margin-top: 40px;
     }
+
     .animated-text {
         text-align: center;
         font-size: 1.3rem;
@@ -332,10 +365,9 @@
 
         #more-text.show {
             opacity: 1;
-            max-height: 1000px; 
+            max-height: 1000px;
             transform: translateY(0);
             transition: all 1s ease;
         }
-
 
 </style>

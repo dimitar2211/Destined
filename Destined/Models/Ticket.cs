@@ -10,11 +10,11 @@ namespace Destined.Models
 
         [Required]
         [Display(Name = "От къде")]
-        public string From { get; set; }
+        public string From { get; set; } = string.Empty;
 
         [Required]
         [Display(Name = "До къде")]
-        public string To { get; set; }
+        public string To { get; set; } = string.Empty;
 
         [Required]
         [Display(Name = "Час на тръгване")]
@@ -36,7 +36,8 @@ namespace Destined.Models
 
         [Display(Name = "Цвят на дясната част")]
         public string RightColor { get; set; } = "#ffffff";
-        public string TextColor { get; set; } = "#000000"; 
+        public string TextColor { get; set; } = "#000000";
+        public int OrderIndex { get; set; }
 
     }
 }

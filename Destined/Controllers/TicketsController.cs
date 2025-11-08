@@ -25,11 +25,15 @@ namespace Destined.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = _userManager.GetUserId(User);
+
             var tickets = await _context.Tickets
                 .Where(t => t.UserId == userId)
+                .OrderBy(t => t.OrderIndex)
                 .ToListAsync();
+
             return View(tickets);
         }
+
 
         // GET: Tickets/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -140,5 +144,22 @@ namespace Destined.Controllers
         }
 
         private bool TicketExists(int id) => _context.Tickets.Any(e => e.Id == id);
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateOrder([FromBody] List<int> orderedIds)
+        {
+            var tickets = await _context.Tickets.ToListAsync();
+
+            for (int i = 0; i < orderedIds.Count; i++)
+            {
+                var ticket = tickets.FirstOrDefault(t => t.Id == orderedIds[i]);
+                if (ticket != null)
+                    ticket.OrderIndex = i;
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
     }
 }
