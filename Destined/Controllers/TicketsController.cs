@@ -139,9 +139,12 @@ namespace Destined.Controllers
             var publicTickets = await _context.Tickets
                 .Where(t => t.IsPublic)
                 .Include(t => t.User)
+                .OrderBy(t => Guid.NewGuid())
                 .ToListAsync();
+
             return View(publicTickets);
         }
+
 
         private bool TicketExists(int id) => _context.Tickets.Any(e => e.Id == id);
 
