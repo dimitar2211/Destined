@@ -2,6 +2,9 @@
 
 @{
     ViewData["Title"] = "Публични билети";
+    var currentUserId = User.Identity != null && User.Identity.IsAuthenticated
+        ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+        : null;
 }
 
 @functions {
@@ -21,6 +24,14 @@
 <div class="ticket-wrapper">
     <h1 class="page-title">Публични билети</h1>
 
+    <div style="text-align:center; margin-bottom:20px;">
+        <select id="sortSelect" style="padding:8px 14px; border-radius:8px; border:1px solid #ccc; font-size:1rem;">
+            <option value="random">Всички разбъркани</option>
+            <option value="mineFirst">Моите билети най-отгоре (другите разбъркани)</option>
+            <option value="foreignOnly">Само чужди билети (разбъркани)</option>
+        </select>
+    </div>
+
     @if (!Model.Any())
     {
         <p class="no-tickets">Все още няма публични билети.</p>
@@ -30,8 +41,9 @@
         foreach (var ticket in Model)
         {
             string textColor = string.IsNullOrEmpty(ticket.TextColor) ? "#000000" : ticket.TextColor;
+            bool isMine = ticket.UserId == currentUserId;
 
-            <div class="real-ticket">
+            <div class="real-ticket" data-mine="@isMine.ToString().ToLower()">
                 <div class="ticket-left" style="background:@ticket.LeftColor;">
                     <h2 style="color:@textColor">@ticket.From ➔ @ticket.To</h2>
                     <p style="color:@textColor"><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
@@ -44,14 +56,18 @@
                 <div class="ticket-right" style="background:@ticket.RightColor;">
                     <div class="barcode"></div>
                     <div class="actions">
-                        <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" asp-route-readOnly="true" class="btn btn-journal">Дневник (само за четене)</a>
+                        <a asp-controller="Journal" asp-action="Page"
+                           asp-route-ticketId="@ticket.Id"
+                           asp-route-page="1"
+                           asp-route-readOnly="true"
+                           class="btn btn-journal">Дневник (само за четене)</a>
                     </div>
                 </div>
             </div>
         }
     }
 </div>
-
+    
 <style>
     body {
         background: #ececec;
@@ -260,3 +276,55 @@
         margin-top: 40px;
     }
 </style>
+
+<script>
+    function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const select = document.getElementById('sortSelect');
+        const container = document.querySelector('.ticket-wrapper');
+        const tickets = Array.from(document.querySelectorAll('.real-ticket'));
+
+        const userId = "@currentUserId";
+        const storageKey = userId && userId !== ""
+            ? `ticketSortMode_user_${userId}`
+            : "ticketSortMode_guest";
+
+        const savedMode = localStorage.getItem(storageKey) || 'random';
+        select.value = savedMode;
+
+        select.addEventListener('change', () => {
+            const mode = select.value;
+            localStorage.setItem(storageKey, mode);
+            applySort(mode);
+        });
+
+        applySort(savedMode);
+
+        function applySort(mode) {
+            const mine = shuffle(tickets.filter(t => t.dataset.mine === "true"));
+            const others = shuffle(tickets.filter(t => t.dataset.mine === "false"));
+
+            tickets.forEach(t => t.remove());
+
+            if (mode === "mineFirst") {
+                mine.forEach(t => container.appendChild(t));
+                others.forEach(t => container.appendChild(t));
+            }
+            else if (mode === "foreignOnly") {
+                const foreignOnly = shuffle(others);
+                foreignOnly.forEach(t => container.appendChild(t));
+            }
+            else {
+                const mixed = shuffle([...mine, ...others]);
+                mixed.forEach(t => container.appendChild(t));
+            }
+        }
+    });
+</script>
