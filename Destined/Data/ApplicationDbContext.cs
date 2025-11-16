@@ -14,6 +14,7 @@ namespace Destined.Data
 
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<JournalPage> JournalPages { get; set; }
+        public DbSet<TicketComment> TicketComments { get; set; }
 
     }
 }

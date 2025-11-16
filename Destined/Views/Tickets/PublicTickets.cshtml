@@ -61,6 +61,12 @@
                            asp-route-page="1"
                            asp-route-readOnly="true"
                            class="btn btn-journal">Дневник (само за четене)</a>
+
+                        <a asp-controller="Comments"
+                           asp-action="Ticket"
+                           asp-route-ticketId="@ticket.Id"
+                           class="btn btn-detail">Коментари</a>
+
                     </div>
                 </div>
             </div>

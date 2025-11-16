@@ -1,0 +1,304 @@
+﻿@model List<Destined.Models.TicketComment>
+@{
+    var ticket = ViewBag.Ticket as Destined.Models.Ticket;
+    ViewData["Title"] = "Коментари към билет";
+    var currentUserId = User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+}
+
+<h2>Коментари за билет: @ticket.From → @ticket.To</h2>
+
+<hr />
+
+<form asp-controller="Comments" asp-action="Add" method="post">
+    <input type="hidden" name="ticketId" value="@ticket.Id" />
+    <textarea name="content" class="form-control" rows="3" placeholder="Напиши коментар..."></textarea>
+    <button class="btn btn-primary mt-2">Публикувай</button>
+</form>
+
+<hr />
+
+@foreach (var c in Model)
+{
+    <div class="comment-box">
+        <p><strong>@c.User.UserName:</strong> @c.Content</p>
+        <small>@c.CreatedOn.ToString("dd.MM.yyyy HH:mm")</small>
+
+        @if (currentUserId == c.UserId || currentUserId == ticket.UserId)
+        {
+            <form asp-controller="Comments" asp-action="Delete" method="post" style="display:inline;">
+                <input type="hidden" name="id" value="@c.Id" />
+                <button class="btn btn-danger btn-sm">Изтрий</button>
+            </form>
+        }
+
+        <details>
+            <summary>Отговори</summary>
+
+            <form asp-controller="Comments" asp-action="Add" method="post" class="mt-2">
+                <input type="hidden" name="ticketId" value="@ticket.Id" />
+                <input type="hidden" name="parentCommentId" value="@c.Id" />
+                <textarea name="content" rows="2" class="form-control" placeholder="Отговор..."></textarea>
+                <button class="btn btn-secondary btn-sm mt-1">Отговори</button>
+            </form>
+
+            @if (c.Replies != null)
+            {
+                foreach (var reply in c.Replies)
+                {
+                    <div style="margin-left:25px; margin-top:10px;">
+                        <p><strong>@reply.User.UserName:</strong> @reply.Content</p>
+
+                        @if (currentUserId == reply.UserId || currentUserId == ticket.UserId)
+                        {
+                            <form asp-controller="Comments" asp-action="Delete" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@reply.Id" />
+                                <button class="btn btn-danger btn-sm">Изтрий</button>
+                            </form>
+                        }
+
+                    </div>
+                }
+            }
+        </details>
+    </div>
+}
+
+<style>
+    body {
+        background: #ececec;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+    }
+
+    .comment-wrapper {
+        max-width: 900px;
+        margin: 50px auto;
+        padding: 0 20px;
+    }
+
+    .page-title {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 5px;
+        font-weight: 700;
+        color: #222;
+        letter-spacing: 1.2px;
+    }
+
+    .ticket-subtitle {
+        text-align: center;
+        font-size: 1.2rem;
+        color: #00796b;
+        margin-bottom: 30px;
+        font-weight: 600;
+    }
+
+    /* === COMMENT CREATE BOX === */
+    .comment-create-box {
+        background: #ffffff;
+        padding: 20px 25px;
+        border-radius: 15px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        border-left: 5px solid #4caf50;
+        margin-bottom: 25px;
+    }
+
+    .comment-section-title {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #2e2e2e;
+        margin-bottom: 15px;
+    }
+
+    .comment-textarea {
+        width: 100%;
+        border-radius: 10px;
+        padding: 12px;
+        border: 1.5px solid #bbb;
+        font-size: 1rem;
+        transition: 0.3s;
+    }
+
+        .comment-textarea:focus {
+            border-color: #4caf50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
+        }
+
+    .btn-comment-post {
+        background: #4caf50;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        margin-top: 10px;
+        border-radius: 20px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .btn-comment-post:hover {
+            background: #388e3c;
+            transform: translateY(-2px);
+        }
+
+    /* === COMMENT BOX === */
+    .comment-box {
+        background: linear-gradient(145deg, #fafafa, #e6e6e6);
+        margin-bottom: 25px;
+        border-radius: 15px;
+        padding: 20px;
+        border: 1.5px solid #bbb;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 0 8px rgba(255,255,255,0.7);
+        position: relative;
+    }
+
+        .comment-box::before {
+            content: "";
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ececec;
+            box-shadow: inset 3px 3px 6px rgba(255,255,255,1), inset -3px -3px 6px rgba(0,0,0,0.15);
+        }
+
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .comment-author {
+        color: #00796b;
+        font-size: 1.1rem;
+    }
+
+    .comment-date {
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    .comment-content {
+        margin-top: 10px;
+        font-size: 1.1rem;
+        color: #333;
+        padding-left: 5px;
+    }
+
+    .comment-actions form {
+        margin-top: 10px;
+    }
+
+    .btn-delete-comment {
+        background: #f44336;
+        border: none;
+        padding: 6px 16px;
+        color: white;
+        border-radius: 20px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .btn-delete-comment:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+        }
+
+    /* === REPLY SECTION === */
+
+    .reply-section {
+        margin-top: 15px;
+        padding-left: 10px;
+    }
+
+    .reply-toggle {
+        cursor: pointer;
+        font-weight: 600;
+        color: #004d40;
+    }
+
+    .reply-form {
+        margin-top: 10px;
+    }
+
+    .reply-textarea {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1.5px solid #bbb;
+        transition: 0.3s;
+    }
+
+        .reply-textarea:focus {
+            border-color: #2196f3;
+            box-shadow: 0 0 8px rgba(33, 150, 243, 0.4);
+        }
+
+    .btn-reply {
+        margin-top: 5px;
+        background: #2196f3;
+        padding: 6px 16px;
+        border-radius: 20px;
+        color: white;
+        border: none;
+        font-weight: 700;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+
+        .btn-reply:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+        }
+
+    /* Reply items */
+    .reply-box {
+        margin-top: 12px;
+        padding: 10px 15px;
+        background: #fff;
+        border-radius: 10px;
+        border-left: 4px solid #2196f3;
+    }
+
+    .reply-author {
+        font-weight: 700;
+        color: #1976d2;
+    }
+
+    .reply-content {
+        margin-left: 5px;
+    }
+
+    .btn-delete-reply {
+        background: #e53935;
+        border: none;
+        padding: 4px 12px;
+        border-radius: 20px;
+        color: white;
+        cursor: pointer;
+        margin-top: 5px;
+        transition: 0.3s;
+    }
+
+        .btn-delete-reply:hover {
+            background: #b71c1c;
+            transform: translateY(-2px);
+        }
+
+    .reply-delete-form {
+        margin-top: 5px;
+    }
+
+    .no-comments {
+        font-size: 1.2rem;
+        text-align: center;
+        color: #777;
+        margin-top: 20px;
+    }
+
+</style>
