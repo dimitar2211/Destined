@@ -79,7 +79,11 @@ namespace Destined.Controllers
                 return NotFound();
 
             var currentUserId = _userManager.GetUserId(User);
+            var currentUser = await _userManager.GetUserAsync(User);
+            bool isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+
             bool canDelete =
+                isAdmin ||
                 currentUserId == comment.UserId ||
                 currentUserId == comment.Ticket.UserId;
 
@@ -92,8 +96,6 @@ namespace Destined.Controllers
 
             return RedirectToAction("Ticket", new { ticketId = comment.TicketId });
         }
-
-
 
         private async Task DeleteCommentRecursive(TicketComment comment)
         {
@@ -108,7 +110,5 @@ namespace Destined.Controllers
 
             _context.TicketComments.Remove(comment);
         }
-
-
     }
 }

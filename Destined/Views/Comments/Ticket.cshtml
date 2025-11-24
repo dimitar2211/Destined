@@ -3,7 +3,9 @@
     var ticket = ViewBag.Ticket as Destined.Models.Ticket;
     ViewData["Title"] = "Коментари към билет";
     var currentUserId = User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var isAdmin = User.IsInRole("Admin");
 }
+
 
 <h2>Коментари за билет: @ticket.From → @ticket.To</h2>
 
@@ -23,13 +25,14 @@
         <p><strong>@c.User.UserName:</strong> @c.Content</p>
         <small>@c.CreatedOn.ToString("dd.MM.yyyy HH:mm")</small>
 
-        @if (currentUserId == c.UserId || currentUserId == ticket.UserId)
+        @if (currentUserId == c.UserId || currentUserId == ticket.UserId || isAdmin)
         {
             <form asp-controller="Comments" asp-action="Delete" method="post" style="display:inline;">
                 <input type="hidden" name="id" value="@c.Id" />
                 <button class="btn btn-danger btn-sm">Изтрий</button>
             </form>
         }
+
 
         <details>
             <summary>Отговори</summary>
@@ -48,7 +51,7 @@
                     <div style="margin-left:25px; margin-top:10px;">
                         <p><strong>@reply.User.UserName:</strong> @reply.Content</p>
 
-                        @if (currentUserId == reply.UserId || currentUserId == ticket.UserId)
+                        @if (currentUserId == reply.UserId || currentUserId == ticket.UserId || isAdmin)
                         {
                             <form asp-controller="Comments" asp-action="Delete" method="post" style="display:inline;">
                                 <input type="hidden" name="id" value="@reply.Id" />
