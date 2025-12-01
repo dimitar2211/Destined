@@ -20,7 +20,7 @@ namespace Destined.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Ticket(int ticketId)
+        public async Task<IActionResult> Ticket(int ticketId, string sort = "newest")
         {
             var ticket = await _context.Tickets
                 .Include(t => t.User)
@@ -29,15 +29,37 @@ namespace Destined.Controllers
             if (ticket == null || !ticket.IsPublic)
                 return NotFound();
 
-            var comments = await _context.TicketComments
+            var commentsQuery = _context.TicketComments
                 .Where(c => c.TicketId == ticketId && c.ParentCommentId == null)
                 .Include(c => c.User)
                 .Include(c => c.Replies)
                 .ThenInclude(r => r.User)
-                .OrderByDescending(c => c.CreatedOn)
-                .ToListAsync();
+                .AsQueryable();
+
+            switch (sort)
+            {
+                case "oldest":
+                    commentsQuery = commentsQuery.OrderBy(c => c.CreatedOn);
+                    break;
+
+                case "longest":
+                    commentsQuery = commentsQuery.OrderByDescending(c => c.Content.Length);
+                    break;
+
+                case "random":
+                    commentsQuery = commentsQuery.OrderBy(c => Guid.NewGuid());
+                    break;
+
+                default:
+                    commentsQuery = commentsQuery.OrderByDescending(c => c.CreatedOn);
+                    break;
+            }
+
+            var comments = await commentsQuery.ToListAsync();
 
             ViewBag.Ticket = ticket;
+            ViewBag.Sort = sort;
+
             return View(comments);
         }
 

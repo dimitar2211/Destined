@@ -19,6 +19,18 @@
 
 <hr />
 
+<form method="get" class="mb-3">
+    <input type="hidden" name="ticketId" value="@ticket.Id" />
+
+    <select name="sort" class="form-select" onchange="this.form.submit()">
+        <option value="newest" selected="@(ViewBag.Sort == "newest")">Най-нови</option>
+        <option value="oldest" selected="@(ViewBag.Sort == "oldest")">Най-стари</option>
+        <option value="longest" selected="@(ViewBag.Sort == "longest")">Най-дълги</option>
+        <option value="random" selected="@(ViewBag.Sort == "random")">Разбъркани</option>
+    </select>
+
+</form>
+
 @foreach (var c in Model)
 {
     <div class="comment-box">
