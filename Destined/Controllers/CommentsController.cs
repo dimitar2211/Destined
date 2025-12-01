@@ -20,7 +20,7 @@ namespace Destined.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Ticket(int ticketId, string sort = "newest")
+        public async Task<IActionResult> Ticket(int ticketId, string sort = "newest", Guid? seed = null)
         {
             var ticket = await _context.Tickets
                 .Include(t => t.User)
@@ -36,26 +36,34 @@ namespace Destined.Controllers
                 .ThenInclude(r => r.User)
                 .AsQueryable();
 
+            List<TicketComment> comments;
+
+            if (sort == "random" && TempData["Seed"] != null)
+            {
+                seed = (Guid)TempData["Seed"];
+            }
+
             switch (sort)
             {
                 case "oldest":
-                    commentsQuery = commentsQuery.OrderBy(c => c.CreatedOn);
+                    comments = await commentsQuery.OrderBy(c => c.CreatedOn).ToListAsync();
                     break;
-
                 case "longest":
-                    commentsQuery = commentsQuery.OrderByDescending(c => c.Content.Length);
+                    comments = await commentsQuery.OrderByDescending(c => c.Content.Length).ToListAsync();
                     break;
-
                 case "random":
-                    commentsQuery = commentsQuery.OrderBy(c => Guid.NewGuid());
-                    break;
+                    if (seed == null)
+                        seed = Guid.NewGuid();
 
+                    var commentsList = await commentsQuery.AsNoTracking().ToListAsync();
+                    var rng = new Random(seed.Value.GetHashCode());
+                    comments = commentsList.OrderBy(c => rng.Next()).ToList();
+                    ViewBag.Seed = seed;
+                    break;
                 default:
-                    commentsQuery = commentsQuery.OrderByDescending(c => c.CreatedOn);
+                    comments = await commentsQuery.OrderByDescending(c => c.CreatedOn).ToListAsync();
                     break;
             }
-
-            var comments = await commentsQuery.ToListAsync();
 
             ViewBag.Ticket = ticket;
             ViewBag.Sort = sort;
@@ -64,14 +72,14 @@ namespace Destined.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(int ticketId, string content, int? parentCommentId, string sort)
+        public async Task<IActionResult> Add(int ticketId, string content, int? parentCommentId, string sort, Guid? seed)
         {
             var ticket = await _context.Tickets.FindAsync(ticketId);
             if (ticket == null || !ticket.IsPublic)
                 return NotFound();
 
             if (string.IsNullOrWhiteSpace(content))
-                return RedirectToAction("Ticket", new { ticketId, sort });
+                return RedirectToAction("Ticket", new { ticketId, sort, seed });
 
             var currentUser = await _userManager.GetUserAsync(User);
 
@@ -86,11 +94,14 @@ namespace Destined.Controllers
             _context.TicketComments.Add(comment);
             await _context.SaveChangesAsync();
 
+            if (sort == "random" && seed != null)
+                TempData["Seed"] = seed;
+
             return RedirectToAction("Ticket", new { ticketId, sort });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int id, string sort)
+        public async Task<IActionResult> Delete(int id, string sort, Guid? seed)
         {
             var comment = await _context.TicketComments
                 .Include(c => c.Ticket)
@@ -115,6 +126,9 @@ namespace Destined.Controllers
             await DeleteCommentRecursive(comment);
 
             await _context.SaveChangesAsync();
+
+            if (sort == "random" && seed != null)
+                TempData["Seed"] = seed;
 
             return RedirectToAction("Ticket", new { ticketId = comment.TicketId, sort });
         }

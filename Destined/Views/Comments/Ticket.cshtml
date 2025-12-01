@@ -13,22 +13,29 @@
 <form asp-controller="Comments" asp-action="Add" method="post">
     <input type="hidden" name="ticketId" value="@ticket.Id" />
     <input type="hidden" name="sort" value="@ViewBag.Sort" />
+    @if (ViewBag.Seed != null)
+    {
+        <input type="hidden" name="seed" value="@ViewBag.Seed" />
+    }
+
     <textarea name="content" class="form-control" rows="3" placeholder="Напиши коментар..."></textarea>
     <button class="btn btn-primary mt-2">Публикувай</button>
 </form>
 
 <hr />
 
+@{
+    var sort = ViewBag.Sort ?? "newest";
+}
 <form method="get" class="mb-3">
     <input type="hidden" name="ticketId" value="@ticket.Id" />
 
     <select name="sort" class="form-select" onchange="this.form.submit()">
-        <option value="newest" selected="@(ViewBag.Sort == "newest")">Най-нови</option>
-        <option value="oldest" selected="@(ViewBag.Sort == "oldest")">Най-стари</option>
-        <option value="longest" selected="@(ViewBag.Sort == "longest")">Най-дълги</option>
-        <option value="random" selected="@(ViewBag.Sort == "random")">Разбъркани</option>
+        <option value="newest" selected="@(sort == "newest" ? "selected" : null)">Най-нови</option>
+        <option value="oldest" selected="@(sort == "oldest" ? "selected" : null)">Най-стари</option>
+        <option value="longest" selected="@(sort == "longest" ? "selected" : null)">Най-дълги</option>
+        <option value="random" selected="@(sort == "random" ? "selected" : null)">Разбъркани</option>
     </select>
-
 </form>
 
 @foreach (var c in Model)
@@ -42,6 +49,10 @@
             <form asp-controller="Comments" asp-action="Delete" method="post" style="display:inline;">
                 <input type="hidden" name="id" value="@c.Id" />
                 <input type="hidden" name="sort" value="@ViewBag.Sort" />
+                @if (ViewBag.Seed != null)
+                {
+                    <input type="hidden" name="seed" value="@ViewBag.Seed" />
+                }
                 <button class="btn btn-danger btn-sm">Изтрий</button>
             </form>
         }
@@ -53,6 +64,10 @@
                 <input type="hidden" name="ticketId" value="@ticket.Id" />
                 <input type="hidden" name="parentCommentId" value="@c.Id" />
                 <input type="hidden" name="sort" value="@ViewBag.Sort" />
+                @if (ViewBag.Seed != null)
+                {
+                    <input type="hidden" name="seed" value="@ViewBag.Seed" />
+                }
                 <textarea name="content" rows="2" class="form-control" placeholder="Отговор..."></textarea>
                 <button class="btn btn-secondary btn-sm mt-1">Отговори</button>
             </form>
@@ -68,10 +83,14 @@
                         {
                             <form asp-controller="Comments" asp-action="Delete" method="post" style="display:inline;">
                                 <input type="hidden" name="id" value="@reply.Id" />
+                                <input type="hidden" name="sort" value="@ViewBag.Sort" />
+                                @if (ViewBag.Seed != null)
+                                {
+                                    <input type="hidden" name="seed" value="@ViewBag.Seed" />
+                                }
                                 <button class="btn btn-danger btn-sm">Изтрий</button>
                             </form>
                         }
-
                     </div>
                 }
             }
@@ -88,7 +107,6 @@
     });
 
     window.addEventListener("load", function () {
-
         const pos = localStorage.getItem("scrollPos");
         if (pos) {
             window.scrollTo(0, parseInt(pos));
