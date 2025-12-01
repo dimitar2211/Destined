@@ -64,14 +64,14 @@ namespace Destined.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(int ticketId, string content, int? parentCommentId)
+        public async Task<IActionResult> Add(int ticketId, string content, int? parentCommentId, string sort)
         {
             var ticket = await _context.Tickets.FindAsync(ticketId);
             if (ticket == null || !ticket.IsPublic)
                 return NotFound();
 
             if (string.IsNullOrWhiteSpace(content))
-                return RedirectToAction("Ticket", new { ticketId });
+                return RedirectToAction("Ticket", new { ticketId, sort });
 
             var currentUser = await _userManager.GetUserAsync(User);
 
@@ -86,11 +86,11 @@ namespace Destined.Controllers
             _context.TicketComments.Add(comment);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Ticket", new { ticketId });
+            return RedirectToAction("Ticket", new { ticketId, sort });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, string sort)
         {
             var comment = await _context.TicketComments
                 .Include(c => c.Ticket)
@@ -116,7 +116,7 @@ namespace Destined.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Ticket", new { ticketId = comment.TicketId });
+            return RedirectToAction("Ticket", new { ticketId = comment.TicketId, sort });
         }
 
         private async Task DeleteCommentRecursive(TicketComment comment)

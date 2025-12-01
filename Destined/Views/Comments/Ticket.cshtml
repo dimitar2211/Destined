@@ -6,13 +6,13 @@
     var isAdmin = User.IsInRole("Admin");
 }
 
-
 <h2>Коментари за билет: @ticket.From → @ticket.To</h2>
 
 <hr />
 
 <form asp-controller="Comments" asp-action="Add" method="post">
     <input type="hidden" name="ticketId" value="@ticket.Id" />
+    <input type="hidden" name="sort" value="@ViewBag.Sort" />
     <textarea name="content" class="form-control" rows="3" placeholder="Напиши коментар..."></textarea>
     <button class="btn btn-primary mt-2">Публикувай</button>
 </form>
@@ -41,17 +41,18 @@
         {
             <form asp-controller="Comments" asp-action="Delete" method="post" style="display:inline;">
                 <input type="hidden" name="id" value="@c.Id" />
+                <input type="hidden" name="sort" value="@ViewBag.Sort" />
                 <button class="btn btn-danger btn-sm">Изтрий</button>
             </form>
         }
 
-
-        <details>
+        <details data-id="@c.Id">
             <summary>Отговори</summary>
 
             <form asp-controller="Comments" asp-action="Add" method="post" class="mt-2">
                 <input type="hidden" name="ticketId" value="@ticket.Id" />
                 <input type="hidden" name="parentCommentId" value="@c.Id" />
+                <input type="hidden" name="sort" value="@ViewBag.Sort" />
                 <textarea name="content" rows="2" class="form-control" placeholder="Отговор..."></textarea>
                 <button class="btn btn-secondary btn-sm mt-1">Отговори</button>
             </form>
@@ -77,6 +78,33 @@
         </details>
     </div>
 }
+
+<script>
+    document.addEventListener("submit", function () {
+        localStorage.setItem("scrollPos", window.scrollY);
+
+        const openDetails = [...document.querySelectorAll("details[open]")].map(d => d.dataset.id);
+        localStorage.setItem("openDetails", JSON.stringify(openDetails));
+    });
+
+    window.addEventListener("load", function () {
+
+        const pos = localStorage.getItem("scrollPos");
+        if (pos) {
+            window.scrollTo(0, parseInt(pos));
+            localStorage.removeItem("scrollPos");
+        }
+
+        const openDetails = JSON.parse(localStorage.getItem("openDetails"));
+        if (openDetails && openDetails.length > 0) {
+            openDetails.forEach(id => {
+                const details = document.querySelector(`details[data-id='${id}']`);
+                if (details) details.setAttribute("open", "");
+            });
+            localStorage.removeItem("openDetails");
+        }
+    });
+</script>
 
 <style>
     body {
