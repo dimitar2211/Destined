@@ -125,5 +125,28 @@ namespace Destined.Controllers
 
             return RedirectToAction("Page", new { ticketId = page.TicketId, page = page.PageNumber });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadVideo(IFormFile video)
+        {
+            if (video == null || video.Length == 0)
+                return Json(new { location = "" });
+
+            var uploads = Path.Combine(_env.WebRootPath, "uploads");
+            if (!Directory.Exists(uploads))
+                Directory.CreateDirectory(uploads);
+
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(video.FileName);
+            var filePath = Path.Combine(uploads, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await video.CopyToAsync(stream);
+            }
+
+            var videoUrl = "/uploads/" + fileName;
+            return Json(new { location = videoUrl });
+        }
+
     }
 }
