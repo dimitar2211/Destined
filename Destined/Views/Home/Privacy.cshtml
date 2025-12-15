@@ -1,6 +1,170 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="ticket-wrapper" style="position: relative;">
+    <h1 class="page-title">@ViewData["Title"]</h1>
+
+    <!-- Sticky Note -->
+    <div class="sticky-note">
+        <h3>Note</h3>
+        <p>This page explains your rights and how we handle data. Keep this note in mind while browsing!</p>
+    </div>
+
+    <div class="privacy-card">
+        <p>
+            We value your privacy and are committed to protecting your personal information.
+            This page explains what data we collect, how we use it, and your rights regarding your information.
+        </p>
+
+        <h2>Information We Collect</h2>
+        <p>
+            We may collect personal information such as your name, email address, and other data
+            that you provide when creating tickets or writing in the journal.
+        </p>
+
+        <h2>How We Use Your Information</h2>
+        <p>
+            Your information is used to provide, maintain, and improve our services.
+            Public tickets are visible to all users, while private tickets remain accessible only to you.
+        </p>
+
+        <h2>Sharing of Information</h2>
+        <p>
+            We do not sell your information. Public tickets may be viewed by other users,
+            but your private entries in the journal remain confidential.
+        </p>
+
+        <h2>Cookies & Tracking</h2>
+        <p>
+            Our website uses cookies to enhance your experience, remember your preferences,
+            and provide analytics on usage.
+        </p>
+
+        <h2>Your Rights</h2>
+        <p>
+            You can request access, correction, or deletion of your personal information
+            at any time by contacting us.
+        </p>
+
+        <p class="animated-text">
+            <span id="first-word">Learn more</span>
+            <span id="more-text">
+                about how we handle data responsibly and keep your information secure.
+            </span>
+        </p>
+    </div>
+</div>
+
+<script>
+    document.getElementById("first-word").addEventListener("click", function() {
+        document.getElementById("more-text").classList.toggle("show");
+    });
+</script>
+
+<style>
+    .privacy-card {
+        background: linear-gradient(145deg, #ffffff, #f2f2f2);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        margin-bottom: 50px;
+        line-height: 1.7;
+        color: #333;
+        font-weight: 500;
+        position: relative;
+    }
+
+        .privacy-card h2 {
+            color: #00796b;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .privacy-card p {
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+            color: #444;
+        }
+
+    .animated-text {
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-align: center;
+        margin-top: 25px;
+        color: #00796b;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+        .animated-text:hover {
+            color: #004d40;
+        }
+
+    #more-text {
+        display: block;
+        opacity: 0;
+        max-height: 0;
+        overflow: hidden;
+        transform: translateY(-10px);
+        transition: all 0.8s ease;
+        font-weight: 500;
+        color: #004d40;
+    }
+
+        #more-text.show {
+            opacity: 1;
+            max-height: 500px;
+            transform: translateY(0);
+            transition: all 1s ease;
+        }
+
+    /* Sticky Note Styling */
+    .sticky-note {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        background: #fffa72;
+        padding: 20px 25px;
+        border-radius: 10px;
+        box-shadow: 3px 5px 15px rgba(0,0,0,0.2);
+        font-weight: 600;
+        max-width: 280px;
+        font-size: 0.95rem;
+        border-left: 6px solid #f4d03f;
+        transform: rotate(-5deg);
+        z-index: 10;
+        animation: popIn 0.5s ease forwards;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .sticky-note h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #c27c00;
+            font-size: 1.1rem;
+        }
+
+        .sticky-note:hover {
+            transform: rotate(0deg) scale(1.05);
+            box-shadow: 5px 8px 20px rgba(0,0,0,0.3);
+        }
+
+    @@keyframes popIn {
+        0%
+
+    {
+        transform: scale(0.7) rotate(-5deg);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1) rotate(-5deg);
+        opacity: 1;
+    }
+
+    }
+</style>
