@@ -4,6 +4,7 @@
     ViewData["Title"] = "Дневник";
     ViewData["FullWidth"] = true;
     bool readOnly = ViewBag.ReadOnly == true;
+    var currentStyle = string.IsNullOrEmpty(Model.PageStyle) ? "lined" : Model.PageStyle;
 }
 
 <div style="position: relative; min-height: 100vh; overflow-x: hidden;">
@@ -24,36 +25,61 @@
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="TicketId" />
             <input type="hidden" asp-for="PageNumber" />
+            <input type="hidden" asp-for="PageStyle" id="pageStyleInput" />
 
             @if (!readOnly)
             {
                 <div class="toolbar-glass mb-4">
+                    <!-- Text Tools -->
                     <button type="button" class="btn-tool" onclick="document.execCommand('bold', false, null)" title="Удебели"><b>B</b></button>
+                    <button type="button" class="btn-tool" onclick="document.execCommand('italic', false, null)" title="Наклонен"><i>I</i></button>
                     <button type="button" class="btn-tool" onclick="document.execCommand('removeFormat', false, null)" title="Изчисти формат">Tx</button>
+                    
+                    <div class="separator"></div>
+
+                    <!-- Alignment -->
                     <button type="button" class="btn-tool" onclick="document.execCommand('justifyLeft', false, null)" title="Ляво">⇤</button>
                     <button type="button" class="btn-tool" onclick="document.execCommand('justifyCenter', false, null)" title="Центрирай">↔</button>
+                    
+                    <div class="separator"></div>
 
+                    <!-- Color -->
                     <button type="button" class="btn-tool" onclick="setTextColor()" title="Цвят на текста">🎨</button>
                     <input type="color" id="textColorPicker" style="display:none" />
 
+                    <div class="separator"></div>
+
+                    <!-- Media -->
                     <label for="imageUpload" class="btn-tool" title="Добави снимка">📷</label>
                     <input type="file" id="imageUpload" accept="image/*" />
 
                     <label for="videoUpload" class="btn-tool" title="Добави видео">🎥</label>
                     <input type="file" id="videoUpload" accept="video/*" />
+
+                    <div class="separator"></div>
+
+                    <!-- Themes -->
+                    <div class="theme-selector">
+                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('lined')" title="Линии">≡</button>
+                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('grid')" title="Квадратчета">▦</button>
+                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('dotted')" title="Точки">⁙</button>
+                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('plain')" title="Празен">⬜</button>
+                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('vintage')" title="Винтидж">📜</button>
+                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('dark')" title="Чертеж">🌃</button>
+                    </div>
                 </div>
             }
 
             <div id="editor-container">
                 @if (readOnly)
                 {
-                    <div id="editor" contenteditable="false" class="paper-sheet">
+                    <div id="editor" contenteditable="false" class="paper-sheet @currentStyle">
                         @Html.Raw(Model.Content)
                     </div>
                 }
                 else
                 {
-                    <div id="editor" contenteditable="true" spellcheck="false" class="paper-sheet">
+                    <div id="editor" contenteditable="true" spellcheck="false" class="paper-sheet @currentStyle">
                         @Html.Raw(Model.Content)
                     </div>
                 }
@@ -75,8 +101,6 @@
 
             @if (Model.HasNextPage || !readOnly)
             {
-                /* Show Next if it exists OR if we are editing (to allow creating new pages implicitly if logic allows, or just navigation) */
-                /* Assuming standard behavior: Next button usually only if next page exists */
                 if(Model.HasNextPage) {
                      <a class="btn-nav next" href="@Url.Action("Page", "Journal", new { ticketId = Model.TicketId, page = Model.PageNumber + 1, readOnly = ViewBag.ReadOnly })">Следваща →</a>
                 }
@@ -118,14 +142,22 @@
         background: rgba(255, 255, 255, 0.15);
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 10px;
+        padding: 10px 20px;
         border-radius: 50px;
         display: flex;
         justify-content: center;
-        gap: 10px;
-        max-width: 700px;
+        align-items: center;
+        gap: 8px;
+        max-width: 800px;
         margin: 0 auto 20px;
         flex-wrap: wrap;
+    }
+
+    .separator {
+        width: 1px;
+        height: 24px;
+        background: rgba(255,255,255,0.3);
+        margin: 0 5px;
     }
 
     .btn-tool {
@@ -146,6 +178,14 @@
         background: rgba(255, 255, 255, 0.4);
         transform: scale(1.1);
     }
+    
+    .theme-selector {
+        display: flex;
+        gap: 5px;
+        background: rgba(0,0,0,0.2);
+        padding: 4px;
+        border-radius: 30px;
+    }
 
     input[type="file"] { display: none; }
 
@@ -160,12 +200,7 @@
         position: relative;
         width: 794px; /* A4 width roughly at 96dpi */
         height: 1123px; /* A4 height */
-        background-color: #fdfbf7; /* Off-white paper */
-        background-image: 
-            linear-gradient(#e1e1e1 1px, transparent 1px), /* Rules */
-            linear-gradient(90deg, #ff9ca8 1px, transparent 1px); /* Margin line */
-        background-size: 100% 30px, 100% 100%;
-        background-position: 0 30px, 60px 0; /* Align rules and margin */
+        background-color: #fdfbf7; /* Base Off-white */
         
         box-shadow: 
             0 1px 1px rgba(0,0,0,0.15), 
@@ -175,14 +210,62 @@
             0 20px 1px -9px rgba(0,0,0,0.15),
             0 30px 40px rgba(0,0,0,0.4); /* Stacked effect + drop shadow */
         
-        padding: 60px 80px 60px 80px; /* Padding inside margin */
+        padding: 60px 80px 60px 80px; /* Default margin */
         color: #2c3e50;
-        font-family: 'Courier New', Courier, monospace; /* Typewriter/handwritten feel */
+        font-family: 'Courier New', Courier, monospace; 
         font-size: 18px;
-        line-height: 30px; /* Match background-size height */
+        line-height: 30px; 
         outline: none;
         overflow: hidden;
         border-radius: 2px;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    /* --- THEMES --- */
+    .paper-sheet.lined {
+        background-image: 
+            linear-gradient(#e1e1e1 1px, transparent 1px), /* Rules */
+            linear-gradient(90deg, #ff9ca8 1px, transparent 1px); /* Margin line */
+        background-size: 100% 30px, 100% 100%;
+        background-position: 0 30px, 60px 0; /* Align rules and margin */
+    }
+
+    .paper-sheet.grid {
+        padding: 50px;
+        background-image: 
+            linear-gradient(#e0e0e0 1px, transparent 1px),
+            linear-gradient(90deg, #e0e0e0 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+
+    .paper-sheet.dotted {
+        padding: 50px;
+        background-image: radial-gradient(#aaa 1.5px, transparent 1.5px);
+        background-size: 20px 20px;
+    }
+
+    .paper-sheet.plain {
+        padding: 50px;
+        background-image: none;
+    }
+
+    .paper-sheet.vintage {
+        background-color: #e3d4b9;
+        background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png');
+        box-shadow: inset 0 0 80px rgba(0,0,0,0.1), 0 30px 40px rgba(0,0,0,0.5);
+        border: 1px solid #d7ccc8;
+        color: #3e2723;
+        padding: 60px;
+    }
+    
+    .paper-sheet.dark {
+        background-color: #263238; /* Blueprint/Dark Mode */
+        background-image: 
+            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        color: #eceff1;
+        box-shadow: 0 30px 40px rgba(0,0,0,0.6);
     }
     
     @@media (max-width: 850px) {
@@ -253,6 +336,7 @@
     <script>
         const isReadOnly = @readOnly.ToString().ToLower();
         const editor = document.getElementById('editor');
+        const styleInput = document.getElementById('pageStyleInput');
 
         let draggedWrapper = null;
         let offsetX = 0;
@@ -265,6 +349,16 @@
         document.getElementById('textColorPicker').addEventListener('input', function () {
             document.execCommand('foreColor', false, this.value);
         });
+
+        // --- STYLE SWITCHER ---
+        function setPageStyle(style) {
+            // Remove old style classes
+            editor.classList.remove('lined', 'grid', 'dotted', 'plain', 'vintage', 'dark');
+            // Add new class
+            editor.classList.add(style);
+            // Update hidden input
+            styleInput.value = style;
+        }
 
         /* ------------------------- MAKE DRAGGABLE ------------------------- */
         function makeDraggable(wrapper) {
@@ -415,7 +509,7 @@
         };
 
         /* ------------------------- INPUT LIMITER ------------------------- */
-        if (!isReadOnly) {
+         if (!isReadOnly) {
             let lastValidContent = editor.innerHTML;
 
             editor.addEventListener('input', function (e) {

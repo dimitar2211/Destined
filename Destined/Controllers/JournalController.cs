@@ -107,6 +107,7 @@ namespace Destined.Controllers
                 return NotFound();
 
             page.Content = model.Content;
+            page.PageStyle = model.PageStyle;
 
             if (image != null && image.Length > 0)
             {

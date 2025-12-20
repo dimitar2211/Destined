@@ -12,6 +12,8 @@ namespace Destined.Models
         [Required]
         public string Content { get; set; }
 
+        public string PageStyle { get; set; } = "lined"; // Default style
+
         public string? ImagePath { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
