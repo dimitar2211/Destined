@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Публични билети";
+    ViewData["FullWidth"] = true;
     var currentUserId = User.Identity != null && User.Identity.IsAuthenticated
         ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
         : null;
@@ -21,279 +22,224 @@
     }
 }
 
-<div class="ticket-wrapper">
-    <h1 class="page-title">Публични билети</h1>
+<div style="position: relative; min-height: 100vh; overflow-x: hidden;">
+    <partial name="_ThemeBackground" />
 
-    <div style="text-align:center; margin-bottom:20px;">
-        <form method="get" asp-action="PublicTickets" style="display:inline-block; margin-right: 15px;">
-            <input type="text" name="searchCountry" value="@ViewData["SearchCountry"]" placeholder="Търси държава..." style="padding:8px 14px; border-radius:8px; border:1px solid #ccc; font-size:1rem; width: 250px;" />
-            <button type="submit" style="padding:8px 14px; border-radius:8px; border:none; background:#2196f3; color:white; cursor:pointer; font-weight:bold;">Търси</button>
-            @if (ViewData["SearchCountry"] != null)
+    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+        
+        <h1 class="page-title">Публични билети</h1>
+
+        <div class="controls-container">
+            <form method="get" asp-action="PublicTickets" style="display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap;">
+                <input type="text" name="searchCountry" value="@ViewData["SearchCountry"]" placeholder="Търси държава..." class="glass-input" />
+                <button type="submit" class="btn-glass">Търси</button>
+                @if (ViewData["SearchCountry"] != null)
+                {
+                    <a href="@Url.Action("PublicTickets")" class="btn-clear" title="Изчисти търсенето">✖</a>
+                }
+            </form>
+
+            <select id="sortSelect" class="glass-select">
+                <option value="random">Всички разбъркани</option>
+                <option value="mineFirst">Моите билети най-отгоре</option>
+                <option value="foreignOnly">Само чужди билети</option>
+            </select>
+        </div>
+
+        <div class="ticket-wrapper">
+            @if (!Model.Any())
             {
-                <a href="@Url.Action("PublicTickets")" style="margin-left:5px; text-decoration:none; color:#f44336; font-weight:bold; font-size:1.2rem;" title="Изчисти търсенето">✖</a>
+                <div class="no-tickets-glass">
+                    <p>Все още няма публични билети.</p>
+                </div>
             }
-        </form>
+            else
+            {
+                foreach (var ticket in Model)
+                {
+                    string textColor = string.IsNullOrEmpty(ticket.TextColor) ? "#000000" : ticket.TextColor;
+                    bool isMine = ticket.UserId == currentUserId;
 
-        <select id="sortSelect" style="padding:8px 14px; border-radius:8px; border:1px solid #ccc; font-size:1rem;">
-            <option value="random">Всички разбъркани</option>
-            <option value="mineFirst">Моите билети най-отгоре (другите разбъркани)</option>
-            <option value="foreignOnly">Само чужди билети (разбъркани)</option>
-        </select>
-    </div>
+                    <div class="real-ticket" data-mine="@isMine.ToString().ToLower()">
+                        <div class="ticket-left" style="background:@ticket.LeftColor;">
+                            <h2 style="color:@textColor">@ticket.From ➔ @ticket.To</h2>
+                            <p style="color:@textColor"><strong>Дата:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+                            <p style="color:@textColor"><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
+                            @if (!string.IsNullOrEmpty(ticket.Country))
+                            {
+                                <p style="color:@textColor"><strong>Държава:</strong> @ticket.Country</p>
+                            }
+                            <p style="color:@textColor"><strong>От:</strong> @ShortenUserName(ticket.User?.UserName)</p>
+                        </div>
+                        
+                        <div class="ticket-center-wrapper">
+                            <div class="ticket-center"></div>
+                        </div>
 
-    @if (!Model.Any())
-    {
-        <p class="no-tickets">Все още няма публични билети.</p>
-    }
-    else
-    {
-        foreach (var ticket in Model)
-        {
-            string textColor = string.IsNullOrEmpty(ticket.TextColor) ? "#000000" : ticket.TextColor;
-            bool isMine = ticket.UserId == currentUserId;
+                        <div class="ticket-right" style="background:@ticket.RightColor;">
+                            <div class="barcode"></div>
+                            <div class="actions">
+                                <a asp-controller="Journal" asp-action="Page"
+                                   asp-route-ticketId="@ticket.Id"
+                                   asp-route-page="1"
+                                   asp-route-readOnly="true"
+                                   class="btn btn-journal">Дневник</a>
 
-            <div class="real-ticket" data-mine="@isMine.ToString().ToLower()">
-                <div class="ticket-left" style="background:@ticket.LeftColor;">
-                    <h2 style="color:@textColor">@ticket.From ➔ @ticket.To</h2>
-                    <p style="color:@textColor"><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
-                    <p style="color:@textColor"><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
-                    @if (!string.IsNullOrEmpty(ticket.Country))
-                    {
-                        <p style="color:@textColor"><strong>Държава:</strong> @ticket.Country</p>
-                    }
-                    <p style="color:@textColor"><strong>Собственик:</strong> @ShortenUserName(ticket.User?.UserName)</p>
-                </div>
-                <div class="ticket-center">
-                    <div class="perforation"></div>
-                </div>
-                <div class="ticket-right" style="background:@ticket.RightColor;">
-                    <div class="barcode"></div>
-                    <div class="actions">
-                        <a asp-controller="Journal" asp-action="Page"
-                           asp-route-ticketId="@ticket.Id"
-                           asp-route-page="1"
-                           asp-route-readOnly="true"
-                           class="btn btn-journal">Дневник (само за четене)</a>
-
-                        <a asp-controller="Comments"
-                           asp-action="Ticket"
-                           asp-route-ticketId="@ticket.Id"
-                           class="btn btn-detail">Коментари</a>
-
+                                <a asp-controller="Comments"
+                                   asp-action="Ticket"
+                                   asp-route-ticketId="@ticket.Id"
+                                   class="btn btn-detail">Коментари</a>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        }
-    }
+                }
+            }
+        </div>
+    </div>
 </div>
-    
+
 <style>
-    body {
-        background: #ececec;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-    }
-
-    .ticket-wrapper {
-        max-width: 1000px;
-        margin: 50px auto;
-        padding: 0 20px;
-    }
-
+    /* Global Styles */
     .page-title {
         text-align: center;
-        font-size: 2.5rem;
+        font-size: 3rem;
         margin-bottom: 30px;
-        color: #222;
-        font-weight: 700;
-        letter-spacing: 1.2px;
-    }
-
-    .new-ticket {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .btn-create {
-        background: #4caf50;
         color: white;
-        padding: 14px 36px;
-        border-radius: 30px;
-        text-decoration: none;
-        font-weight: 700;
-        font-size: 1.1rem;
-        box-shadow: 0 6px 12px rgba(76,175,80,0.6);
-        transition: background 0.3s ease, transform 0.2s ease;
-        display: inline-block;
+        font-weight: 800;
+        text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        letter-spacing: -1px;
     }
 
-        .btn-create:hover {
-            background: #388e3c;
-            transform: translateY(-3px);
-            box-shadow: 0 12px 20px rgba(56,142,60,0.8);
-        }
+    /* Controls (Search & Sort) */
+    .controls-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 40px;
+    }
+
+    .glass-input, .glass-select {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 12px 20px;
+        border-radius: 30px;
+        color: white;
+        font-size: 1rem;
+        backdrop-filter: blur(10px);
+        outline: none;
+        transition: 0.3s;
+    }
+    .glass-input::placeholder { color: rgba(255, 255, 255, 0.6); }
+    .glass-input:focus, .glass-select:focus {
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.4);
+    }
+    .glass-select option { background: #333; color: white; }
+
+    .btn-glass {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 12px 25px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+    .btn-glass:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+
+    .btn-clear {
+        color: #ff6b6b; font-size: 1.5rem; text-decoration: none; transition: 0.3s;
+    }
+    .btn-clear:hover { color: #ff5252; transform: scale(1.1); }
+
+    .no-tickets-glass {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 40px;
+        border-radius: 20px;
+        text-align: center;
+        color: white;
+        font-size: 1.2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Ticket Styles (Matching Index.cshtml) */
+    .ticket-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
 
     .real-ticket {
         display: flex;
         background: linear-gradient(145deg, #fafafa, #e6e6e6);
         border-radius: 15px;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 0 8px rgba(255,255,255,0.7);
+        filter: drop-shadow(0 10px 10px rgba(0,0,0,0.15));
         overflow: hidden;
         cursor: default;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: transform 0.3s ease, filter 0.3s ease;
         border: 1.5px solid #bbb;
         position: relative;
         font-weight: 600;
         user-select: none;
+        color: #333;
+        
+        -webkit-mask: 
+            radial-gradient(circle at center top, transparent 15px, black 15.5px) top center / 100% 51% no-repeat,
+            radial-gradient(circle at center bottom, transparent 15px, black 15.5px) bottom center / 100% 51% no-repeat;
+        mask: 
+            radial-gradient(circle at center top, transparent 15px, black 15.5px) top center / 100% 51% no-repeat,
+            radial-gradient(circle at center bottom, transparent 15px, black 15.5px) bottom center / 100% 51% no-repeat;
     }
 
-        .real-ticket:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 18px 30px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.9);
-            border-color: #4caf50;
-        }
-
-    .ticket-left, .ticket-right {
-        padding: 25px 30px;
-        flex: 1;
-        position: relative;
-        z-index: 10;
+    .real-ticket:hover {
+        transform: translateY(-5px);
+        filter: drop-shadow(0 18px 25px rgba(0,0,0,0.25));
+        border-color: #4caf50;
     }
 
-    .ticket-left {
-        background: #e0f2f1;
-        border-right: 1.5px dashed #999;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+    .ticket-left, .ticket-right { padding: 25px 30px; flex: 1; position: relative; z-index: 10; }
+    .ticket-left { 
+        background: #e0f2f1; border-right: 1.5px dashed #999; 
+        display: flex; flex-direction: column; justify-content: center; 
+    }
+    .ticket-left h2 { 
+        font-size: 1.8rem; margin-bottom: 10px; color: #00796b; 
+        text-shadow: 0 1px 1px #a0d4cf; 
+    }
+    .ticket-left p { font-size: 1rem; color: #004d40; margin: 4px 0; }
+
+    .ticket-center-wrapper { width: 30px; display: flex; flex-direction: column; justify-content: center; margin: 0; background: transparent; }
+    .ticket-center { width: 30px; height: 100%; background: repeating-linear-gradient( to bottom, transparent, transparent 8px, #999 8px, #999 10px ); position: relative; }
+
+    .ticket-right { 
+        background: #fff; display: flex; flex-direction: column; justify-content: space-between; 
+        border-left: 1.5px dashed #999; 
+    }
+    
+    .barcode { 
+        width: 100%; height: 50px; 
+        background: repeating-linear-gradient( to right, #000, #000 3px, #fff 3px, #fff 6px, #000 6px, #000 9px, #fff 9px, #fff 12px ); 
+        opacity: 0.7; margin-bottom: 15px; 
     }
 
-        .ticket-left h2 {
-            font-size: 2rem;
-            margin-bottom: 12px;
-            color: #00796b;
-            text-shadow: 0 1px 1px #a0d4cf;
-            letter-spacing: 1.2px;
-        }
-
-        .ticket-left p {
-            font-size: 1.1rem;
-            color: #004d40;
-            margin: 6px 0;
-        }
-
-    .ticket-center {
-        width: 30px;
-        background: repeating-linear-gradient( to bottom, transparent, transparent 8px, #999 8px, #999 10px );
-        position: relative;
-    }
-
-        .ticket-center::before,
-        .ticket-center::after {
-            content: "";
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background: #ececec;
-            border-radius: 50%;
-            left: 50%;
-            transform: translateX(-50%);
-            box-shadow: inset 3px 3px 5px rgba(255,255,255,0.9), inset -3px -3px 5px rgba(0,0,0,0.15);
-            z-index: 11;
-        }
-
-        .ticket-center::before {
-            top: -15px;
-        }
-
-        .ticket-center::after {
-            bottom: -15px;
-        }
-
-    .ticket-right {
-        background: #fff;
-        box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        border-left: 1.5px dashed #999;
-    }
-
-    .barcode {
-        width: 100%;
-        height: 60px;
-        background: repeating-linear-gradient( to right, #000, #000 3px, #fff 3px, #fff 6px, #000 6px, #000 9px, #fff 9px, #fff 12px, #000 12px, #000 15px, #fff 15px, #fff 18px );
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-        margin-bottom: 18px;
-    }
-
-    .serial-number {
-        font-size: 0.9rem;
-        font-family: 'Courier New', Courier, monospace;
-        color: #666;
-        margin-bottom: 15px;
-        text-align: center;
-        user-select: text;
-    }
-
-    .actions {
-        display: flex;
-        justify-content: space-around;
-    }
-
+    .actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    
     .btn {
-        padding: 10px 22px;
-        border-radius: 25px;
-        text-decoration: none;
-        font-size: 0.95rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background 0.3s ease, transform 0.2s ease;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-        user-select: none;
+        padding: 8px 18px; border-radius: 20px; text-decoration: none; font-size: 0.9rem; font-weight: 700;
+        transition: 0.2s; border: none; cursor: pointer; color: white;
     }
+    .btn-journal { background: #673ab7; box-shadow: 0 4px 10px rgba(103, 58, 183, 0.4); }
+    .btn-journal:hover { background: #5e35b1; transform: translateY(-2px); }
 
-    .btn-detail {
-        background: #2196f3;
-        color: white;
-        border: none;
-    }
+    .btn-detail { background: #03a9f4; box-shadow: 0 4px 10px rgba(3, 169, 244, 0.4); }
+    .btn-detail:hover { background: #0288d1; transform: translateY(-2px); }
 
-    .btn-edit {
-        background: #ff9800;
-        color: white;
-        border: none;
-    }
-
-    .btn-delete {
-        background: #f44336;
-        color: white;
-        border: none;
-    }
-
-    .btn-detail:hover {
-        background: #1976d2;
-        transform: translateY(-3px);
-    }
-
-    .btn-edit:hover {
-        background: #ef6c00;
-        transform: translateY(-3px);
-    }
-
-    .btn-delete:hover {
-        background: #d32f2f;
-        transform: translateY(-3px);
-    }
-
-    .no-tickets {
-        text-align: center;
-        font-size: 1.3rem;
-        color: #777;
-        margin-top: 40px;
-    }
 </style>
 
 <script>
@@ -308,28 +254,38 @@
     document.addEventListener("DOMContentLoaded", function () {
         const select = document.getElementById('sortSelect');
         const container = document.querySelector('.ticket-wrapper');
-        const tickets = Array.from(document.querySelectorAll('.real-ticket'));
-
+        
+        /* Note: This assumes only ticket elements are direct children of wrapper that are meant to be sorted.
+           If there are other elements in wrapper, filter them out. */
+        
         const userId = "@currentUserId";
         const storageKey = userId && userId !== ""
             ? `ticketSortMode_user_${userId}`
             : "ticketSortMode_guest";
 
         const savedMode = localStorage.getItem(storageKey) || 'random';
-        select.value = savedMode;
+        if(select) {
+            select.value = savedMode;
 
-        select.addEventListener('change', () => {
-            const mode = select.value;
-            localStorage.setItem(storageKey, mode);
-            applySort(mode);
-        });
+            select.addEventListener('change', () => {
+                const mode = select.value;
+                localStorage.setItem(storageKey, mode);
+                applySort(mode);
+            });
+        }
 
+        // Initial sort
+        // We need to wait a tick for DOM or just run it.
         applySort(savedMode);
 
         function applySort(mode) {
+            const tickets = Array.from(container.querySelectorAll('.real-ticket'));
+            if(tickets.length === 0) return;
+
             const mine = shuffle(tickets.filter(t => t.dataset.mine === "true"));
             const others = shuffle(tickets.filter(t => t.dataset.mine === "false"));
 
+            // Detach all
             tickets.forEach(t => t.remove());
 
             if (mode === "mineFirst") {
@@ -338,6 +294,13 @@
             }
             else if (mode === "foreignOnly") {
                 const foreignOnly = shuffle(others);
+                // In generic public view, 'foreignOnly' might mean 'hide mine' or 'show only others'.
+                // Based on previous code logic it seemed to just reorder/filter.
+                // If the user wants to SEE foreign only, we should probably append only them.
+                // But let's stick to previous behaviour: The previous logic effectively showed ONLY foreign tickets if that option was selected?
+                // Looking at old code logic: 
+                // else if (mode === "foreignOnly") { const foreignOnly = shuffle(others); foreignOnly.forEach(...) }
+                // Yes, it effectively filtered out mine.
                 foreignOnly.forEach(t => container.appendChild(t));
             }
             else {
