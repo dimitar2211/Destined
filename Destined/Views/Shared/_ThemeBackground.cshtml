@@ -1,0 +1,323 @@
+<!-- Dynamic Background Container -->
+<div id="page-background" class="theme-space">
+    <!-- 1. Space Elements -->
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+
+    <!-- 2. Ocean Elements -->
+    <div class="bubbles">
+        <!-- More bubbles for richer effect -->
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <div class="fish-container">
+        <div class="fish fish-1">🐟</div>
+        <div class="fish fish-2">🐠</div>
+        <div class="fish fish-3">🐡</div>
+    </div>
+
+    <!-- 3. Forest Elements -->
+    <div class="fireflies">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <!-- 4. Sunset Elements (Animated Gradient Overlay + Sun Rays + Birds) -->
+    <div class="sunset-pulse"></div>
+    <div class="sun-rays"></div>
+    <div class="birds">
+        <div class="bird bird-1"></div>
+        <div class="bird bird-2"></div>
+        <div class="bird bird-3"></div>
+    </div>
+    
+
+</div>
+
+<!-- Theme Settings Toggle (Moved outside to ensure z-index: 1000 works on top of content) -->
+<div class="theme-controls">
+    <button id="theme-toggle-btn" title="Смени темата">🎨</button>
+    <div id="theme-menu" class="hidden">
+        <div class="theme-option" data-theme="theme-space">🌌 Космос</div>
+        <div class="theme-option" data-theme="theme-sunset">🌅 Залез</div>
+        <div class="theme-option" data-theme="theme-ocean">🌊 Океан</div>
+        <div class="theme-option" data-theme="theme-forest">🌲 Гора</div>
+        <div class="theme-option" data-theme="theme-light">☀️ Светла</div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const themeBtn = document.getElementById('theme-toggle-btn');
+        const themeMenu = document.getElementById('theme-menu');
+        const backgroundContainer = document.getElementById('page-background');
+        const themeOptions = document.querySelectorAll('.theme-option');
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('destined_tickets_theme') || 'theme-space';
+        setTheme(savedTheme);
+
+        // Toggle menu
+        if(themeBtn) {
+            themeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                themeMenu.classList.toggle('hidden');
+            });
+        }
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (themeMenu && !themeMenu.contains(e.target) && e.target !== themeBtn) {
+                themeMenu.classList.add('hidden');
+            }
+        });
+
+        // Handle selection
+        if(themeOptions) {
+            themeOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const selectedTheme = option.dataset.theme;
+                    setTheme(selectedTheme);
+                    localStorage.setItem('destined_tickets_theme', selectedTheme);
+                    themeMenu.classList.add('hidden');
+                });
+            });
+        }
+
+        function setTheme(themeName) {
+            if(!backgroundContainer) return;
+            // Remove all existing theme classes
+            backgroundContainer.classList.remove('theme-space', 'theme-sunset', 'theme-ocean', 'theme-forest', 'theme-light');
+            // Add new class
+            backgroundContainer.classList.add(themeName);
+        }
+    });
+</script>
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+    body {
+        margin: 0;
+        background: #0f172a; /* Default base */
+        font-family: 'Outfit', sans-serif;
+        color: white; /* Default text color, light theme will override */
+    }
+
+    /* --- Backgound Container & Base --- */
+    /* --- Backgound Container & Base --- */
+    #page-background {
+        position: absolute; /* Changed from fixed to absolute to scroll with page */
+        top: 0; left: 0; right: 0; bottom: 0; /* Cover the parent container */
+        min-height: 100vh;
+        z-index: 0;
+        transition: background 0.8s ease;
+        /* Removed overflow-y: auto since scrolling handled by body/html */
+    }
+    
+    /* Ensure content on top is clickable */
+    .content-wrapper { pointer-events: none; }
+    /* But actual content inside needs pointer events. 
+       Actually, since I'm using this as a partial, the page content will be outside/after this div if I'm not careful. 
+       Strategy: The partial includes the #page-background div which is Fixed. 
+       The page content should be inside it or on top of it.
+       Best approach: Put the page content INSIDE the #page-background div in the View. 
+    */
+
+    /* === Dynamic Elements Visibility Control === */
+    /* Hide all by default */
+    .stars, .twinkling, .bubbles, .fish-container, .fireflies, .sunset-pulse, .sun-rays, .birds { display: none; }
+    
+    /* Show per theme */
+    .theme-space .stars, .theme-space .twinkling { display: block; }
+    .theme-ocean .bubbles, .theme-ocean .fish-container { display: block; }
+    .theme-forest .fireflies { display: block; }
+    .theme-sunset .sunset-pulse, .theme-sunset .sun-rays, .theme-sunset .birds { display: block; }
+
+
+    /* === 1. Space Theme === */
+    .theme-space {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+    .stars { position: absolute; top:0; left:0; right:0; bottom:0; width: 100%; height: 100%; background: #000 url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/stars.png') repeat top center; z-index: 0; }
+    .twinkling { position: absolute; top:0; left:0; right:0; bottom:0; width: 100%; height: 100%; background: transparent url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/twinkling.png') repeat top center; z-index: 1; animation: move-twinkling 200s linear infinite; opacity: 0.4; pointer-events: none; }
+    @@keyframes move-twinkling { from {background-position:0 0;} to {background-position:-10000px 5000px;} }
+
+
+    /* === 2. Sunset Theme: Dynamic Gradient + Rays + Birds === */
+    .theme-sunset {
+        background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+        background-size: 400% 400%;
+        animation: gradientBG 15s ease infinite;
+    }
+    .sunset-pulse {
+        position: absolute; width: 100%; height: 100%; top: 0; left: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0) 0%, rgba(0,0,0,0.3) 100%);
+        pointer-events: none;
+    }
+    @@keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    /* Sun Rays */
+    .sun-rays {
+        position: absolute; top: -100px; right: -100px; width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 10%, transparent 70%);
+        opacity: 0.6; pointer-events: none; z-index: 0;
+         background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,255,255,0.1) 20px, rgba(255,255,255,0.1) 40px);
+         border-radius: 50%;
+         animation: rotateRays 40s linear infinite;
+    }
+    @@keyframes rotateRays { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }
+
+    /* Birds */
+    .birds { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+    .bird {
+        position: absolute; width: 20px; height: 10px; border-bottom: 2px solid rgba(0,0,0,0.3); border-left: 2px solid rgba(0,0,0,0.3);
+        transform: rotate(-45deg) skew(-10deg);
+        animation: flyBird 20s linear infinite;
+    }
+    .bird-1 { top: 15%; left: -50px; animation-duration: 25s; animation-delay: 0s; }
+    .bird-2 { top: 20%; left: -50px; animation-duration: 28s; animation-delay: 5s; transform: scale(0.8) rotate(-45deg) skew(-10deg); }
+    .bird-3 { top: 12%; left: -50px; animation-duration: 22s; animation-delay: 10s; transform: scale(0.6) rotate(-45deg) skew(-10deg); }
+    
+    @@keyframes flyBird {
+        0% { transform: translateX(-100px) translateY(0) rotate(-45deg) skew(-10deg); opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateX(110vw) translateY(-50px) rotate(-45deg) skew(-10deg); opacity: 0; }
+    }
+
+
+    /* === 3. Ocean Theme: Rising Bubbles === */
+    .theme-ocean {
+        background: linear-gradient(180deg, #021B79 0%, #0575E6 100%);
+    }
+    .bubbles {
+        position: absolute; width: 100%; height: 100%; z-index: 0; overflow: hidden; top:0; left:0; pointer-events: none;
+    }
+    .bubbles span {
+        position: absolute; bottom: -50px; width: 20px; height: 20px; background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%; animation: rise 15s infinite ease-in;
+    }
+    .bubbles span:nth-child(1){ width: 40px; height: 40px; left: 10%; animation-duration: 8s; }
+    .bubbles span:nth-child(2){ width: 20px; height: 20px; left: 20%; animation-duration: 12s; animation-delay: 1s; }
+    .bubbles span:nth-child(3){ width: 50px; height: 50px; left: 35%; animation-duration: 10s; animation-delay: 2s; }
+    .bubbles span:nth-child(4){ width: 80px; height: 80px; left: 50%; animation-duration: 22s; animation-delay: 0s; background: rgba(255, 255, 255, 0.05); }
+    .bubbles span:nth-child(5){ width: 35px; height: 35px; left: 55%; animation-duration: 14s; animation-delay: 1s; }
+    .bubbles span:nth-child(6){ width: 45px; height: 45px; left: 65%; animation-duration: 16s; animation-delay: 3s; }
+    .bubbles span:nth-child(7){ width: 90px; height: 90px; left: 75%; animation-duration: 25s; animation-delay: 2s; background: rgba(255, 255, 255, 0.03); }
+    .bubbles span:nth-child(8){ width: 25px; height: 25px; left: 80%; animation-duration: 18s; animation-delay: 1s; }
+    .bubbles span:nth-child(9){ width: 15px; height: 15px; left: 90%; animation-duration: 10s; animation-delay: 4s; }
+    .bubbles span:nth-child(10){ width: 50px; height: 50px; left: 95%; animation-duration: 15s; animation-delay: 3s; }
+    .bubbles span:nth-child(11){ width: 10px; height: 10px; left: 5%; animation-duration: 11s; animation-delay: 5s; }
+    .bubbles span:nth-child(12){ width: 12px; height: 12px; left: 15%; animation-duration: 13s; animation-delay: 6s; }
+    .bubbles span:nth-child(13){ width: 8px; height: 8px; left: 25%; animation-duration: 9s; animation-delay: 4s; }
+    .bubbles span:nth-child(14){ width: 14px; height: 14px; left: 45%; animation-duration: 15s; animation-delay: 2s; }
+    .bubbles span:nth-child(15){ width: 16px; height: 16px; left: 85%; animation-duration: 17s; animation-delay: 1s; }
+
+    @@keyframes rise {
+        0% { bottom: -100px; transform: translateX(0); }
+        50% { transform: translateX(50px); }
+        100% { bottom: 100%; transform: translateX(-50px); }
+    }
+
+    /* Fish */
+    .fish-container { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 1; }
+    .fish { position: absolute; font-size: 2rem; opacity: 0.6; animation: swim 20s linear infinite; }
+    
+    .fish-1 { top: 30%; left: -100px; animation-duration: 25s; }
+    .fish-2 { top: 60%; left: -100px; animation-duration: 35s; animation-delay: 5s; font-size: 1.5rem; }
+    .fish-3 { top: 80%; left: -100px; animation-duration: 40s; animation-delay: 10s; font-size: 2.5rem; }
+
+    @@keyframes swim {
+        0% { left: -100px; transform: scaleX(1); } /* Swim right */
+        48% { left: 110vw; transform: scaleX(1); }
+        49% { left: 110vw; transform: scaleX(-1); } /* Turn around */
+        50% { left: 110vw; transform: scaleX(-1); }
+        98% { left: -100px; transform: scaleX(-1); } /* Swim left */
+        99% { left: -100px; transform: scaleX(1); }
+        100% { left: -100px; transform: scaleX(1); }
+    }
+
+
+    /* === 4. Forest Theme: Fireflies === */
+    .theme-forest {
+        background: linear-gradient(to bottom, #000000 0%, #0f3d0f 100%);
+    }
+    .fireflies {
+        position: absolute; width: 100%; height: 100%; top:0; left:0; overflow: hidden; pointer-events: none;
+    }
+    .fireflies span {
+        position: absolute; width: 6px; height: 6px; background: #eaff00; border-radius: 50%;
+        box-shadow: 0 0 10px #eaff00, 0 0 20px #eaff00;
+        animation: fly 15s infinite alternate ease-in-out;
+        opacity: 0;
+    }
+    .fireflies span:nth-child(1) { top: 20%; left: 10%; animation-duration: 8s; animation-delay: 0s; }
+    .fireflies span:nth-child(2) { top: 50%; left: 50%; animation-duration: 12s; animation-delay: 1s; }
+    .fireflies span:nth-child(3) { top: 70%; left: 20%; animation-duration: 15s; animation-delay: 2s; }
+    .fireflies span:nth-child(4) { top: 40%; left: 80%; animation-duration: 10s; animation-delay: 3s; }
+    .fireflies span:nth-child(5) { top: 80%; left: 60%; animation-duration: 18s; animation-delay: 0s; }
+    .fireflies span:nth-child(6) { top: 10%; left: 40%; animation-duration: 14s; animation-delay: 2s; }
+    
+    @@keyframes fly {
+        0% { transform: translate(0, 0); opacity: 0; }
+        20% { opacity: 1; }
+        50% { transform: translate(50px, -50px); opacity: 0.5; }
+        80% { opacity: 1; }
+        100% { transform: translate(-30px, 30px); opacity: 0; }
+    }
+
+
+    /* === 5. Light Theme === */
+    .theme-light {
+        background: #f0f2f5;
+    }
+    
+    /* Text Color Adjustments for Light Theme */
+    .theme-light .page-title, .theme-light h1, .theme-light h2, .theme-light h3 { color: #1f2937 !important; }
+    .theme-light label { color: #374151 !important; }
+    .theme-light .gradient-text { 
+        background: linear-gradient(to right, #2563eb 0%, #7c3aed 100%);
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    /* --- Theme Settings UI --- */
+    .theme-controls {
+        position: fixed; /* Fixed so it follows scroll */
+        top: 20px; right: 20px; z-index: 1000;
+    }
+    #theme-toggle-btn {
+        background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.2); color: white;
+        font-size: 1.5rem; padding: 8px; border-radius: 50%;
+        cursor: pointer; transition: transform 0.2s, background 0.2s;
+        width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
+    }
+    .theme-light #theme-toggle-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #333; }
+    #theme-toggle-btn:hover { transform: rotate(30deg); background: rgba(255, 255, 255, 0.2); }
+
+    #theme-menu {
+        position: absolute; top: 55px; right: 0;
+        background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px); border-radius: 12px; padding: 8px;
+        min-width: 150px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        flex-direction: column; gap: 5px; display: flex;
+        transition: opacity 0.2s, transform 0.2s;
+    }
+    .theme-light #theme-menu { background: white; border-color: #e5e7eb; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+    #theme-menu.hidden { opacity: 0; pointer-events: none; transform: translateY(-10px); }
+
+    .theme-option {
+        padding: 10px 15px; border-radius: 8px; cursor: pointer;
+        transition: background 0.2s; color: #cbd5e1; font-weight: 500;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .theme-light .theme-option { color: #374151; }
+    .theme-option:hover { background: rgba(255, 255, 255, 0.1); color: white; }
+    .theme-light .theme-option:hover { background: #f3f4f6; color: #111; }
+</style>

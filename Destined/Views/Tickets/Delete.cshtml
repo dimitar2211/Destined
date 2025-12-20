@@ -2,47 +2,49 @@
 
 @{
     ViewData["Title"] = "Изтриване на билет";
+    ViewData["FullWidth"] = true;
 }
 
-<div class="ticket-wrapper">
-    <h1 class="page-title">Изтриване на билет</h1>
+<div style="position: relative; min-height: 100vh; overflow-x: hidden;">
+    <partial name="_ThemeBackground" />
 
-    <form asp-action="Delete" method="post">
-        <input type="hidden" asp-for="Id" />
+    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+        <div class="ticket-wrapper">
+            <h1 class="page-title">Изтриване на билет</h1>
+            <p style="text-align: center; color: #white; margin-bottom: 20px;">Сигурни ли сте, че искате да изтриете този билет?</p>
 
-        <div class="real-ticket">
-            <div class="ticket-left" style="background-color:@Model.LeftColor; --text-color:@Model.TextColor;">
-                <h2 style="color:@Model.TextColor;">@Model.From ➔ @Model.To</h2>
-                <p><strong style="color:@Model.TextColor;">Дата и час:</strong> <span style="color:@Model.TextColor;">@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</span></p>
-                <p><strong style="color:@Model.TextColor;">Пътници:</strong> <span style="color:@Model.TextColor;">@Model.NumberOfPassengers</span></p>
-            </div>
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="Id" />
 
-            <div class="ticket-center">
-                <div class="perforation"></div>
-            </div>
+                <div class="real-ticket">
+                    <div class="ticket-left" style="background-color:@Model.LeftColor; --text-color:@Model.TextColor;">
+                        <h2 style="color:@Model.TextColor;">@Model.From ➔ @Model.To</h2>
+                        <p><strong style="color:@Model.TextColor;">Дата и час:</strong> <span style="color:@Model.TextColor;">@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</span></p>
+                        <p><strong style="color:@Model.TextColor;">Пътници:</strong> <span style="color:@Model.TextColor;">@Model.NumberOfPassengers</span></p>
+                    </div>
 
-            <div class="ticket-right" style="background-color:@Model.RightColor; color:@Model.TextColor;">
-                <div class="barcode"></div>
-                <div class="serial-number">ID: @Model.Id</div>
-                <div class="actions">
-                    <button type="submit" class="btn btn-delete">Изтрий</button>
-                    <a asp-action="Index" class="btn btn-journal">Отказ</a>
+                    <div class="ticket-center">
+                        <div class="perforation"></div>
+                    </div>
+
+                    <div class="ticket-right" style="background-color:@Model.RightColor; color:@Model.TextColor;">
+                        <div class="barcode"></div>
+                        <div class="serial-number">ID: @Model.Id</div>
+                        <div class="actions">
+                            <button type="submit" class="btn btn-delete">Изтрий</button>
+                            <a asp-action="Index" class="btn btn-journal">Отказ</a>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 
 <style>
-    body {
-        background: #ececec;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-    }
-
     .ticket-wrapper {
         max-width: 1000px;
-        margin: 50px auto;
+        margin: 0 auto;
         padding: 0 20px;
     }
 
@@ -50,10 +52,13 @@
         text-align: center;
         font-size: 2.5rem;
         margin-bottom: 30px;
-        color: #222;
+        color: #fff; /* White for dark themes */
         font-weight: 700;
         letter-spacing: 1.2px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
+    
+    p { color: white; } /* Default text color for confirmation msg */
 
     .real-ticket {
         display: flex;

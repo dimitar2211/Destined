@@ -2,46 +2,48 @@
 
 @{
     ViewData["Title"] = "Детайли на билет";
+    ViewData["FullWidth"] = true;
 }
 
-<div class="ticket-wrapper">
-    <h1 class="page-title">Детайли на билет</h1>
+<div style="position: relative; min-height: 100vh; overflow-x: hidden;">
+    <partial name="_ThemeBackground" />
 
-    <div class="real-ticket">
-        <div class="ticket-left" style="background-color:@Model.LeftColor; --text-color:@Model.TextColor;">
-            <h2 style="color:@Model.TextColor;">@Model.From ➔ @Model.To</h2>
-            <p><strong style="color:@Model.TextColor;">Дата и час:</strong> <span style="color:@Model.TextColor;">@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</span></p>
-            <p><strong style="color:@Model.TextColor;">Пътници:</strong> <span style="color:@Model.TextColor;">@Model.NumberOfPassengers</span></p>
-            @if (!string.IsNullOrEmpty(Model.Country))
-            {
-                <p><strong style="color:@Model.TextColor;">Държава:</strong> <span style="color:@Model.TextColor;">@Model.Country</span></p>
-            }
-        </div>
+    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+        <div class="ticket-wrapper">
+            <h1 class="page-title">Детайли на билет</h1>
 
-        <div class="ticket-center">
-            <div class="perforation"></div>
-        </div>
+            <div class="real-ticket">
+                <div class="ticket-left" style="background-color:@Model.LeftColor; --text-color:@Model.TextColor;">
+                    <h2 style="color:@Model.TextColor;">@Model.From ➔ @Model.To</h2>
+                    <p><strong style="color:@Model.TextColor;">Дата и час:</strong> <span style="color:@Model.TextColor;">@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</span></p>
+                    <p><strong style="color:@Model.TextColor;">Пътници:</strong> <span style="color:@Model.TextColor;">@Model.NumberOfPassengers</span></p>
+                    @if (!string.IsNullOrEmpty(Model.Country))
+                    {
+                        <p><strong style="color:@Model.TextColor;">Държава:</strong> <span style="color:@Model.TextColor;">@Model.Country</span></p>
+                    }
+                </div>
 
-        <div class="ticket-right" style="background-color:@Model.RightColor; color:@Model.TextColor;">
-            <div class="barcode"></div>
-            <div class="serial-number">ID: @Model.Id</div>
-            <div class="actions">
-                <a class="btn btn-journal" href="@Url.Action("Page", "Journal", new { ticketId = Model.Id, readOnly = true })">Прегледай дневник</a>
+                <div class="ticket-center">
+                    <div class="perforation"></div>
+                </div>
+
+                <div class="ticket-right" style="background-color:@Model.RightColor; color:@Model.TextColor;">
+                    <div class="barcode"></div>
+                    <div class="serial-number">ID: @Model.Id</div>
+                    <div class="actions">
+                        <a class="btn btn-journal" href="@Url.Action("Page", "Journal", new { ticketId = Model.Id, readOnly = true })">Прегледай дневник</a>
+                        <a asp-action="Index" class="btn btn-secondary">Назад</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    body {
-        background: #ececec;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-    }
-
     .ticket-wrapper {
         max-width: 1000px;
-        margin: 50px auto;
+        margin: 0 auto;
         padding: 0 20px;
     }
 
@@ -49,9 +51,10 @@
         text-align: center;
         font-size: 2.5rem;
         margin-bottom: 30px;
-        color: #222;
+        color: #fff; /* White for dark themes */
         font-weight: 700;
         letter-spacing: 1.2px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
     .real-ticket {
@@ -165,7 +168,7 @@
 
     .actions {
         display: flex;
-        justify-content: center;
+        justify-content: space-around;
         gap: 20px;
         padding-bottom: 10px;
     }
@@ -188,4 +191,15 @@
             color: black;
             transform: translateY(-2px);
         }
+    
+    .btn-secondary {
+        background: #9ca3af;
+        color: white;
+        padding: 10px 22px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 700;
+        border:none;
+    }
+    .btn-secondary:hover { background: #6b7280; color: white; }
 </style>

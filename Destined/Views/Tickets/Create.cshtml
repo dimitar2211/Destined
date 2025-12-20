@@ -2,18 +2,191 @@
 
 @{
     ViewData["Title"] = "Create Ticket";
+    ViewData["FullWidth"] = true;
+}
+
+<div style="position: relative; min-height: 100vh; overflow-x: hidden;">
+    <partial name="_ThemeBackground" />
+
+    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+        <div class="ticket-wrapper">
+            <h1 class="page-title">Нов билет</h1>
+
+            <form method="post" asp-action="Create">
+                <div class="real-ticket">
+                    <div class="ticket-left">
+                        <div class="from-to-wrapper">
+                            <label>
+                                <strong>От:</strong>
+                                <input asp-for="From" class="fake-input" placeholder="Град на тръгване" maxlength="22" required />
+                                <span asp-validation-for="From" class="text-danger"></span>
+                            </label>
+                            <div class="arrow">→</div>
+                            <label>
+                                <strong>До:</strong>
+                                <input asp-for="To" class="fake-input" placeholder="Дестинация" maxlength="22" required />
+                                <span asp-validation-for="To" class="text-danger"></span>
+                            </label>
+                        </div>
+                        <label>
+                            <strong>Дата и час:</strong>
+                            <input asp-for="DepartureTime" type="datetime-local" class="fake-input small-input" required />
+                            <span asp-validation-for="DepartureTime" class="text-danger"></span>
+                        </label>
+                        <label>
+                            <strong>Пътници:</strong>
+                            <input asp-for="NumberOfPassengers" class="fake-input small-input" min="1" value="1" required />
+                            <span asp-validation-for="NumberOfPassengers" class="text-danger"></span>
+                        </label>
+                        <div class="dropdown-container">
+                            <label>
+                                <strong>Държава:</strong>
+                                <input type="text" id="countrySearch" class="fake-input dropdown-search" placeholder="Търси държава..." autocomplete="off">
+                                <input asp-for="Country" type="hidden" id="selectedCountry" />
+                                <span asp-validation-for="Country" class="text-danger"></span>
+                            </label>
+                            <div id="countryList" class="dropdown-list">
+                                <!-- Countries will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ticket-center-wrapper">
+                        <div class="ticket-center"></div>
+                    </div>
+
+                    <div class="ticket-right">
+                        <div class="barcode"></div>
+                        <div class="actions">
+                            <button type="submit" class="btn-create">Създай билет</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const maxLength = 22;
+            const inputs = document.querySelectorAll('input[asp-for="From"], input[asp-for="To"]');
+
+            inputs.forEach(input => {
+                input.addEventListener('input', () => {
+                    if (input.value.length > maxLength) {
+                        input.value = input.value.slice(0, maxLength);
+                    }
+                });
+            });
+
+            // Country Dropdown Logic
+            const countries = [
+                // Европа
+                "Албания","Андора","Австрия","Беларус","Белгия","Босна и Херцеговина","България",
+                "Ватикана","Великобритания","Германия","Гърция","Дания","Естония","Ирландия",
+                "Исландия","Испания","Италия","Кипър","Латвия","Литва","Лихтенщайн","Люксембург",
+                "Малта","Молдова","Монако","Нидерландия","Норвегия","Полша","Португалия",
+                "Румъния","Сан Марино","Северна Македония","Словакия","Словения","Сърбия",
+                "Украйна","Унгария","Финландия","Франция","Хърватия","Черна гора","Чехия",
+                "Швейцария","Швеция",
+
+                // Азия
+                "Афганистан","Армения","Азербайджан","Бангладеш","Бахрейн","Бруней","Бутан",
+                "Виетнам","Грузия","Израел","Индия","Индонезия","Ирак","Иран","Йордания",
+                "Казахстан","Камбоджа","Катар","Киргизстан","Китай","Кувейт","Лаос","Ливан",
+                "Малайзия","Малдиви","Монголия","Мианмар","Непал","ОАЕ","Оман","Пакистан",
+                "Саудитска Арабия","Северна Корея","Сингапур","Сирия","Таджикистан","Тайланд",
+                "Туркменистан","Турция","Узбекистан","Филипини","Шри Ланка","Южна Корея",
+                "Япония","Палестина","Тимор-Лесте",
+
+                // Африка
+                "Алжир","Ангола","Бенин","Ботсвана","Буркина Фасо","Бурунди","Габон","Гамбия",
+                "Гана","Гвинея","Гвинея-Бисау","Джибути","Египет","Екваториална Гвинея",
+                "Еритрея","Есватини","Етиопия","Замбия","Зимбабве","Кабо Верде","Камерун",
+                "Кения","Коморски острови","Конго","ДР Конго","Кот д’Ивоар","Лесото","Либерия",
+                "Либия","Мадагаскар","Малави","Мали","Мароко","Мавритания","Мавриций",
+                "Мозамбик","Намибия","Нигер","Нигерия","Руанда","Сао Томе и Принсипи",
+                "Сейшели","Сенегал","Сиера Леоне","Сомалия","Судан","Южен Судан","Танзания",
+                "Того","Тунис","Уганда","Централноафриканска република","Чад","ЮАР",
+
+                // Северна и Централна Америка
+                "Антигуа и Барбуда","Бахами","Барбадос","Белиз","Гватемала","Доминика",
+                "Доминиканска република","Канада","Коста Рика","Куба","Мексико","Никарагуа",
+                "Панама","Салвадор","САЩ","Сейнт Китс и Невис","Сейнт Лусия",
+                "Сейнт Винсент и Гренадини","Тринидад и Тобаго","Хаити","Хондурас","Ямайка",
+
+                // Южна Америка
+                "Аржентина","Боливия","Бразилия","Венецуела","Гаяна","Колумбия","Парагвай",
+                "Перу","Суринам","Уругвай","Чили","Еквадор",
+
+                // Океания
+                "Австралия","Вануату","Кирибати","Маршалови острови","Микронезия","Науру",
+                "Нова Зеландия","Палау","Папуа Нова Гвинея","Самоа","Соломонови острови",
+                "Тонга","Тувалу","Фиджи"
+            ]; // Add more as needed
+
+            const searchInput = document.getElementById('countrySearch');
+            const countryList = document.getElementById('countryList');
+            const hiddenInput = document.getElementById('selectedCountry');
+
+            function populateList(filter = "") {
+                countryList.innerHTML = '';
+                const filtered = countries.filter(c => c.toLowerCase().includes(filter.toLowerCase()));
+                
+                if (filtered.length === 0) {
+                    const noResult = document.createElement('div');
+                    noResult.className = 'dropdown-item';
+                    noResult.textContent = 'Няма резултати';
+                    
+                    noResult.style.color = '#999';
+                    noResult.style.cursor = 'default';
+                    countryList.appendChild(noResult);
+                    return;
+                }
+
+                filtered.forEach(country => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item';
+                    item.textContent = country;
+                    item.addEventListener('click', () => {
+                        searchInput.value = country;
+                        hiddenInput.value = country;
+                        countryList.style.display = 'none';
+                    });
+                    countryList.appendChild(item);
+                });
+            }
+
+            searchInput.addEventListener('input', () => {
+                populateList(searchInput.value);
+                countryList.style.display = 'block';
+            });
+
+            searchInput.addEventListener('focus', () => {
+                populateList(searchInput.value);
+                countryList.style.display = 'block';
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !countryList.contains(e.target)) {
+                    countryList.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
 
 <style>
-    body {
-        background: #ececec;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-    }
+    /* Removed body background to let theme shine through */
 
     .ticket-wrapper {
         max-width: 1000px;
-        margin: 50px auto;
+        margin: 0 auto; 
         padding: 0 20px;
     }
 
@@ -21,11 +194,12 @@
         text-align: center;
         font-size: 2.5rem;
         margin-bottom: 30px;
-        color: #222;
+        color: #fff; /* White for dark themes by default */
         font-weight: 700;
         letter-spacing: 1.2px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-
+    
     form {
         user-select: none;
     }
@@ -35,7 +209,6 @@
         background: linear-gradient(145deg, #fafafa, #e6e6e6);
         border-radius: 15px;
         box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 0 8px rgba(255,255,255,0.7);
-        /* overflow: hidden; Removed to allow dropdown to expand outside */
         cursor: default;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         border: 1.5px solid #bbb;
@@ -253,172 +426,3 @@
         color: #00796b;
     }
 </style>
-
-<div class="ticket-wrapper">
-    <h1 class="page-title">Нов билет</h1>
-
-    <form method="post" asp-action="Create">
-        <div class="real-ticket">
-            <div class="ticket-left">
-                <div class="from-to-wrapper">
-                    <label>
-                        <strong>От:</strong>
-                        <input asp-for="From" class="fake-input" placeholder="Град на тръгване" maxlength="22" required />
-                        <span asp-validation-for="From" class="text-danger"></span>
-                    </label>
-                    <div class="arrow">→</div>
-                    <label>
-                        <strong>До:</strong>
-                        <input asp-for="To" class="fake-input" placeholder="Дестинация" maxlength="22" required />
-                        <span asp-validation-for="To" class="text-danger"></span>
-                    </label>
-                </div>
-                <label>
-                    <strong>Дата и час:</strong>
-                    <input asp-for="DepartureTime" type="datetime-local" class="fake-input small-input" required />
-                    <span asp-validation-for="DepartureTime" class="text-danger"></span>
-                </label>
-                <label>
-                    <strong>Пътници:</strong>
-                    <input asp-for="NumberOfPassengers" class="fake-input small-input" min="1" value="1" required />
-                    <span asp-validation-for="NumberOfPassengers" class="text-danger"></span>
-                </label>
-                <div class="dropdown-container">
-                    <label>
-                        <strong>Държава:</strong>
-                        <input type="text" id="countrySearch" class="fake-input dropdown-search" placeholder="Търси държава..." autocomplete="off">
-                        <input asp-for="Country" type="hidden" id="selectedCountry" />
-                        <span asp-validation-for="Country" class="text-danger"></span>
-                    </label>
-                    <div id="countryList" class="dropdown-list">
-                        <!-- Countries will be populated here -->
-                    </div>
-                </div>
-            </div>
-
-            <div class="ticket-center-wrapper">
-                <div class="ticket-center"></div>
-            </div>
-
-            <div class="ticket-right">
-                <div class="barcode"></div>
-                <div class="actions">
-                    <button type="submit" class="btn-create">Създай билет</button>
-                </div>
-            </div>
-        </div>
-    </form>
-</div>
-
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const maxLength = 22;
-            const inputs = document.querySelectorAll('input[asp-for="From"], input[asp-for="To"]');
-
-            inputs.forEach(input => {
-                input.addEventListener('input', () => {
-                    if (input.value.length > maxLength) {
-                        input.value = input.value.slice(0, maxLength);
-                    }
-                });
-            });
-
-            // Country Dropdown Logic
-            const countries = [
-                // Европа
-                "Албания","Андора","Австрия","Беларус","Белгия","Босна и Херцеговина","България",
-                "Ватикана","Великобритания","Германия","Гърция","Дания","Естония","Ирландия",
-                "Исландия","Испания","Италия","Кипър","Латвия","Литва","Лихтенщайн","Люксембург",
-                "Малта","Молдова","Монако","Нидерландия","Норвегия","Полша","Португалия",
-                "Румъния","Сан Марино","Северна Македония","Словакия","Словения","Сърбия",
-                "Украйна","Унгария","Финландия","Франция","Хърватия","Черна гора","Чехия",
-                "Швейцария","Швеция",
-
-                // Азия
-                "Афганистан","Армения","Азербайджан","Бангладеш","Бахрейн","Бруней","Бутан",
-                "Виетнам","Грузия","Израел","Индия","Индонезия","Ирак","Иран","Йордания",
-                "Казахстан","Камбоджа","Катар","Киргизстан","Китай","Кувейт","Лаос","Ливан",
-                "Малайзия","Малдиви","Монголия","Мианмар","Непал","ОАЕ","Оман","Пакистан",
-                "Саудитска Арабия","Северна Корея","Сингапур","Сирия","Таджикистан","Тайланд",
-                "Туркменистан","Турция","Узбекистан","Филипини","Шри Ланка","Южна Корея",
-                "Япония","Палестина","Тимор-Лесте",
-
-                // Африка
-                "Алжир","Ангола","Бенин","Ботсвана","Буркина Фасо","Бурунди","Габон","Гамбия",
-                "Гана","Гвинея","Гвинея-Бисау","Джибути","Египет","Екваториална Гвинея",
-                "Еритрея","Есватини","Етиопия","Замбия","Зимбабве","Кабо Верде","Камерун",
-                "Кения","Коморски острови","Конго","ДР Конго","Кот д’Ивоар","Лесото","Либерия",
-                "Либия","Мадагаскар","Малави","Мали","Мароко","Мавритания","Мавриций",
-                "Мозамбик","Намибия","Нигер","Нигерия","Руанда","Сао Томе и Принсипи",
-                "Сейшели","Сенегал","Сиера Леоне","Сомалия","Судан","Южен Судан","Танзания",
-                "Того","Тунис","Уганда","Централноафриканска република","Чад","ЮАР",
-
-                // Северна и Централна Америка
-                "Антигуа и Барбуда","Бахами","Барбадос","Белиз","Гватемала","Доминика",
-                "Доминиканска република","Канада","Коста Рика","Куба","Мексико","Никарагуа",
-                "Панама","Салвадор","САЩ","Сейнт Китс и Невис","Сейнт Лусия",
-                "Сейнт Винсент и Гренадини","Тринидад и Тобаго","Хаити","Хондурас","Ямайка",
-
-                // Южна Америка
-                "Аржентина","Боливия","Бразилия","Венецуела","Гаяна","Колумбия","Парагвай",
-                "Перу","Суринам","Уругвай","Чили","Еквадор",
-
-                // Океания
-                "Австралия","Вануату","Кирибати","Маршалови острови","Микронезия","Науру",
-                "Нова Зеландия","Палау","Папуа Нова Гвинея","Самоа","Соломонови острови",
-                "Тонга","Тувалу","Фиджи"
-            ]; // Add more as needed
-
-            const searchInput = document.getElementById('countrySearch');
-            const countryList = document.getElementById('countryList');
-            const hiddenInput = document.getElementById('selectedCountry');
-
-            function populateList(filter = "") {
-                countryList.innerHTML = '';
-                const filtered = countries.filter(c => c.toLowerCase().includes(filter.toLowerCase()));
-                
-                if (filtered.length === 0) {
-                    const noResult = document.createElement('div');
-                    noResult.className = 'dropdown-item';
-                    noResult.textContent = 'Няма резултати';
-                    noResult.style.color = '#999';
-                    noResult.style.cursor = 'default';
-                    countryList.appendChild(noResult);
-                    return;
-                }
-
-                filtered.forEach(country => {
-                    const item = document.createElement('div');
-                    item.className = 'dropdown-item';
-                    item.textContent = country;
-                    item.addEventListener('click', () => {
-                        searchInput.value = country;
-                        hiddenInput.value = country;
-                        countryList.style.display = 'none';
-                    });
-                    countryList.appendChild(item);
-                });
-            }
-
-            searchInput.addEventListener('input', () => {
-                populateList(searchInput.value);
-                countryList.style.display = 'block';
-            });
-
-            searchInput.addEventListener('focus', () => {
-                populateList(searchInput.value);
-                countryList.style.display = 'block';
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!searchInput.contains(e.target) && !countryList.contains(e.target)) {
-                    countryList.style.display = 'none';
-                }
-            });
-        });
-    </script>
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

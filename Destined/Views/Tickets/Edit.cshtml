@@ -1,72 +1,79 @@
 ﻿@model Destined.Models.Ticket
 @{
     ViewData["Title"] = "Редактиране на билет";
+    ViewData["FullWidth"] = true;
 }
 
-<div class="ticket-wrapper">
-    <h1 class="page-title">Редактиране на билет</h1>
+<div style="position: relative; min-height: 100vh; overflow-x: hidden;">
+    <partial name="_ThemeBackground" />
 
-    <form asp-action="Edit" method="post">
-        <input type="hidden" asp-for="Id" />
+    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+        <div class="ticket-wrapper">
+            <h1 class="page-title">Редактиране на билет</h1>
 
-        <div class="color-controls">
-            <label>Цвят лява част: <input asp-for="LeftColor" type="color" id="leftColorPicker" /></label>
-            <label>Цвят дясна част: <input asp-for="RightColor" type="color" id="rightColorPicker" /></label>
-            <label>Цвят на текста: <input asp-for="TextColor" type="color" id="textColorPicker" /></label>
-        </div>
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
 
-        <div class="real-ticket">
-            <div class="ticket-left" id="ticketLeft" style="background:@Model.LeftColor; color:@Model.TextColor;">
-                <h2>
-                    <input asp-for="From" class="edit-input location-input" placeholder="От" maxlength="22" required />
-                    <span class="arrow">➔</span>
-                    <input asp-for="To" class="edit-input location-input" placeholder="До" maxlength="22" required />
-                </h2>
-                <p class="date-time">
-                    <strong>Дата и час:</strong>
-                    <input asp-for="DepartureTime" type="datetime-local" class="edit-input" required />
-                    <span asp-validation-for="DepartureTime" class="text-danger"></span>
-                </p>
-                <p class="passengers">
-                    <strong>Пътници:</strong>
-                    <input asp-for="NumberOfPassengers" type="number" min="1" class="edit-input small-input" required />
-                    <span asp-validation-for="NumberOfPassengers" class="text-danger"></span>
-                </p>
-                
-                <div class="dropdown-container">
-                    <p style="margin:0;">
-                         <strong>Държава:</strong>
-                    </p>
-                    <input type="text" id="countrySearch" class="dropdown-search edit-input" placeholder="Търси държава..." autocomplete="off" value="@Model.Country">
-                    <input asp-for="Country" type="hidden" id="selectedCountry" />
-                    <span asp-validation-for="Country" class="text-danger"></span>
-                    <div id="countryList" class="dropdown-list">
-                        <!-- Countries will be populated here -->
+                <div class="color-controls">
+                    <label>Цвят лява част: <input asp-for="LeftColor" type="color" id="leftColorPicker" /></label>
+                    <label>Цвят дясна част: <input asp-for="RightColor" type="color" id="rightColorPicker" /></label>
+                    <label>Цвят на текста: <input asp-for="TextColor" type="color" id="textColorPicker" /></label>
+                </div>
+
+                <div class="real-ticket">
+                    <div class="ticket-left" id="ticketLeft" style="background:@Model.LeftColor; color:@Model.TextColor;">
+                        <h2>
+                            <input asp-for="From" class="edit-input location-input" placeholder="От" maxlength="22" required />
+                            <span class="arrow">➔</span>
+                            <input asp-for="To" class="edit-input location-input" placeholder="До" maxlength="22" required />
+                        </h2>
+                        <p class="date-time">
+                            <strong>Дата и час:</strong>
+                            <input asp-for="DepartureTime" type="datetime-local" class="edit-input" required />
+                            <span asp-validation-for="DepartureTime" class="text-danger"></span>
+                        </p>
+                        <p class="passengers">
+                            <strong>Пътници:</strong>
+                            <input asp-for="NumberOfPassengers" type="number" min="1" class="edit-input small-input" required />
+                            <span asp-validation-for="NumberOfPassengers" class="text-danger"></span>
+                        </p>
+                        
+                        <div class="dropdown-container">
+                            <p style="margin:0;">
+                                 <strong>Държава:</strong>
+                            </p>
+                            <input type="text" id="countrySearch" class="dropdown-search edit-input" placeholder="Търси държава..." autocomplete="off" value="@Model.Country">
+                            <input asp-for="Country" type="hidden" id="selectedCountry" />
+                            <span asp-validation-for="Country" class="text-danger"></span>
+                            <div id="countryList" class="dropdown-list">
+                                <!-- Countries will be populated here -->
+                            </div>
+                        </div>
+                        <div class="form-group form-check" style="margin-top: 15px;">
+                            <input asp-for="IsPublic" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsPublic" class="form-check-label">Публичен билет?</label>
+                            <span asp-validation-for="IsPublic" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="ticket-center-wrapper">
+                        <div class="ticket-center">
+                            <div class="perforation"></div>
+                        </div>
+                    </div>
+
+                    <div class="ticket-right" id="ticketRight" style="background:@Model.RightColor; color:@Model.TextColor;">
+                        <div class="barcode"></div>
+                        <div class="serial-number">ID: @Model.Id</div>
+                        <div class="actions">
+                            <button type="submit" class="btn btn-edit">Запази</button>
+                            <a asp-action="Index" class="btn btn-delete">Отказ</a>
+                        </div>
                     </div>
                 </div>
-                <div class="form-group form-check">
-                    <input asp-for="IsPublic" class="form-check-input" type="checkbox" />
-                    <label asp-for="IsPublic" class="form-check-label"></label>
-                    <span asp-validation-for="IsPublic" class="text-danger"></span>
-                </div>
-            </div>
-
-            <div class="ticket-center-wrapper">
-                <div class="ticket-center">
-                    <div class="perforation"></div>
-                </div>
-            </div>
-
-            <div class="ticket-right" id="ticketRight" style="background:@Model.RightColor; color:@Model.TextColor;">
-                <div class="barcode"></div>
-                <div class="serial-number">ID: @Model.Id</div>
-                <div class="actions">
-                    <button type="submit" class="btn btn-edit">Запази</button>
-                    <a asp-action="Index" class="btn btn-delete">Отказ</a>
-                </div>
-            </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
 
 @section Scripts {
@@ -244,15 +251,9 @@
 }
 
 <style>
-    body {
-        background: #ececec;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-    }
-
     .ticket-wrapper {
         max-width: 1000px;
-        margin: 50px auto;
+        margin: 0 auto;
         padding: 0 20px;
     }
 
@@ -260,14 +261,31 @@
         text-align: center;
         font-size: 2.5rem;
         margin-bottom: 30px;
-        color: #222;
+        color: #fff; /* White for dark themes */
         font-weight: 700;
         letter-spacing: 1.2px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .color-controls {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        border: 1px solid rgba(255,255,255,0.2);
     }
 
     .color-controls label {
-        margin-right: 15px;
+        margin-right: 0;
         font-weight: 600;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .real-ticket {
@@ -276,7 +294,6 @@
         border-radius: 15px;
         margin-bottom: 30px;
         box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 0 8px rgba(255,255,255,0.7);
-        /* overflow: hidden; Removed to allow dropdown */
         cursor: default;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         border: 1.5px solid #bbb;
@@ -305,7 +322,7 @@
     .dropdown-container {
         position: relative;
         width: 100%;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         margin-top: 10px;
     }
 
