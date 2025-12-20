@@ -60,12 +60,23 @@
             }
             else
             {
+                var pics = ViewBag.ProfilePictures as Dictionary<string, string>;
+
                 <div class="comments-list">
                     @foreach (var c in Model)
                     {
+                        string picUrl = null;
+                        var hasPic = pics != null && pics.TryGetValue(c.UserId, out picUrl);
+
                         <div class="glass-comment">
                             <div class="comment-header">
-                                <span class="author">@c.User.UserName</span>
+                                <div class="author-info">
+                                    @if (hasPic)
+                                    {
+                                        <img src="@picUrl" alt="@c.User.UserName" class="comment-avatar" />
+                                    }
+                                    <span class="author">@c.User.UserName</span>
+                                </div>
                                 <span class="date">@c.CreatedOn.ToString("dd.MM.yyyy HH:mm")</span>
                             </div>
                             
@@ -96,9 +107,18 @@
                                         {
                                             foreach (var reply in c.Replies)
                                             {
+                                                string replyPicUrl = null;
+                                                var hasReplyPic = pics != null && pics.TryGetValue(reply.UserId, out replyPicUrl);
+
                                                 <div class="reply-item">
                                                     <div class="reply-header">
-                                                        <span class="reply-author">@reply.User.UserName</span>
+                                                        <div class="reply-author-info">
+                                                            @if (hasReplyPic)
+                                                            {
+                                                                <img src="@replyPicUrl" alt="@reply.User.UserName" class="reply-avatar" />
+                                                            }
+                                                            <span class="reply-author">@reply.User.UserName</span>
+                                                        </div>
                                                         <span class="reply-content">@reply.Content</span>
                                                     </div>
                                                     
@@ -296,7 +316,13 @@
 
     /* Comment Structure */
     .comment-header {
-        display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;
+        display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; align-items: center;
+    }
+    .author-info {
+        display: flex; align-items: center; gap: 10px;
+    }
+    .comment-avatar {
+        width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.2);
     }
     .author { font-weight: 700; color: #a5d6a7; font-size: 1.1rem; }
     .date { font-size: 0.85rem; color: rgba(255,255,255,0.5); }
@@ -314,9 +340,11 @@
     .reply-item {
         background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 0.95rem;
     }
-    .reply-header { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+    .reply-header { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 5px; }
+    .reply-author-info { display: flex; align-items: center; gap: 6px; }
+    .reply-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
     .reply-author { font-weight: 700; color: #81d4fa; }
-    .reply-content { color: rgba(255,255,255,0.9); }
+    .reply-content { color: rgba(255,255,255,0.9); margin-left: 5px; }
 
     .no-comments {
         text-align: center; padding: 40px; color: rgba(255,255,255,0.5); font-size: 1.2rem;

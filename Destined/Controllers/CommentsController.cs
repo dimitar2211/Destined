@@ -65,6 +65,19 @@ namespace Destined.Controllers
                     break;
             }
 
+            // --- Fetch Profile Pictures ---
+            var userIds = comments.Select(c => c.UserId)
+                .Concat(comments.SelectMany(c => c.Replies ?? new List<TicketComment>()).Select(r => r.UserId))
+                .Distinct()
+                .ToList();
+
+            var profilePictures = await _context.UserClaims
+                .Where(c => userIds.Contains(c.UserId) && c.ClaimType == "profile_picture")
+                .ToDictionaryAsync(c => c.UserId, c => c.ClaimValue);
+
+            ViewBag.ProfilePictures = profilePictures;
+            // -----------------------------
+
             ViewBag.Ticket = ticket;
             ViewBag.Sort = sort;
 
