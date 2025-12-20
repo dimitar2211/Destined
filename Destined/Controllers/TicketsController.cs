@@ -134,14 +134,23 @@ namespace Destined.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> PublicTickets()
+        public async Task<IActionResult> PublicTickets(string? searchCountry)
         {
-            var publicTickets = await _context.Tickets
+            var query = _context.Tickets
                 .Where(t => t.IsPublic)
                 .Include(t => t.User)
-                .OrderBy(t => Guid.NewGuid())
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchCountry))
+            {
+                query = query.Where(t => t.Country.Contains(searchCountry));
+            }
+
+            var publicTickets = await query
+                .OrderBy(t => Guid.NewGuid()) // Keep random shuffle even for results
                 .ToListAsync();
 
+            ViewData["SearchCountry"] = searchCountry;
             return View(publicTickets);
         }
 
