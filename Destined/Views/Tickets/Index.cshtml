@@ -44,6 +44,10 @@
                         <h2 style="color:@textColor">@shortFrom ➔ @shortTo</h2>
                         <p style="color:@textColor"><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
                         <p style="color:@textColor"><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
+                        @if (!string.IsNullOrEmpty(ticket.Country))
+                        {
+                            <p style="color:@textColor"><strong>Държава:</strong> @ticket.Country</p>
+                        }
                     </div>
 
                     <div class="ticket-center">

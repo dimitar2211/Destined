@@ -12,6 +12,10 @@
             <h2 style="color:@Model.TextColor;">@Model.From ➔ @Model.To</h2>
             <p><strong style="color:@Model.TextColor;">Дата и час:</strong> <span style="color:@Model.TextColor;">@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</span></p>
             <p><strong style="color:@Model.TextColor;">Пътници:</strong> <span style="color:@Model.TextColor;">@Model.NumberOfPassengers</span></p>
+            @if (!string.IsNullOrEmpty(Model.Country))
+            {
+                <p><strong style="color:@Model.TextColor;">Държава:</strong> <span style="color:@Model.TextColor;">@Model.Country</span></p>
+            }
         </div>
 
         <div class="ticket-center">

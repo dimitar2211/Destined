@@ -39,5 +39,8 @@ namespace Destined.Models
         public string TextColor { get; set; } = "#000000";
         public int OrderIndex { get; set; }
 
+        [Display(Name = "Държава")]
+        public string Country { get; set; } = string.Empty;
+
     }
 }

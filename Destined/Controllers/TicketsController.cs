@@ -55,7 +55,7 @@ namespace Destined.Controllers
         // POST: Tickets/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("From,To,DepartureTime,NumberOfPassengers,LeftColor,RightColor,TextColor")] Ticket ticket)
+        public async Task<IActionResult> Create([Bind("From,To,DepartureTime,NumberOfPassengers,LeftColor,RightColor,TextColor,Country")] Ticket ticket)
         {
             if (ModelState.IsValid)
             {
@@ -84,7 +84,7 @@ namespace Destined.Controllers
         // POST: Tickets/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,From,To,DepartureTime,NumberOfPassengers,IsPublic,LeftColor,RightColor,TextColor")] Ticket ticket)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,From,To,DepartureTime,NumberOfPassengers,IsPublic,LeftColor,RightColor,TextColor,Country")] Ticket ticket)
         {
             if (id != ticket.Id) return NotFound();
 

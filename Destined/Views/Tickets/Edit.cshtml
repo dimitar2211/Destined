@@ -32,6 +32,18 @@
                     <input asp-for="NumberOfPassengers" type="number" min="1" class="edit-input small-input" required />
                     <span asp-validation-for="NumberOfPassengers" class="text-danger"></span>
                 </p>
+                
+                <div class="dropdown-container">
+                    <p style="margin:0;">
+                         <strong>Държава:</strong>
+                    </p>
+                    <input type="text" id="countrySearch" class="dropdown-search edit-input" placeholder="Търси държава..." autocomplete="off" value="@Model.Country">
+                    <input asp-for="Country" type="hidden" id="selectedCountry" />
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                    <div id="countryList" class="dropdown-list">
+                        <!-- Countries will be populated here -->
+                    </div>
+                </div>
                 <div class="form-group form-check">
                     <input asp-for="IsPublic" class="form-check-input" type="checkbox" />
                     <label asp-for="IsPublic" class="form-check-label"></label>
@@ -39,8 +51,10 @@
                 </div>
             </div>
 
-            <div class="ticket-center">
-                <div class="perforation"></div>
+            <div class="ticket-center-wrapper">
+                <div class="ticket-center">
+                    <div class="perforation"></div>
+                </div>
             </div>
 
             <div class="ticket-right" id="ticketRight" style="background:@Model.RightColor; color:@Model.TextColor;">
@@ -67,6 +81,99 @@
                         input.value = input.value.slice(0, maxLength);
                     }
                 });
+            });
+
+            // Country Dropdown Logic
+            const countries = [
+                // Европа
+                "Албания","Андора","Австрия","Беларус","Белгия","Босна и Херцеговина","България",
+                "Ватикана","Великобритания","Германия","Гърция","Дания","Естония","Ирландия",
+                "Исландия","Испания","Италия","Кипър","Латвия","Литва","Лихтенщайн","Люксембург",
+                "Малта","Молдова","Монако","Нидерландия","Норвегия","Полша","Португалия",
+                "Румъния","Сан Марино","Северна Македония","Словакия","Словения","Сърбия",
+                "Украйна","Унгария","Финландия","Франция","Хърватия","Черна гора","Чехия",
+                "Швейцария","Швеция",
+
+                // Азия
+                "Афганистан","Армения","Азербайджан","Бангладеш","Бахрейн","Бруней","Бутан",
+                "Виетнам","Грузия","Израел","Индия","Индонезия","Ирак","Иран","Йордания",
+                "Казахстан","Камбоджа","Катар","Киргизстан","Китай","Кувейт","Лаос","Ливан",
+                "Малайзия","Малдиви","Монголия","Мианмар","Непал","ОАЕ","Оман","Пакистан",
+                "Саудитска Арабия","Северна Корея","Сингапур","Сирия","Таджикистан","Тайланд",
+                "Туркменистан","Турция","Узбекистан","Филипини","Шри Ланка","Южна Корея",
+                "Япония","Палестина","Тимор-Лесте",
+
+                // Африка
+                "Алжир","Ангола","Бенин","Ботсвана","Буркина Фасо","Бурунди","Габон","Гамбия",
+                "Гана","Гвинея","Гвинея-Бисау","Джибути","Египет","Екваториална Гвинея",
+                "Еритрея","Есватини","Етиопия","Замбия","Зимбабве","Кабо Верде","Камерун",
+                "Кения","Коморски острови","Конго","ДР Конго","Кот д’Ивоар","Лесото","Либерия",
+                "Либия","Мадагаскар","Малави","Мали","Мароко","Мавритания","Мавриций",
+                "Мозамбик","Намибия","Нигер","Нигерия","Руанда","Сао Томе и Принсипи",
+                "Сейшели","Сенегал","Сиера Леоне","Сомалия","Судан","Южен Судан","Танзания",
+                "Того","Тунис","Уганда","Централноафриканска република","Чад","ЮАР",
+
+                // Северна и Централна Америка
+                "Антигуа и Барбуда","Бахами","Барбадос","Белиз","Гватемала","Доминика",
+                "Доминиканска република","Канада","Коста Рика","Куба","Мексико","Никарагуа",
+                "Панама","Салвадор","САЩ","Сейнт Китс и Невис","Сейнт Лусия",
+                "Сейнт Винсент и Гренадини","Тринидад и Тобаго","Хаити","Хондурас","Ямайка",
+
+                // Южна Америка
+                "Аржентина","Боливия","Бразилия","Венецуела","Гаяна","Колумбия","Парагвай",
+                "Перу","Суринам","Уругвай","Чили","Еквадор",
+
+                // Океания
+                "Австралия","Вануату","Кирибати","Маршалови острови","Микронезия","Науру",
+                "Нова Зеландия","Палау","Папуа Нова Гвинея","Самоа","Соломонови острови",
+                "Тонга","Тувалу","Фиджи"
+            ]; 
+
+            const searchInput = document.getElementById('countrySearch');
+            const countryList = document.getElementById('countryList');
+            const hiddenInput = document.getElementById('selectedCountry');
+
+            function populateList(filter = "") {
+                countryList.innerHTML = '';
+                const filtered = countries.filter(c => c.toLowerCase().includes(filter.toLowerCase()));
+                
+                if (filtered.length === 0) {
+                    const noResult = document.createElement('div');
+                    noResult.className = 'dropdown-item';
+                    noResult.textContent = 'Няма резултати';
+                    noResult.style.color = '#999';
+                    noResult.style.cursor = 'default';
+                    countryList.appendChild(noResult);
+                    return;
+                }
+
+                filtered.forEach(country => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item';
+                    item.textContent = country;
+                    item.addEventListener('click', () => {
+                        searchInput.value = country;
+                        hiddenInput.value = country;
+                        countryList.style.display = 'none';
+                    });
+                    countryList.appendChild(item);
+                });
+            }
+
+            searchInput.addEventListener('input', () => {
+                populateList(searchInput.value);
+                countryList.style.display = 'block';
+            });
+
+            searchInput.addEventListener('focus', () => {
+                populateList(searchInput.value);
+                countryList.style.display = 'block';
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !countryList.contains(e.target)) {
+                    countryList.style.display = 'none';
+                }
             });
 
             const leftPicker = document.getElementById('leftColorPicker');
@@ -169,7 +276,7 @@
         border-radius: 15px;
         margin-bottom: 30px;
         box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 0 8px rgba(255,255,255,0.7);
-        overflow: hidden;
+        /* overflow: hidden; Removed to allow dropdown */
         cursor: default;
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         border: 1.5px solid #bbb;
@@ -191,7 +298,66 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+        border-radius: 15px 0 0 15px; /* Radius fix */
     }
+
+    /* Custom Dropdown Styles */
+    .dropdown-container {
+        position: relative;
+        width: 100%;
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+
+    .dropdown-search {
+        width: 100%;
+        margin-bottom: 5px;
+        background: transparent;
+        border: none;
+        border-bottom: 1.5px dashed #004d40;
+        color: #004d40;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 6px 4px;
+    }
+
+    .dropdown-search::placeholder {
+        color: #00796b88;
+    }
+
+    .dropdown-search:focus {
+        outline: none;
+        border-color: #4caf50;
+    }
+
+    .dropdown-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        max-height: 220px;
+        overflow-y: auto;
+        z-index: 100;
+        display: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .dropdown-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: background 0.2s;
+        color: #333; /* Ensure text is visible in dropdown */
+        text-shadow: none; /* No shadow in dropdown */
+    }
+
+    .dropdown-item:hover {
+        background: #e0f2f1;
+        color: #00796b;
+    }
+
 
         .ticket-left h2 {
             font-size: 2rem;
@@ -243,8 +409,17 @@
         font-size: 1.1rem;
     }
 
+
+
+    .ticket-center-wrapper {
+        width: 30px;
+        overflow: hidden;
+        position: relative;
+    }
+
     .ticket-center {
         width: 30px;
+        height: 100%;
         background: repeating-linear-gradient(to bottom, transparent, transparent 8px, #999 8px, #999 10px);
         position: relative;
     }
@@ -278,6 +453,7 @@
         flex-direction: column;
         justify-content: space-between;
         border-left: 1.5px dashed #999;
+        border-radius: 0 15px 15px 0; /* Radius fix */
     }
 
     .barcode {
