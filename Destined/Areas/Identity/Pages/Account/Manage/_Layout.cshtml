@@ -7,59 +7,75 @@
     {
         Layout = "/Areas/Identity/Pages/_Layout.cshtml";
     }
+    
+    // Ensure full width for the background
+    ViewData["FullWidth"] = true;
 }
 
-<div class="passport-sheet">
-    <div class="passport-inner">
-        <div class="passport-left">
-            <div class="portrait-frame">
-                <div class="portrait-placeholder">
-                    <span>PHOTO</span>
-
-                    <div class="stamp-inside-wrap" aria-hidden="true">
-                        <svg class="stamp" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Decorative stamp">
-                            <defs>
-                                <filter id="roughEdge" x="-20%" y="-20%" width="140%" height="140%">
-                                    <feTurbulence baseFrequency="0.6" numOctaves="2" result="turb" />
-                                    <feDisplacementMap in="SourceGraphic" in2="turb" scale="4" xChannelSelector="R" yChannelSelector="G" />
-                                </filter>
-                            </defs>
-                            <g filter="url(#roughEdge)">
-                                <circle cx="120" cy="120" r="92" fill="none" stroke="#0b5ed7" stroke-width="6" />
-                            </g>
-                            <circle cx="120" cy="120" r="64" fill="none" stroke="#0b5ed7" stroke-width="3" stroke-dasharray="6 5" opacity="0.92" />
-                            <text x="120" y="118" font-size="15" text-anchor="middle" fill="#0b5ed7" font-family="Segoe UI, Arial" font-weight="800" letter-spacing="1.4">
-                                ACCOUNT
-                            </text>
-                            <text x="120" y="138" font-size="13" text-anchor="middle" fill="#0b5ed7" font-family="Segoe UI, Arial" font-weight="700" letter-spacing="1.2">
-                                MANAGER
-                            </text>
-                        </svg>
+<div style="position: relative; min-height: 100vh; overflow-x: hidden;">
+    <!-- Global Animated Background -->
+    <partial name="~/Views/Shared/_ThemeBackground.cshtml" />
+    
+    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+        
+        <!-- Passport Container -->
+        <div class="passport-sheet">
+            <!-- Spine removed -->
+            <div class="passport-inner">
+                
+                <!-- Left Page: Photo & decorative stamp -->
+                <div class="passport-left">
+                    <div class="portrait-frame">
+                        <div class="portrait-placeholder">
+                            <i class="passport-photo-icon">📷</i>
+                            <div class="stamp-overlay">
+                                <svg width="140" height="140" viewBox="0 0 140 140">
+                                    <circle cx="70" cy="70" r="65" stroke="#1a237e" stroke-width="2" fill="none" opacity="0.6" stroke-dasharray="4 2"/>
+                                    <circle cx="70" cy="70" r="55" stroke="#1a237e" stroke-width="1" fill="none" opacity="0.4"/>
+                                    <path id="curve" d="M 20 70 A 50 50 0 1 1 120 70" fill="transparent"/>
+                                    <text width="140">
+                                        <textPath href="#curve" startOffset="50%" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a237e" letter-spacing="2">
+                                            OFFICIAL MEMBER
+                                        </textPath>
+                                    </text>
+                                    <text x="70" y="80" text-anchor="middle" font-size="10" fill="#1a237e" font-family="Courier New">DESTINED</text>
+                                    <text x="70" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">APPROVED</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="portrait-label">HOLDER'S SIGNATURE</div>
+                        <div class="signature-line"></div>
+                    </div>
+                    
+                    <!-- Navigation as "Visas" or Section List -->
+                    <div class="passport-nav-container">
+                        <div class="nav-title">SECTIONS</div>
+                        <partial name="_ManageNav" />
                     </div>
                 </div>
-                <div class="portrait-caption">Вашият профил</div>
+
+                <!-- Right Page: Details form -->
+                <div class="passport-right">
+                    <div class="doc-header">
+                        <div class="doc-symbol">⚜</div>
+                        <div>
+                            <div class="doc-country">DESTINED REPUBLIC</div>
+                            <div class="doc-type">IDENTIFICATION CARD</div>
+                        </div>
+                    </div>
+
+                    <div class="passport-content">
+                        @RenderBody()
+                    </div>
+                    
+                    <div class="passport-footer-code">
+                        P&lt;DESTINED&lt;&lt;USER&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+                        1234567890M1234567&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="passport-right">
-            <div class="doc-header">
-                <div class="doc-title">Manage your account</div>
-                <div class="doc-sub">Change your account settings</div>
-            </div>
-
-            <div class="passport-content">
-                <div class="manage-layout">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <partial name="_ManageNav" />
-                        </div>
-                        <div class="col-md-9">
-                            @RenderBody()
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -68,177 +84,269 @@
 }
 
 <style>
-.passport-sheet {
-    max-width: 960px;
-    margin: 40px auto;
-    padding: 28px;
-    background: linear-gradient(180deg, #f7f3ea 0%, #efe6d6 100%);
-    border: 1px solid rgba(30,20,10,0.12);
-    box-shadow: 0 12px 36px rgba(0,0,0,0.25);
-    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-    color: #2e2a25;
-    border-radius: 8px;
-}
-
-.passport-inner {
-    display: flex;
-    gap: 22px;
-}
-
-.passport-left {
-    width: 38%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.portrait-frame {
-    width: 100%;
-    text-align: center;
-}
-
-.portrait-placeholder {
-    position: relative;
-    width: 100%;
-    height: 240px;
-    background: linear-gradient(180deg, #eef3f5 0%, #e6eded 100%);
-    border: 3px solid rgba(20,20,20,0.06);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #6b6b6b;
-    font-weight: 700;
-    letter-spacing: 2px;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
-}
-
-.portrait-placeholder::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image:
-        linear-gradient(rgba(0,0,0,0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,0,0,0.01) 1px, transparent 1px);
-    background-size: 100% 6px, 6px 100%;
-    mix-blend-mode: multiply;
-    pointer-events: none;
-}
-
-.portrait-caption {
-    margin-top: 6px;
-    font-size: 0.85rem;
-    color: #4b4238;
-}
-
-.stamp-inside-wrap {
-    position: absolute;
-    bottom: -80px;
-    right: -80px;
-    width: 160px;
-    height: 160px;
-    transform: rotate(-12deg);
-    pointer-events: none;
-    z-index: 5;
-}
-
-.stamp {
-    width: 160px;
-    height: 160px;
-    opacity: 0.95;
-    mix-blend-mode: multiply;
-    filter: drop-shadow(0 1px 0 rgba(0,0,0,0.03));
-}
-
-.passport-right {
-    width: 62%;
-}
-
-.doc-header {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 14px;
-}
-
-.doc-title {
-    font-weight: 700;
-    font-size: 1.2rem;
-    letter-spacing: 1px;
-    color: #3a2f27;
-}
-
-.doc-sub {
-    font-size: 0.9rem;
-    color: #645548;
-}
-
-.manage-layout .col-md-3 {
-    border-right: 1px dashed rgba(60,50,40,0.2);
-}
-
-#manage-nav {
-    padding-right: 10px;
-}
-
-#manage-nav a.nav-link {
-    color: #3a2f27;
-    padding: 6px 0;
-    display: block;
-    font-weight: 600;
-    transition: color 0.2s;
-}
-
-#manage-nav a.nav-link.active {
-    color: #0b5ed7;
-}
-
-#manage-nav a.nav-link:hover {
-    color: #0b5ed7;
-}
-
-.passport-input {
-    background: linear-gradient(180deg, #faf7f1 0%, #f3ebe0 100%);
-    border: 1px solid rgba(90,70,55,0.12);
-    color: #30261b;
-    padding: 1rem .75rem;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
-    border-radius: 4px;
-}
-
-.passport-btn {
-    background: #0d6efd;
-    color: white;
-    border: none;
-    padding: 12px;
-    font-weight: 700;
-    border-radius: 6px;
-    box-shadow: 0 4px 10px rgba(13,110,253,0.18);
-    cursor: pointer;
-}
-
-.passport-btn:hover {
-    transform: translateY(-1px);
-}
-
-@@media (max-width: 880px) {
-    .passport-inner {
-        flex-direction: column;
+    /* Remove default body margin to fit full layout if needed, though usually handled by reset */
+    .passport-sheet {
+        max-width: 1000px;
+        margin: 40px auto;
+        /* Warmer, vintage parchment look */
+        background-color: #f3e5d0; 
+        background: 
+            radial-gradient(circle at 10% 20%, rgba(0,0,0,0.02) 0%, transparent 20%),
+            radial-gradient(circle at 90% 80%, rgba(0,0,0,0.02) 0%, transparent 20%),
+            linear-gradient(#f3e5d0, #e8d6bd);
+        border: 1px solid #cbb69d;
+        border-radius: 8px; /* Slightly less rounded */
+        box-shadow: 
+            0 20px 50px rgba(0,0,0,0.5), /* Deep shadow */
+            inset 0 0 60px rgba(160, 130, 100, 0.2); /* Inner vignette for aging */
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        font-family: 'Courier New', Courier, monospace; /* Typewriter feel */
     }
-
-    .passport-left, .passport-right {
+    
+    /* Spine effect removed */
+    /* .passport-spine { ... } */
+    
+    .passport-inner {
+        display: flex;
         width: 100%;
     }
 
-    .portrait-placeholder {
-        height: 200px;
+    /* === Left Page === */
+    .passport-left {
+        width: 40%;
+        padding: 40px 30px;
+        border-right: 1px solid rgba(0,0,0,0.05);
+        /* Subtle pattern */
+        background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.01) 10px, rgba(0,0,0,0.01) 11px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
-    .stamp-inside-wrap {
-        bottom: -60px;
-        right: -60px;
-        width: 140px;
-        height: 140px;
+    .portrait-frame {
+        width: 100%;
+        max-width: 200px;
+        text-align: center;
     }
-}
+    
+    .portrait-placeholder {
+        width: 160px;
+        height: 200px;
+        background: #e6e0d5;
+        margin: 0 auto 15px;
+        border: 4px double #8d6e63; /* Vintage frame */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+    }
+    .passport-photo-icon { font-size: 3rem; opacity: 0.4; color: #5d4037; font-style: normal; }
+    
+    .stamp-overlay {
+        position: absolute;
+        bottom: -20px;
+        right: -20px;
+        transform: rotate(-20deg);
+        pointer-events: none;
+        mix-blend-mode: multiply;
+        opacity: 0.8;
+    }
+
+    .portrait-label { font-size: 0.75rem; color: #5d4037; font-weight: bold; letter-spacing: 1px; margin-top: 10px; }
+    .signature-line {
+        height: 2px; background: rgba(0,0,0,0.7); width: 80%; margin: 30px auto 0;
+        position: relative;
+        opacity: 0.6;
+        transform: rotate(-1deg); /* Slight handwritten unevenness */
+    }
+    .signature-line::before {
+        content: "X"; position: absolute; left: -20px; bottom: -8px; font-size: 1.4rem; font-family: cursive; color: #000;
+    }
+
+    /* Nav items styled as list */
+    .passport-nav-container {
+        width: 100%;
+        margin-top: 50px;
+        border-top: 2px solid rgba(141, 110, 99, 0.3);
+        padding-top: 20px;
+        position: relative;
+    }
+    .passport-nav-container::before {
+        content: "VISAS";
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #f1e3cc;
+        padding: 0 10px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: #8d6e63;
+        letter-spacing: 2px;
+    }
+    
+    /* Override bootstrap nav links */
+    .passport-nav-container .nav {
+        flex-direction: column;
+        gap: 8px;
+        padding-left: 0;
+    }
+    .passport-nav-container .nav-item { list-style: none; }
+    
+    .passport-nav-container .nav-link {
+        color: #5d4037;
+        font-weight: 700;
+        padding: 10px 15px;
+        border-radius: 4px;
+        transition: 0.2s;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        display: block;
+        text-decoration: none;
+        border: 1px solid transparent;
+    }
+    .passport-nav-container .nav-link:hover {
+        background: rgba(141, 110, 99, 0.1);
+        border-color: rgba(141, 110, 99, 0.2);
+        color: #3e2723;
+    }
+    .passport-nav-container .nav-link.active {
+        background: rgba(141, 110, 99, 0.15);
+        color: #bf360c; /* Deep rust red */
+        border: 1px solid rgba(191, 54, 12, 0.3);
+        box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    }
+
+    /* === Right Page === */
+    .passport-right {
+        width: 60%;
+        padding: 40px 40px 80px 40px; 
+        position: relative;
+        /* Map watermark */
+        background-image: 
+            radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.03)),
+            url('https://www.transparenttextures.com/patterns/shattered-island.png'); /* Subtle map-like texture */
+        background-color: #f1e6d4;
+    }
+    
+    /* Compass/Globe decoration via CSS shape */
+    .passport-right::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 300px;
+        border: 2px solid rgba(0,0,0,0.03);
+        border-radius: 50%;
+        box-shadow: 0 0 0 20px rgba(0,0,0,0.01), 0 0 0 40px rgba(0,0,0,0.01);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .doc-header {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        margin-bottom: 30px;
+        border-bottom: 2px double #8d6e63;
+        padding-bottom: 15px;
+        position: relative;
+        z-index: 1;
+    }
+    .doc-symbol { font-size: 3rem; color: #bf360c; text-shadow: 0 2px 2px rgba(0,0,0,0.1); }
+    .doc-country { font-weight: 800; font-size: 1.4rem; letter-spacing: 2px; color: #3e2723; }
+    .doc-type { font-size: 0.85rem; letter-spacing: 4px; color: #795548; text-transform: uppercase; font-weight: bold; }
+
+    .passport-content {
+        font-family: 'Courier New', Courier, monospace;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .passport-footer-code {
+        position: absolute;
+        bottom: 30px;
+        left: 40px;
+        right: 40px;
+        font-family: 'OCR-B', monospace; 
+        letter-spacing: 2px;
+        font-weight: bold;
+        color: #333;
+        word-break: break-all;
+        line-height: 1.4;
+        opacity: 0.7;
+        font-size: 1.1rem;
+    }
+
+    /* Input Styling Override for Passport Form */
+    .passport-content form .form-floating {
+        margin-bottom: 20px;
+    }
+    
+    .passport-content .form-control {
+        background: rgba(255,255,255,0.4);
+        border: none;
+        border-bottom: 2px solid #5d4037;
+        border-radius: 0;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: #1a237e; /* Traditional passport ink color */
+        padding-left: 5px;
+        padding-bottom: 5px;
+        box-shadow: none;
+    }
+    .passport-content .form-control:focus {
+        background: rgba(255,255,255,0.6);
+        border-color: #bf360c; /* Focus highlight */
+        box-shadow: none;
+        outline: none;
+    }
+    
+    .passport-content label {
+        padding-left: 5px;
+        color: #795548;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+    }
+    
+    .passport-content .btn-primary {
+        background: #3e2723; /* Dark leather brown */
+        border: 1px solid #5d4037;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        padding: 12px 20px;
+        font-family: sans-serif;
+        font-weight: bold;
+        color: #e6dace; /* Light text */
+        margin-top: 25px;
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        transition: 0.2s;
+    }
+    .passport-content .btn-primary:hover {
+        background: #5d4037;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 10px rgba(0,0,0,0.4);
+    }
+
+    @@media (max-width: 800px) {
+        .passport-sheet { flex-direction: column; margin: 20px 10px; }
+        .passport-spine { display: none; }
+        .passport-left { width: 100%; border-right: none; border-bottom: 2px dashed rgba(0,0,0,0.1); flex-direction: row; gap: 20px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+        .portrait-frame { max-width: 140px; }
+        .portrait-placeholder { width: 120px; height: 140px; }
+        .passport-nav-container { margin-top: 20px; border-top: none; width: 100%; }
+        .passport-nav-container::before { content: none; }
+        .passport-right { width: 100%; padding-bottom: 80px; }
+    }
 </style>
