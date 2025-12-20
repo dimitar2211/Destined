@@ -7,33 +7,65 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/start.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/header.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Destined</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Tickets" asp-action="Index">Билети</a>
-                        </li>
-                    </ul>
-
-                    <partial name="_LoginPartial" />
+    <header class="destined-header">
+        <div class="header-content">
+            <!-- Logo (Left) -->
+            <a class="header-logo" asp-area="" asp-controller="Home" asp-action="Index">
+                <div class="logo-icon-circle">
+                    <svg viewBox="0 0 24 24" fill="none" class="logo-svg">
+                        <path d="M21 16V14L13 9V3.5C13 2.67 12.33 2 11.5 2C10.67 2 10 2.67 10 3.5V9L2 14V16L10 13.5V19L8 20.5V22L11.5 21L15 22V20.5L13 19V13.5L21 16Z" fill="currentColor"/>
+                    </svg>
                 </div>
+                <span class="logo-text">DESTINED</span>
+            </a>
+
+            <!-- User Auth (Right) -->
+            <div class="header-auth">
+                @using Microsoft.AspNetCore.Identity
+                @inject SignInManager<IdentityUser> SignInManager
+                @inject UserManager<IdentityUser> UserManager
+
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    var user = await UserManager.GetUserAsync(User);
+                    var picClaim = User.FindFirst("profile_picture");
+                    var picUrl = picClaim?.Value;
+
+                    <div class="user-profile-display">
+                        <span class="username">@User.Identity?.Name</span>
+                        @if (!string.IsNullOrEmpty(picUrl))
+                        {
+                            <img src="@picUrl" alt="Profile" class="header-avatar" />
+                        }
+                        else
+                        {
+                            <div class="header-avatar-placeholder">
+                                @User.Identity?.Name?.Substring(0, 1).ToUpper()
+                            </div>
+                        }
+                        
+                        <!-- Dropdown Menu -->
+                        <div class="user-dropdown">
+                             <a asp-area="Identity" asp-page="/Account/Manage/Index" class="dropdown-item">My Passport</a>
+                             <a asp-controller="Tickets" asp-action="Index" class="dropdown-item">My Tickets</a>
+                             <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                <button type="submit" class="dropdown-item text-danger">Logout</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="guest-controls">
+                        <a class="btn-glass-auth" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                        <a class="btn-glass-auth highlight" asp-area="Identity" asp-page="/Account/Register">Register</a>
+                    </div>
+                }
             </div>
-        </nav>
+        </div>
     </header>
     @if (ViewData["FullWidth"] as bool? == true)
     {
