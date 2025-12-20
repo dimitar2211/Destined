@@ -4,8 +4,11 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -25,39 +28,22 @@ namespace Destined.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Username { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            [Display(Name = "Profile Picture")]
+            public IFormFile ProfilePicture { get; set; }
         }
 
         private async Task LoadAsync(IdentityUser user)
@@ -108,6 +94,42 @@ namespace Destined.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            // --- Profile Picture Upload Logic ---
+            if (Input.ProfilePicture != null)
+            {
+                // 1. Create directory
+                var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "avatars");
+                if (!Directory.Exists(uploadDir))
+                {
+                    Directory.CreateDirectory(uploadDir);
+                }
+
+                // 2. Create unique filename
+                var fileName = $"{user.Id}_{Guid.NewGuid()}{Path.GetExtension(Input.ProfilePicture.FileName)}";
+                var filePath = Path.Combine(uploadDir, fileName);
+
+                // 3. Save file
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await Input.ProfilePicture.CopyToAsync(stream);
+                }
+
+                // 4. Update Claim
+                var publicUrl = $"/uploads/avatars/{fileName}";
+                
+                // Remove old claim if exists
+                var claims = await _userManager.GetClaimsAsync(user);
+                var oldPicClaim = claims.FirstOrDefault(c => c.Type == "profile_picture");
+                if (oldPicClaim != null)
+                {
+                    await _userManager.RemoveClaimAsync(user, oldPicClaim);
+                    // Optionally delete old file? Keeping it simple for now.
+                }
+
+                // Add new claim
+                await _userManager.AddClaimAsync(user, new Claim("profile_picture", publicUrl));
             }
 
             await _signInManager.RefreshSignInAsync(user);

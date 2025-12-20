@@ -3,100 +3,91 @@
 
 @{
     ViewData["Title"] = "Вход";
+    ViewData["FullWidth"] = true;
 }
 
-<div class="passport-sheet">
-    <div class="passport-inner">
-        <div class="passport-left">
-            <div class="portrait-frame">
-                <div class="portrait-placeholder">
-                    <span>PHOTO</span>
+<div style="position: relative; min-height: 100vh; overflow-x: hidden;">
+    <partial name="~/Views/Shared/_ThemeBackground.cshtml" />
 
-                    <div class="stamp-inside-wrap" aria-hidden="true">
-                        <svg class="stamp" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Decorative stamp">
-                            <defs>
-                                <filter id="inkGrain">
-                                    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="noise" />
-                                    <feColorMatrix type="saturate" values="0" result="mono" />
-                                    <feComponentTransfer in="mono" result="grain">
-                                        <feFuncA type="table" tableValues="0 0.6" />
-                                    </feComponentTransfer>
-                                    <feBlend in="SourceGraphic" in2="grain" mode="multiply" />
-                                </filter>
-                                <filter id="roughEdge" x="-20%" y="-20%" width="140%" height="140%">
-                                    <feTurbulence baseFrequency="0.6" numOctaves="2" result="turb" />
-                                    <feDisplacementMap in="SourceGraphic" in2="turb" scale="4" xChannelSelector="R" yChannelSelector="G" />
-                                </filter>
-                                <mask id="inkMask">
-                                    <rect x="0" y="0" width="100%" height="100%" fill="white" />
-                                    <g fill="black" opacity="0.06">
-                                        <circle cx="60" cy="170" r="40" />
-                                        <circle cx="180" cy="40" r="30" />
-                                        <ellipse cx="140" cy="130" rx="36" ry="18" />
-                                    </g>
-                                </mask>
-                            </defs>
-                            <g transform="translate(0,0)">
-                                <g filter="url(#roughEdge)">
-                                    <circle cx="120" cy="120" r="92" fill="none" stroke="#0b5ed7" stroke-width="6" />
-                                </g>
-                                <circle cx="120" cy="120" r="64" fill="none" stroke="#0b5ed7" stroke-width="3" stroke-dasharray="6 5" opacity="0.92" />
-                                <text x="120" y="110" font-size="18" text-anchor="middle" fill="#0b5ed7" font-family="Segoe UI, Arial" font-weight="800" letter-spacing="1.5">TRAVEL</text>
-                                <text x="120" y="130" font-size="14" text-anchor="middle" fill="#0b5ed7" font-family="Segoe UI, Arial" font-weight="800" letter-spacing="1.2">MEMORIES</text>
-                                <line x1="60" y1="120" x2="90" y2="120" stroke="#0b5ed7" stroke-width="2" opacity="0.85" />
-                                <line x1="150" y1="120" x2="180" y2="120" stroke="#0b5ed7" stroke-width="2" opacity="0.85" />
-                                <path d="M40 160 q40 -24 80 -10 q30 10 60 -8" fill="none" stroke="#0b5ed7" stroke-opacity="0.14" stroke-width="12" stroke-linecap="round" />
-                                <g filter="url(#inkGrain)" opacity="0.98"></g>
-                                <g mask="url(#inkMask)" opacity="0.18" fill="#0b5ed7">
-                                    <circle cx="50" cy="170" r="12" />
-                                    <circle cx="190" cy="40" r="8" />
-                                    <ellipse cx="140" cy="130" rx="22" ry="10" />
-                                </g>
-                            </g>
-                        </svg>
+    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+        
+        <div class="passport-sheet">
+            <div class="passport-inner">
+                
+                <!-- Left Page -->
+                <div class="passport-left">
+                    <div class="portrait-frame">
+                        <div class="portrait-placeholder">
+                            <i class="passport-photo-icon">📷</i>
+                            <div class="stamp-overlay">
+                                <svg width="140" height="140" viewBox="0 0 140 140">
+                                    <circle cx="70" cy="70" r="65" stroke="#1a237e" stroke-width="2" fill="none" opacity="0.6" stroke-dasharray="4 2"/>
+                                    <circle cx="70" cy="70" r="55" stroke="#1a237e" stroke-width="1" fill="none" opacity="0.4"/>
+                                    <path id="curve" d="M 20 70 A 50 50 0 1 1 120 70" fill="transparent"/>
+                                    <text width="140">
+                                        <textPath href="#curve" startOffset="50%" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a237e" letter-spacing="2">
+                                            TRAVEL PERMIT
+                                        </textPath>
+                                    </text>
+                                    <text x="70" y="80" text-anchor="middle" font-size="10" fill="#1a237e" font-family="Courier New">ENTRY VISA</text>
+                                    <text x="70" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">GRANTED</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="portrait-caption">IDENTITY VERIFICATION</div>
                     </div>
                 </div>
-                <div class="portrait-caption">Ваш портрет</div>
+
+                <!-- Right Page -->
+                <div class="passport-right">
+                    <div class="doc-header">
+                        <div class="doc-symbol">⚜</div>
+                        <div>
+                            <div class="doc-country">DESTINED REPUBLIC</div>
+                            <div class="doc-type">OFFICIAL LOGIN</div>
+                        </div>
+                    </div>
+
+                    <div class="passport-content">
+                        <form id="account" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="name@example.com" />
+                                <label asp-for="Input.Email">PASSPORT / EMAIL</label>
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" placeholder="Password" />
+                                <label asp-for="Input.Password">ACCESS CODE / WORD</label>
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" asp-for="Input.RememberMe" />
+                                <label class="form-check-label" asp-for="Input.RememberMe">REMEMBER MY IDENTITY</label>
+                            </div>
+
+                            <div>
+                                <button id="login-submit" type="submit" class="w-100 btn btn-primary">STAMP & ENTER</button>
+                            </div>
+
+                            <div class="small-links mt-3 text-center">
+                                <a id="forgot-password" asp-page="./ForgotPassword">Lost Documents?</a> | 
+                                <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Apply for Visa (Register)</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="passport-footer-code">
+                        P&lt;DESTINED&lt;&lt;LOGIN&lt;&lt;AUTH&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+                        REQ882910M&lt;&lt;&lt;ENTRY&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="passport-right">
-            <div class="doc-header">
-                <div class="doc-title">PASSPORT-STYLE</div>
-                <div class="doc-sub">TRAVEL MEMORY PAGE </div>
-            </div>
-
-            <form id="account" method="post" class="passport-form">
-                <div asp-validation-summary="ModelOnly" class="validation text-danger" role="alert"></div>
-
-                <!-- Email and Password only -->
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Email" class="form-control passport-input" autocomplete="username" placeholder="email@example.com" />
-                    <label asp-for="Input.Email">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-
-                <div class="form-floating mb-3">
-                    <input asp-for="Input.Password" class="form-control passport-input" autocomplete="current-password" placeholder="Парола" />
-                    <label asp-for="Input.Password">Парола</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-
-                <div class="form-check mb-3">
-                    <input class="form-check-input" asp-for="Input.RememberMe" />
-                    <label class="form-check-label" asp-for="Input.RememberMe">Запомни ме</label>
-                </div>
-
-                <div class="d-grid mb-2">
-                    <button id="login-submit" type="submit" class="btn passport-btn">Вход</button>
-                </div>
-
-                <div class="small-links">
-                    <a asp-page="./ForgotPassword">Забравена парола?</a> ·
-                    <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Регистрация</a>
-                </div>
-            </form>
-        </div>
     </div>
 </div>
 
@@ -105,185 +96,209 @@
 }
 
 <style>
+    /* Remove default body margin to fit full layout if needed, though usually handled by reset */
     .passport-sheet {
-        max-width: 920px;
+        max-width: 900px;
         margin: 40px auto;
-        padding: 28px;
-        background: linear-gradient(180deg, #f7f3ea 0%, #efe6d6 100%);
-        border: 1px solid rgba(30,20,10,0.12);
-        box-shadow: 0 12px 36px rgba(0,0,0,0.25);
-        font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-        color: #2e2a25;
-        border-radius: 8px;
+        /* Warmer, vintage parchment look */
+        background-color: #f3e5d0; 
+        background: 
+            radial-gradient(circle at 10% 20%, rgba(0,0,0,0.02) 0%, transparent 20%),
+            radial-gradient(circle at 90% 80%, rgba(0,0,0,0.02) 0%, transparent 20%),
+            linear-gradient(#f3e5d0, #e8d6bd);
+        border: 1px solid #cbb69d;
+        border-radius: 8px; /* Slightly less rounded */
+        box-shadow: 
+            0 20px 50px rgba(0,0,0,0.5), /* Deep shadow */
+            inset 0 0 60px rgba(160, 130, 100, 0.2); /* Inner vignette for aging */
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        font-family: 'Courier New', Courier, monospace; /* Typewriter feel */
     }
-
+    
     .passport-inner {
         display: flex;
-        gap: 22px;
+        width: 100%;
     }
 
+    /* === Left Page === */
     .passport-left {
-        width: 38%;
+        width: 40%;
+        padding: 40px 30px;
+        border-right: 1px solid rgba(0,0,0,0.05);
+        /* Subtle pattern */
+        background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.01) 10px, rgba(0,0,0,0.01) 11px);
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
     }
 
     .portrait-frame {
         width: 100%;
+        max-width: 200px;
         text-align: center;
     }
-
+    
     .portrait-placeholder {
-        position: relative;
-        width: 100%;
-        height: 240px;
-        background: linear-gradient(180deg, #eef3f5 0%, #e6eded 100%);
-        border: 3px solid rgba(20,20,20,0.06);
-        border-radius: 6px;
+        width: 160px;
+        height: 200px;
+        background: #e6e0d5;
+        margin: 0 auto 15px;
+        border: 4px double #8d6e63; /* Vintage frame */
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #6b6b6b;
-        font-weight: 700;
-        letter-spacing: 2px;
-        box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
-        overflow: visible;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
     }
-
-        .portrait-placeholder::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: linear-gradient(rgba(0,0,0,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.01) 1px, transparent 1px);
-            background-size: 100% 6px, 6px 100%;
-            mix-blend-mode: multiply;
-            pointer-events: none;
-        }
-
-    .portrait-caption {
-        margin-top: 6px;
-        font-size: 0.85rem;
-        color: #4b4238;
-    }
-
-    .stamp-inside-wrap {
+    .passport-photo-icon { font-size: 3rem; opacity: 0.4; color: #5d4037; font-style: normal; }
+    
+    .stamp-overlay {
         position: absolute;
-        bottom: -80px;
-        right: -80px;
-        width: 160px;
-        height: 160px;
-        transform: rotate(-12deg);
+        bottom: -20px;
+        right: -20px;
+        transform: rotate(-20deg);
         pointer-events: none;
-        z-index: 5;
-    }
-
-    .stamp {
-        width: 160px;
-        height: 160px;
-        opacity: 0.95;
         mix-blend-mode: multiply;
-        filter: drop-shadow(0 1px 0 rgba(0,0,0,0.03));
+        opacity: 0.8;
     }
 
+    .portrait-caption { font-size: 0.75rem; color: #5d4037; font-weight: bold; letter-spacing: 1px; margin-top: 10px; }
+
+    /* === Right Page === */
     .passport-right {
-        width: 62%;
+        width: 60%;
+        padding: 40px 40px 80px 40px; 
+        position: relative;
+        /* Map watermark */
+        background-image: 
+            radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.03)),
+            url('https://www.transparenttextures.com/patterns/shattered-island.png'); /* Subtle map-like texture */
+        background-color: #f1e6d4;
+    }
+    
+    /* Compass/Globe decoration via CSS shape */
+    .passport-right::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 300px;
+        border: 2px solid rgba(0,0,0,0.03);
+        border-radius: 50%;
+        box-shadow: 0 0 0 20px rgba(0,0,0,0.01), 0 0 0 40px rgba(0,0,0,0.01);
+        pointer-events: none;
+        z-index: 0;
     }
 
     .doc-header {
         display: flex;
-        flex-direction: column;
-        gap: 6px;
-        margin-bottom: 14px;
-    }
-
-    .doc-title {
-        font-weight: 700;
-        font-size: 1.05rem;
-        letter-spacing: 1px;
-        color: #3a2f27;
-    }
-
-    .doc-sub {
-        font-size: 0.82rem;
-        color: #645548;
-    }
-
-    .passport-form .form-floating {
+        gap: 15px;
+        align-items: center;
+        margin-bottom: 30px;
+        border-bottom: 2px double #8d6e63;
+        padding-bottom: 15px;
         position: relative;
+        z-index: 1;
+    }
+    .doc-symbol { font-size: 3rem; color: #bf360c; text-shadow: 0 2px 2px rgba(0,0,0,0.1); }
+    .doc-country { font-weight: 800; font-size: 1.4rem; letter-spacing: 2px; color: #3e2723; }
+    .doc-type { font-size: 0.85rem; letter-spacing: 4px; color: #795548; text-transform: uppercase; font-weight: bold; }
+
+    .passport-content {
+        font-family: 'Courier New', Courier, monospace;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .passport-footer-code {
+        position: absolute;
+        bottom: 30px;
+        left: 40px;
+        right: 40px;
+        font-family: 'OCR-B', monospace; 
+        letter-spacing: 2px;
+        font-weight: bold;
+        color: #333;
+        word-break: break-all;
+        line-height: 1.4;
+        opacity: 0.7;
+        font-size: 1.1rem;
     }
 
-    .passport-input {
-        background: linear-gradient(180deg, #faf7f1 0%, #f3ebe0 100%);
-        border: 1px solid rgba(90,70,55,0.12);
-        color: #30261b;
-        padding: 1rem .75rem;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,0.4);
-        border-radius: 4px;
+    /* Input Styling */
+    .passport-content form .form-floating {
+        margin-bottom: 20px;
     }
-
-    .passport-form .form-floating label {
-        color: #5d4a3b;
-    }
-
-    .form-check {
-        margin-bottom: 1rem;
-    }
-
-    .passport-btn {
-        background: #0d6efd;
-        color: white;
+    
+    .passport-content .form-control {
+        background: rgba(255,255,255,0.4);
         border: none;
-        padding: 12px;
-        font-weight: 700;
-        border-radius: 6px;
-        box-shadow: 0 4px 10px rgba(13,110,253,0.18);
-        cursor: pointer;
+        border-bottom: 2px solid #5d4037;
+        border-radius: 0;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: #1a237e; /* Traditional passport ink color */
+        padding-left: 5px;
+        padding-bottom: 5px;
+        box-shadow: none;
     }
-
-        .passport-btn:hover {
-            transform: translateY(-1px);
-        }
-
-    .small-links {
-        margin-top: 8px;
-        font-size: 0.86rem;
-        color: #4f4239;
+    .passport-content .form-control:focus {
+        background: rgba(255,255,255,0.6);
+        border-color: #bf360c; /* Focus highlight */
+        box-shadow: none;
+        outline: none;
     }
+    
+    .passport-content label {
+        padding-left: 5px;
+        color: #795548;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+    }
+    
+    .passport-content .btn-primary {
+        background: #3e2723; /* Dark leather brown */
+        border: 1px solid #5d4037;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        padding: 12px 20px;
+        font-family: sans-serif;
+        font-weight: bold;
+        color: #e6dace; /* Light text */
+        margin-top: 10px;
+        width: 100%;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        transition: 0.2s;
+    }
+    .passport-content .btn-primary:hover {
+        background: #5d4037;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 10px rgba(0,0,0,0.4);
+    }
+    
+    .small-links a {
+        color: #bf360c;
+        font-weight: bold;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .small-links a:hover { text-decoration: underline; color: #e64a19; }
 
-        .small-links a {
-            color: #103a8b;
-            text-decoration: none;
-        }
-
-            .small-links a:hover {
-                text-decoration: underline;
-            }
-
-    @@media (max-width: 880px) {
-        .passport-inner {
-            flex-direction: column;
-        }
-
-        .passport-left,
-        .passport-right {
-            width: 100%;
-        }
-
-        .portrait-placeholder {
-            height: 200px;
-        }
-
-        .stamp-inside-wrap {
-            bottom: -60px;
-            right: -60px;
-            width: 140px;
-            height: 140px;
-        }
-
-        .stamp {
-            width: 140px;
-            height: 140px;
-        }
+    @@media (max-width: 800px) {
+        .passport-sheet { flex-direction: column; margin: 20px 10px; }
+        .passport-left { width: 100%; border-right: none; border-bottom: 2px dashed rgba(0,0,0,0.1); padding: 20px; }
+        .portrait-frame { max-width: 140px; }
+        .portrait-placeholder { width: 120px; height: 140px; }
+        .passport-right { width: 100%; padding-bottom: 80px; }
     }
 </style>
