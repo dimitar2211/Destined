@@ -2,103 +2,152 @@
 @{
     var ticket = ViewBag.Ticket as Destined.Models.Ticket;
     ViewData["Title"] = "Коментари към билет";
+    ViewData["FullWidth"] = true;
     var currentUserId = User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
     var isAdmin = User.IsInRole("Admin");
 }
 
-<h2>Коментари за билет: @ticket.From → @ticket.To</h2>
+<div style="position: relative; min-height: 100vh; overflow-x: hidden;">
+    <partial name="_ThemeBackground" />
 
-<hr />
+    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+        
+        <div class="comment-wrapper">
+            <h2 class="page-title">Коментари</h2>
+            <h3 class="ticket-subtitle">за билет: @ticket.From ➔ @ticket.To</h3>
 
-<form asp-controller="Comments" asp-action="Add" method="post">
-    <input type="hidden" name="ticketId" value="@ticket.Id" />
-    <input type="hidden" name="sort" value="@ViewBag.Sort" />
-    @if (ViewBag.Seed != null)
-    {
-        <input type="hidden" name="seed" value="@ViewBag.Seed" />
-    }
+            <!-- New Comment Form -->
+            <div class="glass-panel create-box">
+                <form asp-controller="Comments" asp-action="Add" method="post">
+                    <input type="hidden" name="ticketId" value="@ticket.Id" />
+                    <input type="hidden" name="sort" value="@ViewBag.Sort" />
+                    @if (ViewBag.Seed != null)
+                    {
+                        <input type="hidden" name="seed" value="@ViewBag.Seed" />
+                    }
 
-    <textarea name="content" class="form-control" rows="3" placeholder="Напиши коментар..."></textarea>
-    <button class="btn btn-primary mt-2">Публикувай</button>
-</form>
-
-<hr />
-
-@{
-    var sort = ViewBag.Sort ?? "newest";
-}
-<form method="get" class="mb-3">
-    <input type="hidden" name="ticketId" value="@ticket.Id" />
-
-    <select name="sort" class="form-select" onchange="this.form.submit()">
-        <option value="newest" selected="@(sort == "newest" ? "selected" : null)">Най-нови</option>
-        <option value="oldest" selected="@(sort == "oldest" ? "selected" : null)">Най-стари</option>
-        <option value="longest" selected="@(sort == "longest" ? "selected" : null)">Най-дълги</option>
-        <option value="random" selected="@(sort == "random" ? "selected" : null)">Разбъркани</option>
-    </select>
-</form>
-
-@foreach (var c in Model)
-{
-    <div class="comment-box">
-        <p><strong>@c.User.UserName:</strong> @c.Content</p>
-        <small>@c.CreatedOn.ToString("dd.MM.yyyy HH:mm")</small>
-
-        @if (currentUserId == c.UserId || currentUserId == ticket.UserId || isAdmin)
-        {
-            <form asp-controller="Comments" asp-action="Delete" method="post" style="display:inline;">
-                <input type="hidden" name="id" value="@c.Id" />
-                <input type="hidden" name="sort" value="@ViewBag.Sort" />
-                @if (ViewBag.Seed != null)
-                {
-                    <input type="hidden" name="seed" value="@ViewBag.Seed" />
-                }
-                <button class="btn btn-danger btn-sm">Изтрий</button>
-            </form>
-        }
-
-        <details data-id="@c.Id">
-            <summary>Отговори</summary>
-
-            <form asp-controller="Comments" asp-action="Add" method="post" class="mt-2">
-                <input type="hidden" name="ticketId" value="@ticket.Id" />
-                <input type="hidden" name="parentCommentId" value="@c.Id" />
-                <input type="hidden" name="sort" value="@ViewBag.Sort" />
-                @if (ViewBag.Seed != null)
-                {
-                    <input type="hidden" name="seed" value="@ViewBag.Seed" />
-                }
-                <textarea name="content" rows="2" class="form-control" placeholder="Отговор..."></textarea>
-                <button class="btn btn-secondary btn-sm mt-1">Отговори</button>
-            </form>
-
-            @if (c.Replies != null)
-            {
-                foreach (var reply in c.Replies)
-                {
-                    <div style="margin-left:25px; margin-top:10px;">
-                        <p><strong>@reply.User.UserName:</strong> @reply.Content</p>
-
-                        @if (currentUserId == reply.UserId || currentUserId == ticket.UserId || isAdmin)
-                        {
-                            <form asp-controller="Comments" asp-action="Delete" method="post" style="display:inline;">
-                                <input type="hidden" name="id" value="@reply.Id" />
-                                <input type="hidden" name="sort" value="@ViewBag.Sort" />
-                                @if (ViewBag.Seed != null)
-                                {
-                                    <input type="hidden" name="seed" value="@ViewBag.Seed" />
-                                }
-                                <button class="btn btn-danger btn-sm">Изтрий</button>
-                            </form>
-                        }
+                    <div class="form-group">
+                        <textarea name="content" class="glass-input" rows="3" placeholder="Напиши коментар..."></textarea>
                     </div>
-                }
+                    <div style="text-align: right;">
+                        <button class="btn-action primary">Публикувай</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Sort & Filter -->
+            @{
+                var sort = ViewBag.Sort ?? "newest";
             }
-        </details>
+            <div class="sort-container">
+                <form method="get">
+                    <input type="hidden" name="ticketId" value="@ticket.Id" />
+                    <select name="sort" class="glass-select" onchange="this.form.submit()">
+                        <option value="newest" selected="@(sort == "newest" ? "selected" : null)">Най-нови</option>
+                        <option value="oldest" selected="@(sort == "oldest" ? "selected" : null)">Най-стари</option>
+                        <option value="longest" selected="@(sort == "longest" ? "selected" : null)">Най-дълги</option>
+                        <option value="random" selected="@(sort == "random" ? "selected" : null)">Разбъркани</option>
+                    </select>
+                </form>
+            </div>
+
+            <!-- Comments List -->
+            @if (!Model.Any())
+            {
+                <div class="no-comments">
+                    <p>Все още няма коментари. Бъди първият!</p>
+                </div>
+            }
+            else
+            {
+                <div class="comments-list">
+                    @foreach (var c in Model)
+                    {
+                        <div class="glass-comment">
+                            <div class="comment-header">
+                                <span class="author">@c.User.UserName</span>
+                                <span class="date">@c.CreatedOn.ToString("dd.MM.yyyy HH:mm")</span>
+                            </div>
+                            
+                            <div class="comment-body">
+                                @c.Content
+                            </div>
+
+                            <div class="comment-footer">
+                                <details data-id="@c.Id" class="reply-details">
+                                    <summary class="btn-link">Отговори (@(c.Replies?.Count ?? 0))</summary>
+
+                                    <div class="reply-section">
+                                        <form asp-controller="Comments" asp-action="Add" method="post" class="reply-form">
+                                            <input type="hidden" name="ticketId" value="@ticket.Id" />
+                                            <input type="hidden" name="parentCommentId" value="@c.Id" />
+                                            <input type="hidden" name="sort" value="@ViewBag.Sort" />
+                                            @if (ViewBag.Seed != null)
+                                            {
+                                                <input type="hidden" name="seed" value="@ViewBag.Seed" />
+                                            }
+                                            <div style="display: flex; gap: 10px;">
+                                                <textarea name="content" rows="1" class="glass-input small" placeholder="Твоят отговор..."></textarea>
+                                                <button class="btn-action secondary small">Прати</button>
+                                            </div>
+                                        </form>
+
+                                        @if (c.Replies != null)
+                                        {
+                                            foreach (var reply in c.Replies)
+                                            {
+                                                <div class="reply-item">
+                                                    <div class="reply-header">
+                                                        <span class="reply-author">@reply.User.UserName</span>
+                                                        <span class="reply-content">@reply.Content</span>
+                                                    </div>
+                                                    
+                                                    @if (currentUserId == reply.UserId || currentUserId == ticket.UserId || isAdmin)
+                                                    {
+                                                        <form asp-controller="Comments" asp-action="Delete" method="post" style="display:inline;">
+                                                            <input type="hidden" name="id" value="@reply.Id" />
+                                                            <input type="hidden" name="sort" value="@ViewBag.Sort" />
+                                                            @if (ViewBag.Seed != null)
+                                                            {
+                                                                <input type="hidden" name="seed" value="@ViewBag.Seed" />
+                                                            }
+                                                            <button class="btn-text-danger">Изтрий</button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </details>
+
+                                @if (currentUserId == c.UserId || currentUserId == ticket.UserId || isAdmin)
+                                {
+                                    <form asp-controller="Comments" asp-action="Delete" method="post" style="display:inline; margin-left: auto;">
+                                        <input type="hidden" name="id" value="@c.Id" />
+                                        <input type="hidden" name="sort" value="@ViewBag.Sort" />
+                                        @if (ViewBag.Seed != null)
+                                        {
+                                            <input type="hidden" name="seed" value="@ViewBag.Seed" />
+                                        }
+                                        <button class="btn-text-danger">Изтрий коментара</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            
+            <div style="text-align: center; margin-top: 40px;">
+                <a asp-controller="Tickets" asp-action="PublicTickets" class="btn-back">Обратно към билетите</a>
+            </div>
+
+        </div>
     </div>
-}
+</div>
 
 <script>
+    /* Preserve scroll and open details state handles */
     document.addEventListener("submit", function () {
         localStorage.setItem("scrollPos", window.scrollY);
 
@@ -113,253 +162,164 @@
             localStorage.removeItem("scrollPos");
         }
 
-        const openDetails = JSON.parse(localStorage.getItem("openDetails"));
-        if (openDetails && openDetails.length > 0) {
-            openDetails.forEach(id => {
-                const details = document.querySelector(`details[data-id='${id}']`);
-                if (details) details.setAttribute("open", "");
-            });
+        const openDetailsJson = localStorage.getItem("openDetails");
+        if(openDetailsJson) {
+            const openDetails = JSON.parse(openDetailsJson);
+            if (openDetails && openDetails.length > 0) {
+                openDetails.forEach(id => {
+                    const details = document.querySelector(`details[data-id='${id}']`);
+                    if (details) details.setAttribute("open", "");
+                });
+            }
             localStorage.removeItem("openDetails");
         }
     });
 </script>
 
 <style>
-    body {
-        background: #ececec;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
-    }
-
-    .comment-wrapper {
-        max-width: 900px;
-        margin: 50px auto;
-        padding: 0 20px;
-    }
-
+    /* Typography */
     .page-title {
         text-align: center;
         font-size: 2.5rem;
         margin-bottom: 5px;
-        font-weight: 700;
-        color: #222;
-        letter-spacing: 1.2px;
+        color: white;
+        font-weight: 800;
+        text-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
-
     .ticket-subtitle {
         text-align: center;
         font-size: 1.2rem;
-        color: #00796b;
+        color: rgba(255,255,255,0.8);
         margin-bottom: 30px;
-        font-weight: 600;
+        font-weight: 500;
     }
 
-    /* === COMMENT CREATE BOX === */
-    .comment-create-box {
-        background: #ffffff;
-        padding: 20px 25px;
-        border-radius: 15px;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-        border-left: 5px solid #4caf50;
-        margin-bottom: 25px;
+    .comment-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
     }
 
-    .comment-section-title {
-        font-size: 1.4rem;
-        font-weight: bold;
-        color: #2e2e2e;
-        margin-bottom: 15px;
-    }
-
-    .comment-textarea {
-        width: 100%;
-        border-radius: 10px;
-        padding: 12px;
-        border: 1.5px solid #bbb;
-        font-size: 1rem;
-        transition: 0.3s;
-    }
-
-        .comment-textarea:focus {
-            border-color: #4caf50;
-            box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
-        }
-
-    .btn-comment-post {
-        background: #4caf50;
-        border: none;
-        color: white;
-        padding: 10px 20px;
-        margin-top: 10px;
+    /* Glass Panels */
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         border-radius: 20px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: 0.3s;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     }
 
-        .btn-comment-post:hover {
-            background: #388e3c;
-            transform: translateY(-2px);
-        }
+    .create-box {
+        padding: 25px;
+        margin-bottom: 30px;
+        border-left: 5px solid #4caf50; /* Accent */
+    }
 
-    /* === COMMENT BOX === */
-    .comment-box {
-        background: linear-gradient(145deg, #fafafa, #e6e6e6);
-        margin-bottom: 25px;
+    .glass-comment {
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 15px;
         padding: 20px;
-        border: 1.5px solid #bbb;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.15), inset 0 0 8px rgba(255,255,255,0.7);
-        position: relative;
-    }
-
-        .comment-box::before {
-            content: "";
-            position: absolute;
-            left: -15px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #ececec;
-            box-shadow: inset 3px 3px 6px rgba(255,255,255,1), inset -3px -3px 6px rgba(0,0,0,0.15);
-        }
-
-    .comment-header {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 5px;
-        font-weight: 600;
-    }
-
-    .comment-author {
-        color: #00796b;
-        font-size: 1.1rem;
-    }
-
-    .comment-date {
-        font-size: 0.9rem;
-        color: #555;
-    }
-
-    .comment-content {
-        margin-top: 10px;
-        font-size: 1.1rem;
-        color: #333;
-        padding-left: 5px;
-    }
-
-    .comment-actions form {
-        margin-top: 10px;
-    }
-
-    .btn-delete-comment {
-        background: #f44336;
-        border: none;
-        padding: 6px 16px;
+        margin-bottom: 20px;
         color: white;
-        border-radius: 20px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: 0.3s;
+        transition: transform 0.2s;
+    }
+    .glass-comment:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.12);
     }
 
-        .btn-delete-comment:hover {
-            background: #d32f2f;
-            transform: translateY(-2px);
-        }
-
-    /* === REPLY SECTION === */
-
-    .reply-section {
-        margin-top: 15px;
-        padding-left: 10px;
-    }
-
-    .reply-toggle {
-        cursor: pointer;
-        font-weight: 600;
-        color: #004d40;
-    }
-
-    .reply-form {
-        margin-top: 10px;
-    }
-
-    .reply-textarea {
+    /* Inputs */
+    .glass-input, .glass-select {
         width: 100%;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1.5px solid #bbb;
-        transition: 0.3s;
-    }
-
-        .reply-textarea:focus {
-            border-color: #2196f3;
-            box-shadow: 0 0 8px rgba(33, 150, 243, 0.4);
-        }
-
-    .btn-reply {
-        margin-top: 5px;
-        background: #2196f3;
-        padding: 6px 16px;
-        border-radius: 20px;
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         color: white;
-        border: none;
-        font-weight: 700;
-        transition: 0.3s;
-        cursor: pointer;
-    }
-
-        .btn-reply:hover {
-            background: #1976d2;
-            transform: translateY(-2px);
-        }
-
-    /* Reply items */
-    .reply-box {
-        margin-top: 12px;
-        padding: 10px 15px;
-        background: #fff;
+        padding: 12px;
         border-radius: 10px;
-        border-left: 4px solid #2196f3;
-    }
-
-    .reply-author {
-        font-weight: 700;
-        color: #1976d2;
-    }
-
-    .reply-content {
-        margin-left: 5px;
-    }
-
-    .btn-delete-reply {
-        background: #e53935;
-        border: none;
-        padding: 4px 12px;
-        border-radius: 20px;
-        color: white;
-        cursor: pointer;
-        margin-top: 5px;
+        font-size: 1rem;
+        outline: none;
         transition: 0.3s;
+        font-family: inherit;
+    }
+    .glass-input:focus, .glass-select:focus {
+        background: rgba(0, 0, 0, 0.4);
+        border-color: #4caf50;
+    }
+    .glass-select option { background: #222; color: white; }
+    .glass-input.small { padding: 8px; font-size: 0.9rem; }
+
+    .sort-container {
+        display: flex; justify-content: flex-end; margin-bottom: 15px;
+    }
+    .sort-container select { width: auto; min-width: 150px; }
+
+    /* Buttons */
+    .btn-action {
+        padding: 10px 25px;
+        border-radius: 30px;
+        border: none;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.3s;
+        color: white;
+    }
+    .btn-action.primary {
+        background: linear-gradient(45deg, #4caf50, #81c784);
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+    }
+    .btn-action.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+    }
+    .btn-action.secondary {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    .btn-action.secondary:hover { background: rgba(255, 255, 255, 0.3); }
+    .btn-action.small { padding: 8px 16px; font-size: 0.9rem; }
+
+    .btn-text-danger {
+        background: none; border: none; color: #ff5252; cursor: pointer; font-size: 0.85rem; padding: 0 5px; opacity: 0.7; transition: 0.2s;
+    }
+    .btn-text-danger:hover { opacity: 1; text-decoration: underline; }
+
+    .btn-link {
+        background: none; border: none; color: #64b5f6; cursor: pointer; font-weight: 600; font-size: 0.9rem; outline: none; list-style: none;
+    }
+    .btn-link:hover { text-decoration: underline; color: #90caf9; }
+    
+    .btn-back {
+        color: rgba(255,255,255,0.6); text-decoration: none; transition: 0.2s;
+    }
+    .btn-back:hover { color: white; }
+
+    /* Comment Structure */
+    .comment-header {
+        display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;
+    }
+    .author { font-weight: 700; color: #a5d6a7; font-size: 1.1rem; }
+    .date { font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+    .comment-body { font-size: 1rem; line-height: 1.5; margin-bottom: 15px; }
+    
+    .comment-footer {
+        display: flex; align-items: center; justify-content: space-between;
     }
 
-        .btn-delete-reply:hover {
-            background: #b71c1c;
-            transform: translateY(-2px);
-        }
-
-    .reply-delete-form {
-        margin-top: 5px;
+    /* Replies */
+    .reply-section {
+        margin-top: 15px; padding-left: 15px; border-left: 2px solid rgba(255,255,255,0.1);
     }
+    .reply-form { margin-bottom: 15px; margin-top: 10px; }
+    .reply-item {
+        background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 8px; font-size: 0.95rem;
+    }
+    .reply-header { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+    .reply-author { font-weight: 700; color: #81d4fa; }
+    .reply-content { color: rgba(255,255,255,0.9); }
 
     .no-comments {
-        font-size: 1.2rem;
-        text-align: center;
-        color: #777;
-        margin-top: 20px;
+        text-align: center; padding: 40px; color: rgba(255,255,255,0.5); font-size: 1.2rem;
+        background: rgba(255, 255, 255, 0.05); border-radius: 20px;
     }
-
 </style>
