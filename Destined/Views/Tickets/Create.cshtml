@@ -131,11 +131,27 @@
             const countryList = document.getElementById('countryList');
             const hiddenInput = document.getElementById('selectedCountry');
 
+            // Move to body
+            document.body.appendChild(countryList);
+
+            function updateDropdownPosition() {
+                const rect = searchInput.getBoundingClientRect();
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                
+                countryList.style.top = (rect.bottom + scrollTop) + 'px';
+                countryList.style.left = (rect.left + scrollLeft) + 'px';
+                countryList.style.width = rect.width + 'px';
+            }
+
             function populateList(filter = "") {
                 countryList.innerHTML = '';
                 const filtered = countries.filter(c => c.toLowerCase().includes(filter.toLowerCase()));
                 
-                if (filtered.length === 0) {
+                // Show all if filter is empty
+                let showList = filter === "" ? countries : filtered;
+
+                if (showList.length === 0) {
                     const noResult = document.createElement('div');
                     noResult.className = 'dropdown-item';
                     noResult.textContent = 'Няма резултати';
@@ -146,7 +162,7 @@
                     return;
                 }
 
-                filtered.forEach(country => {
+                showList.forEach(country => {
                     const item = document.createElement('div');
                     item.className = 'dropdown-item';
                     item.textContent = country;
@@ -162,12 +178,21 @@
             searchInput.addEventListener('input', () => {
                 populateList(searchInput.value);
                 countryList.style.display = 'block';
+                updateDropdownPosition();
             });
 
             searchInput.addEventListener('focus', () => {
                 populateList(searchInput.value);
                 countryList.style.display = 'block';
+                updateDropdownPosition();
             });
+
+            window.addEventListener('resize', () => {
+                if (countryList.style.display === 'block') updateDropdownPosition();
+            });
+            window.addEventListener('scroll', () => {
+                 if (countryList.style.display === 'block') updateDropdownPosition();
+            }, true);
 
             document.addEventListener('click', (e) => {
                 if (!searchInput.contains(e.target) && !countryList.contains(e.target)) {
@@ -390,15 +415,12 @@
 
     .dropdown-list {
         position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
         background: white;
         border: 1px solid #ccc;
         border-radius: 4px;
-        max-height: 220px; /* Adjusted to show approx 5 items (5 * ~40px) */
+        max-height: 220px;
         overflow-y: auto;
-        z-index: 100;
+        z-index: 10000;
         display: none;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
