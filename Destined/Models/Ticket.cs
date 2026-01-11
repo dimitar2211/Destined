@@ -8,9 +8,8 @@ namespace Destined.Models
     {
         public int Id { get; set; }
 
-        [Required]
         [Display(Name = "От къде")]
-        public string From { get; set; } = string.Empty;
+        public string? From { get; set; } = string.Empty;
 
         [Required]
         [Display(Name = "До къде")]

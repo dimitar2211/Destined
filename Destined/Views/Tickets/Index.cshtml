@@ -48,11 +48,19 @@
                         <div class="real-ticket" data-id="@ticket.Id">
                             <div class="ticket-left" style="background:@ticket.LeftColor;">
                                 @{
-                                    string shortFrom = ticket.From.Length > 10 ? ticket.From.Substring(0, 10) + "…" : ticket.From;
+                                    string fromVal = ticket.From ?? "";
+                                    string shortFrom = fromVal.Length > 10 ? fromVal.Substring(0, 10) + "…" : fromVal;
                                     string shortTo = ticket.To.Length > 10 ? ticket.To.Substring(0, 10) + "…" : ticket.To;
                                     string textColor = string.IsNullOrEmpty(ticket.TextColor) ? "#000000" : ticket.TextColor;
                                 }
-                                <h2 style="color:@textColor">@shortFrom ➔ @shortTo</h2>
+                                @if (!string.IsNullOrEmpty(ticket.From))
+                                {
+                                    <h2 style="color:@textColor">@shortFrom ➔ @shortTo</h2>
+                                }
+                                else
+                                {
+                                    <h2 style="color:@textColor">@shortTo</h2>
+                                }
                                 <p style="color:@textColor"><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
                                 <p style="color:@textColor"><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
                                 @if (!string.IsNullOrEmpty(ticket.Country))
