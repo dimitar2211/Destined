@@ -30,6 +30,8 @@ namespace Destined.Areas.Identity.Pages.Account.Manage
 
         public string Username { get; set; }
 
+        public string CurrentProfilePictureUrl { get; set; }
+
         [TempData]
         public string StatusMessage { get; set; }
 
@@ -50,6 +52,10 @@ namespace Destined.Areas.Identity.Pages.Account.Manage
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+
+            var claims = await _userManager.GetClaimsAsync(user);
+            var profilePic = claims.FirstOrDefault(c => c.Type == "profile_picture");
+            CurrentProfilePictureUrl = profilePic?.Value;
 
             Username = userName;
 
@@ -134,6 +140,37 @@ namespace Destined.Areas.Identity.Pages.Account.Manage
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
+            return RedirectToPage();
+        }
+
+        public async Task<IActionResult> OnPostRemovePictureAsync()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var claims = await _userManager.GetClaimsAsync(user);
+            var oldPicClaim = claims.FirstOrDefault(c => c.Type == "profile_picture");
+            if (oldPicClaim != null)
+            {
+                var result = await _userManager.RemoveClaimAsync(user, oldPicClaim);
+                if (result.Succeeded)
+                {
+                     await _signInManager.RefreshSignInAsync(user);
+                     StatusMessage = "Profile picture removed successfully.";
+                }
+                else
+                {
+                     StatusMessage = "Error removing profile picture.";
+                }
+            }
+            else
+            {
+                StatusMessage = "No profile picture to remove.";
+            }
+
             return RedirectToPage();
         }
     }

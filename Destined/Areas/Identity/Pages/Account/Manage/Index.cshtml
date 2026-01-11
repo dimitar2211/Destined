@@ -13,6 +13,12 @@
     <!-- Profile Picture Upload -->
     <div class="mb-4">
         <label asp-for="Input.ProfilePicture" class="form-label">IDENTITY PHOTO</label>
+        @if (!string.IsNullOrEmpty(Model.CurrentProfilePictureUrl))
+        {
+            <div class="mb-2">
+                <button type="submit" asp-page-handler="RemovePicture" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove your profile picture?');">Remove Picture</button>
+            </div>
+        }
         <input asp-for="Input.ProfilePicture" type="file" class="form-control" accept="image/*" />
         <span asp-validation-for="Input.ProfilePicture" class="text-danger"></span>
     </div>
