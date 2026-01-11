@@ -43,7 +43,6 @@
         <div class="theme-option" data-theme="theme-sunset">🌅 Залез</div>
         <div class="theme-option" data-theme="theme-ocean">🌊 Океан</div>
         <div class="theme-option" data-theme="theme-forest">🌲 Гора</div>
-        <div class="theme-option" data-theme="theme-light">☀️ Светла</div>
     </div>
 </div>
 
@@ -54,12 +53,18 @@
         const backgroundContainer = document.getElementById('page-background');
         const themeOptions = document.querySelectorAll('.theme-option');
         
-        // Load saved theme
-        const savedTheme = localStorage.getItem('destined_tickets_theme') || 'theme-space';
-        setTheme(savedTheme);
+        // Server-side theme loading
+        // Theme is applied via class on #page-background, but we should set it initially if possible
+        // Ideally, we read the claim in Razor and output it to JS
+        const userSavedTheme = '@(User.FindFirst("user_theme")?.Value ?? "theme-space")';
+        
+        // Fallback to space if the saved theme was 'theme-light' which is now removed
+        const effectiveTheme = userSavedTheme === 'theme-light' ? 'theme-space' : userSavedTheme;
+        
+        setTheme(effectiveTheme);
 
         // Toggle menu
-        if(themeBtn) {
+        if (themeBtn) {
             themeBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 themeMenu.classList.toggle('hidden');
@@ -79,7 +84,22 @@
                 option.addEventListener('click', () => {
                     const selectedTheme = option.dataset.theme;
                     setTheme(selectedTheme);
-                    localStorage.setItem('destined_tickets_theme', selectedTheme);
+                    
+                    // Save to server
+                    fetch('/api/Theme/SetTheme', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(selectedTheme)
+                    }).then(response => {
+                        if (response.ok) {
+                            console.log('Theme saved');
+                        } else {
+                            console.error('Failed to save theme');
+                        }
+                    });
+
                     themeMenu.classList.add('hidden');
                 });
             });
@@ -273,19 +293,6 @@
     }
 
 
-    /* === 5. Light Theme === */
-    .theme-light {
-        background: #f0f2f5;
-    }
-    
-    /* Text Color Adjustments for Light Theme */
-    .theme-light .page-title, .theme-light h1, .theme-light h2, .theme-light h3 { color: #1f2937 !important; }
-    .theme-light label { color: #374151 !important; }
-    .theme-light .gradient-text { 
-        background: linear-gradient(to right, #2563eb 0%, #7c3aed 100%);
-        -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-
     /* --- Theme Settings UI --- */
     .theme-controls {
         position: absolute; /* Changed to absolute so it stays at the top of the content, not fixed to screen */
@@ -298,7 +305,6 @@
         cursor: pointer; transition: transform 0.2s, background 0.2s;
         width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
     }
-    .theme-light #theme-toggle-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: #333; }
     #theme-toggle-btn:hover { transform: rotate(30deg); background: rgba(255, 255, 255, 0.2); }
 
     #theme-menu {
@@ -309,7 +315,6 @@
         flex-direction: column; gap: 5px; display: flex;
         transition: opacity 0.2s, transform 0.2s;
     }
-    .theme-light #theme-menu { background: white; border-color: #e5e7eb; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
     #theme-menu.hidden { opacity: 0; pointer-events: none; transform: translateY(-10px); }
 
     .theme-option {
@@ -317,7 +322,6 @@
         transition: background 0.2s; color: #cbd5e1; font-weight: 500;
         display: flex; align-items: center; gap: 8px;
     }
-    .theme-light .theme-option { color: #374151; }
+
     .theme-option:hover { background: rgba(255, 255, 255, 0.1); color: white; }
-    .theme-light .theme-option:hover { background: #f3f4f6; color: #111; }
 </style>
