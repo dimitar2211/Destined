@@ -1,0 +1,251 @@
+@model IEnumerable<Destined.Models.TicketReport>
+
+@{
+    ViewData["Title"] = "Докладвани билети";
+    ViewData["FullWidth"] = true;
+}
+
+<partial name="_ThemeBackground" />
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h1>Админ Панел</h1>
+        <p>Управление на докладвани билети и сигурност</p>
+    </div>
+
+    <div class="glass-table-wrapper">
+        @if (!Model.Any())
+        {
+            <div class="empty-state">
+                <h3>Всичко е спокойно</h3>
+                <p>Няма нови доклади за преглед.</p>
+            </div>
+        }
+        else
+        {
+            <table class="glass-table">
+                <thead>
+                    <tr>
+                        <th width="15%">Дата</th>
+                        <th width="15%">Докладващ</th>
+                        <th width="20%">Билет</th>
+                        <th width="30%">Причина</th>
+                        <th width="20%" class="text-center">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <span class="date-badge">@item.Timestamp.ToString("dd.MM.yyyy")</span>
+                                <span class="time-badge">@item.Timestamp.ToString("HH:mm")</span>
+                            </td>
+                            <td class="user-cell">
+                                @(item.Reporter?.UserName ?? "Unknown")
+                            </td>
+                            <td>
+                                @if (item.Ticket != null)
+                                {
+                                    <div class="ticket-info">
+                                        <strong>@item.Ticket.From</strong> ➝ <strong>@item.Ticket.To</strong>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="status-deleted">Изтрит билет</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="reason-box">@item.Reason</div>
+                            </td>
+                            <td>
+                                <div class="actions-group">
+                                    @if (item.Ticket != null)
+                                    {
+                                        <a asp-controller="Tickets" asp-action="Details" asp-route-id="@item.TicketId" 
+                                           asp-route-returnUrl="@Url.Action("Index", "Reports")"
+                                           class="btn-text btn-view" title="Преглед">
+                                            Преглед
+                                        </a>
+                                        
+                                        <form asp-action="DeleteTicket" asp-route-id="@item.TicketId" method="post" 
+                                              onsubmit="return confirm('⚠️ ВНИМАНИЕ: Това ще изтрие билета завинаги! Продължаване?');">
+                                            <button type="submit" class="btn-text btn-delete-ticket" title="Изтрий Билет">
+                                                Изтриване
+                                            </button>
+                                        </form>
+                                    }
+
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" 
+                                          onsubmit="return confirm('Изчистване на този доклад?');">
+                                        <button type="submit" class="btn-text btn-dismiss" title="Изчисти Доклад">
+                                            Изчисти
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <div class="back-link-wrapper">
+        <a asp-controller="Home" asp-action="Index" class="btn-back">Към Начало</a>
+    </div>
+</div>
+
+<style>
+    /* Layout */
+    .admin-container {
+        position: relative;
+        z-index: 10;
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .admin-header {
+        text-align: center;
+        margin-bottom: 40px;
+        color: white;
+    }
+    .admin-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        margin-bottom: 10px;
+    }
+    .admin-header p {
+        font-size: 1.2rem;
+        color: rgba(255,255,255,0.7);
+    }
+
+    /* Glass Table */
+    .glass-table-wrapper {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        overflow-x: auto;
+    }
+
+    .glass-table {
+        width: 100%;
+        border-collapse: collapse;
+        color: white;
+    }
+
+    .glass-table th {
+        text-align: left;
+        padding: 20px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: rgba(255,255,255,0.5);
+        border-bottom: 2px solid rgba(255,255,255,0.1);
+    }
+
+    .glass-table td {
+        padding: 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        vertical-align: middle;
+    }
+
+    .glass-table tr:last-child td { border-bottom: none; }
+    .glass-table tr:hover td {
+        background: rgba(255,255,255,0.05);
+    }
+
+    /* Cell Styles */
+    .date-badge, .time-badge {
+        display: block;
+        font-size: 0.85rem;
+    }
+    .date-badge { font-weight: bold; color: #fff; }
+    .time-badge { color: rgba(255,255,255,0.5); }
+
+    .user-cell { font-weight: 600; }
+    
+    .ticket-info {
+        background: rgba(255,255,255,0.1);
+        padding: 8px 12px;
+        border-radius: 8px;
+        display: inline-block;
+    }
+    .status-deleted {
+        color: #ff6b6b;
+        font-style: italic;
+    }
+
+    .reason-box {
+        background: rgba(0,0,0,0.2);
+        padding: 10px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: #ddd;
+        border-left: 3px solid #ffca28;
+    }
+
+    /* Actions */
+    .actions-group {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn-text {
+        padding: 8px 16px;
+        border-radius: 20px; /* Pill shape */
+        border: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 80px;
+    }
+
+    .btn-view { background: rgba(33, 150, 243, 0.2); color: #64b5f6; border: 1px solid rgba(33, 150, 243, 0.3); }
+    .btn-view:hover { background: #2196f3; color: white; transform: translateY(-2px); }
+
+    .btn-delete-ticket { background: rgba(244, 67, 54, 0.2); color: #e57373; border: 1px solid rgba(244, 67, 54, 0.3); }
+    .btn-delete-ticket:hover { background: #f44336; color: white; transform: translateY(-2px); }
+
+    .btn-dismiss { background: rgba(76, 175, 80, 0.2); color: #81c784; border: 1px solid rgba(76, 175, 80, 0.3); }
+    .btn-dismiss:hover { background: #4caf50; color: white; transform: translateY(-2px); }
+
+    /* Empty State */
+    .empty-state { text-align: center; padding: 40px; }
+    .empty-state h3 { font-size: 1.5rem; margin-bottom: 10px; }
+    .empty-state p { color: rgba(255,255,255,0.5); }
+
+    /* Back Button */
+    .back-link-wrapper { margin-top: 40px; text-align: center; }
+    .btn-back {
+        display: inline-block;
+        padding: 12px 30px;
+        background: rgba(255,255,255,0.1);
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: 600;
+        transition: 0.3s;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .btn-back:hover {
+        background: white;
+        color: #333;
+        transform: translateY(-2px);
+    }
+</style>

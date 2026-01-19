@@ -32,7 +32,14 @@
                     <div class="serial-number">ID: @Model.Id</div>
                     <div class="actions">
                         <a class="btn btn-journal" href="@Url.Action("Page", "Journal", new { ticketId = Model.Id, readOnly = true })">Прегледай дневник</a>
-                        <a asp-action="Index" class="btn btn-secondary">Назад</a>
+                        @if (!string.IsNullOrEmpty(Context.Request.Query["returnUrl"]))
+                        {
+                            <a href="@Context.Request.Query["returnUrl"]" class="btn btn-secondary">Назад</a>
+                        }
+                        else
+                        {
+                            <a asp-action="Index" class="btn btn-secondary">Назад</a>
+                        }
                     </div>
                 </div>
             </div>

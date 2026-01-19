@@ -25,7 +25,7 @@
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="TicketId" />
             <input type="hidden" asp-for="PageNumber" />
-            <input type="hidden" asp-for="PageStyle" id="pageStyleInput" />
+            <input type="hidden" asp-for="PageStyle" id="pageStyleInput" value="@currentStyle" />
 
             @if (!readOnly)
             {
