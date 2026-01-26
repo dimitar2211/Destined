@@ -139,6 +139,7 @@
         width: 100%;
         border-collapse: collapse;
         color: white;
+        table-layout: fixed; /* Ensures columns respect width */
     }
 
     .glass-table th {
@@ -170,7 +171,13 @@
     .date-badge { font-weight: bold; color: #fff; }
     .time-badge { color: rgba(255,255,255,0.5); }
 
-    .user-cell { font-weight: 600; }
+    .user-cell { 
+        font-weight: 600;
+        /* Ensure long usernames don't overflow */
+        white-space: normal;
+        overflow-wrap: break-word; /* Standard */
+        word-break: break-all;     /* aggressive breaking for long strings without spaces */
+    }
     
     .ticket-info {
         background: rgba(255,255,255,0.1);
@@ -191,6 +198,10 @@
         line-height: 1.5;
         color: #ddd;
         border-left: 3px solid #ffca28;
+        /* Text wrapping fixes */
+        white-space: normal;
+        overflow-wrap: break-word;
+        word-break: break-word;
     }
 
     /* Actions */
@@ -247,5 +258,10 @@
         background: white;
         color: #333;
         transform: translateY(-2px);
+    }
+
+    /* Prevent horizontal scroll from background animations or table */
+    body {
+        overflow-x: hidden;
     }
 </style>
