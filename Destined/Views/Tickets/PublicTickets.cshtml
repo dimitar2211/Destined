@@ -29,6 +29,19 @@
         
         <h1 class="page-title">Публични билети</h1>
 
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert-glass error-alert">
+                @TempData["Error"]
+            </div>
+        }
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert-glass success-alert">
+                @TempData["Message"]
+            </div>
+        }
+
         <div class="controls-container">
             <form method="get" asp-action="PublicTickets" style="display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap;">
                 <input type="text" name="searchCountry" value="@ViewData["SearchCountry"]" placeholder="Търси държава..." class="glass-input" />
@@ -92,7 +105,7 @@
 
                                 <button type="button" 
                                         class="btn btn-report" 
-                                        onclick="openReportModal(@ticket.Id)">
+                                        onclick="checkAndOpenReportModal(@ticket.Id)">
                                     Report
                                 </button>
                             </div>
@@ -102,6 +115,11 @@
             }
         </div>
     </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast-glass">
+    <span id="toastMessage"></span>
 </div>
 
 <!-- Report Modal -->
@@ -220,6 +238,64 @@
         color: white;
         font-size: 1.2rem;
         border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .alert-glass {
+        padding: 15px 20px;
+        border-radius: 15px;
+        margin-bottom: 25px;
+        backdrop-filter: blur(10px);
+        font-weight: 600;
+        text-align: center;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+        animation: fadeIn 0.5s ease-out;
+    }
+    
+    .error-alert {
+        background: rgba(255, 82, 82, 0.2);
+        border: 1px solid rgba(255, 82, 82, 0.4);
+        color: #ff8a80;
+    }
+    
+    .success-alert {
+        background: rgba(76, 175, 80, 0.2);
+        border: 1px solid rgba(76, 175, 80, 0.4);
+        color: #b9f6ca;
+    }
+    
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Toast Notification */
+    .toast-glass {
+        visibility: hidden;
+        min-width: 250px;
+        background: rgba(255, 150, 60, 0.9); /* Orange warning color */
+        color: white;
+        text-align: center;
+        border-radius: 50px;
+        padding: 16px;
+        position: fixed;
+        z-index: 2000;
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        font-size: 1rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(5px);
+        opacity: 0;
+        transition: opacity 0.5s, bottom 0.5s;
+    }
+
+    .toast-glass.show {
+        visibility: visible;
+        opacity: 1;
+        bottom: 50px;
     }
 
     /* Ticket Styles (Matching Index.cshtml) */
@@ -356,6 +432,29 @@
     }
     
     // Modal Logic
+    function checkAndOpenReportModal(ticketId) {
+        fetch(`/Reports/CheckReportStatus?ticketId=${ticketId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.reported) {
+                    showToast("Вече сте изпратили доклад за този билет!");
+                } else {
+                    openReportModal(ticketId);
+                }
+            })
+            .catch(error => {
+                console.error("Error checking report status:", error);
+                openReportModal(ticketId); // Fallback to open modal if check fails
+            });
+    }
+
+    function showToast(message) {
+        var x = document.getElementById("toast");
+        document.getElementById("toastMessage").innerText = message;
+        x.className = "toast-glass show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+    }
+
     function openReportModal(ticketId) {
         document.getElementById('reportTicketId').value = ticketId;
         document.getElementById('reportModal').style.display = 'flex';

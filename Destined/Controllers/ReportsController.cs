@@ -67,6 +67,16 @@ namespace Destined.Controllers
         }
 
 
+        [HttpGet]
+        public async Task<IActionResult> CheckReportStatus(int ticketId)
+        {
+            var userId = _userManager.GetUserId(User);
+            var exists = await _context.TicketReports
+                .AnyAsync(r => r.TicketId == ticketId && r.ReporterId == userId);
+            
+            return Json(new { reported = exists });
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitReport(int ticketId, string reason)
@@ -84,10 +94,20 @@ namespace Destined.Controllers
                 return NotFound();
             }
 
+            var userId = _userManager.GetUserId(User);
+            var existingReport = await _context.TicketReports
+                .FirstOrDefaultAsync(r => r.TicketId == ticketId && r.ReporterId == userId);
+
+            if (existingReport != null)
+            {
+                TempData["Error"] = "Вече сте изпратили доклад за този билет!";
+                return RedirectToAction("PublicTickets", "Tickets");
+            }
+
             var report = new TicketReport
             {
                 TicketId = ticketId,
-                ReporterId = _userManager.GetUserId(User),
+                ReporterId = userId,
                 Reason = reason,
                 Timestamp = DateTime.Now
             };
