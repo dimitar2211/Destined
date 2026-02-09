@@ -12,7 +12,7 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
         
-        <h2 class="page-title">Дневник за билет #@Model.TicketId <span style="font-size: 0.6em; opacity: 0.8; display: block; margin-top: 5px;">Страница @Model.PageNumber</span></h2>
+        <h2 class="page-title">Дневник <span style="font-size: 0.6em; opacity: 0.8; display: block; margin-top: 5px;">Страница @Model.PageNumber</span></h2>
 
         @if (readOnly && string.IsNullOrWhiteSpace(Model.Content))
         {
