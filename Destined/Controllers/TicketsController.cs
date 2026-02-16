@@ -151,7 +151,19 @@ namespace Destined.Controllers
                 .ToListAsync();
 
             ViewData["SearchCountry"] = searchCountry;
+            ViewData["SearchCountry"] = searchCountry;
             return View(publicTickets);
+        }
+
+        public async Task<IActionResult> MapCompletion()
+        {
+            var userId = _userManager.GetUserId(User);
+            var tickets = await _context.Tickets
+                .Where(t => t.UserId == userId && !string.IsNullOrEmpty(t.Country))
+                .OrderByDescending(t => t.DepartureTime)
+                .ToListAsync();
+
+            return View(tickets);
         }
 
 
