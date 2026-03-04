@@ -24,6 +24,12 @@
     </div>
 
     <div class="form-floating mb-3">
+        <input asp-for="Input.DisplayUsername" class="form-control" placeholder="Your username" />
+        <label asp-for="Input.DisplayUsername" class="form-label">USERNAME</label>
+        <span asp-validation-for="Input.DisplayUsername" class="text-danger"></span>
+    </div>
+
+    <div class="form-floating mb-3">
         <input asp-for="Username" class="form-control" placeholder="Потребителско име" disabled />
         <label asp-for="Username" class="form-label">IDENTITY / USERNAME</label>
     </div>

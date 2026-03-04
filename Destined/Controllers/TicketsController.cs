@@ -147,11 +147,39 @@ namespace Destined.Controllers
             }
 
             var publicTickets = await query
-                .OrderBy(t => Guid.NewGuid()) // Keep random shuffle even for results
+                .OrderBy(t => Guid.NewGuid())
                 .ToListAsync();
 
+            // Build userId → display username map
+            var userIds = publicTickets
+                .Where(t => t.UserId != null)
+                .Select(t => t.UserId!)
+                .Distinct()
+                .ToList();
+
+            var userDisplayNames = new Dictionary<string, string>();
+            foreach (var uid in userIds)
+            {
+                var u = await _userManager.FindByIdAsync(uid);
+                if (u != null)
+                {
+                    var claims = await _userManager.GetClaimsAsync(u);
+                    var displayClaim = claims.FirstOrDefault(c => c.Type == "display_username");
+                    if (displayClaim != null && !string.IsNullOrEmpty(displayClaim.Value))
+                    {
+                        userDisplayNames[uid] = displayClaim.Value;
+                    }
+                    else
+                    {
+                        var name = u.UserName ?? string.Empty;
+                        var atIdx = name.IndexOf('@');
+                        userDisplayNames[uid] = atIdx >= 0 ? name.Substring(0, atIdx) : name;
+                    }
+                }
+            }
+
             ViewData["SearchCountry"] = searchCountry;
-            ViewData["SearchCountry"] = searchCountry;
+            ViewData["UserDisplayNames"] = userDisplayNames;
             return View(publicTickets);
         }
 

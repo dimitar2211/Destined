@@ -33,9 +33,13 @@
                     var user = await UserManager.GetUserAsync(User);
                     var picClaim = User.FindFirst("profile_picture");
                     var picUrl = picClaim?.Value;
+                    var displayUsernameClaim = User.FindFirst("display_username");
+                    var displayName = !string.IsNullOrEmpty(displayUsernameClaim?.Value)
+                        ? displayUsernameClaim.Value
+                        : User.Identity?.Name;
 
                     <div class="user-profile-display">
-                        <span class="username">@User.Identity?.Name</span>
+                        <span class="username">@displayName</span>
                         @if (!string.IsNullOrEmpty(picUrl))
                         {
                             <img src="@picUrl" alt="Profile" class="header-avatar" />
@@ -43,7 +47,7 @@
                         else
                         {
                             <div class="header-avatar-placeholder">
-                                @User.Identity?.Name?.Substring(0, 1).ToUpper()
+                                @displayName?.Substring(0, 1).ToUpper()
                             </div>
                         }
                         

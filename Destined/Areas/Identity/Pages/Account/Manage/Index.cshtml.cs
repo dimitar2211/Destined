@@ -40,6 +40,11 @@ namespace Destined.Areas.Identity.Pages.Account.Manage
 
         public class InputModel
         {
+            [Required]
+            [StringLength(50, ErrorMessage = "Username must be between {2} and {1} characters.", MinimumLength = 1)]
+            [Display(Name = "Username")]
+            public string DisplayUsername { get; set; }
+
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
@@ -57,11 +62,14 @@ namespace Destined.Areas.Identity.Pages.Account.Manage
             var profilePic = claims.FirstOrDefault(c => c.Type == "profile_picture");
             CurrentProfilePictureUrl = profilePic?.Value;
 
+            var displayUsernameClaim = claims.FirstOrDefault(c => c.Type == "display_username");
+
             Username = userName;
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                DisplayUsername = displayUsernameClaim?.Value ?? string.Empty
             };
         }
 
@@ -100,6 +108,16 @@ namespace Destined.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            // --- Display Username Update ---
+            var allClaims = await _userManager.GetClaimsAsync(user);
+            var oldUsernameClaim = allClaims.FirstOrDefault(c => c.Type == "display_username");
+            if (oldUsernameClaim == null || oldUsernameClaim.Value != Input.DisplayUsername)
+            {
+                if (oldUsernameClaim != null)
+                    await _userManager.RemoveClaimAsync(user, oldUsernameClaim);
+                await _userManager.AddClaimAsync(user, new Claim("display_username", Input.DisplayUsername));
             }
 
             // --- Profile Picture Upload Logic ---

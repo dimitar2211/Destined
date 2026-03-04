@@ -6,21 +6,9 @@
     var currentUserId = User.Identity != null && User.Identity.IsAuthenticated
         ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
         : null;
+    var userDisplayNames = ViewData["UserDisplayNames"] as Dictionary<string, string> ?? new Dictionary<string, string>();
 }
 
-@functions {
-    string ShortenUserName(string userName)
-    {
-        if (string.IsNullOrEmpty(userName))
-            return "Непознат";
-
-        int atIndex = userName.IndexOf('@');
-        if (atIndex == -1)
-            return userName;
-
-        return userName.Substring(0, atIndex);
-    }
-}
 
 <div style="position: relative; min-height: 100vh; overflow-x: hidden;">
     <partial name="_ThemeBackground" />
@@ -82,7 +70,7 @@
                             {
                                 <p style="color:@textColor"><strong>Държава:</strong> @ticket.Country</p>
                             }
-                            <p style="color:@textColor"><strong>От:</strong> @ShortenUserName(ticket.User?.UserName)</p>
+                            <p style="color:@textColor"><strong>От:</strong> @(ticket.UserId != null && userDisplayNames.ContainsKey(ticket.UserId) ? userDisplayNames[ticket.UserId] : "Непознат")</p>
                         </div>
                         
                         <div class="ticket-center-wrapper">
