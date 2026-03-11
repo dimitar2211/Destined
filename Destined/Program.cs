@@ -63,6 +63,36 @@ using (var scope = app.Services.CreateScope())
             await userManager.AddToRoleAsync(newAdmin, "Admin");
         }
     }
+
+    var dbContext = services.GetRequiredService<ApplicationDbContext>();
+    var usersWithoutCode = await dbContext.Users
+        .Where(u => !dbContext.UserFriendCodes.Any(fc => fc.UserId == u.Id))
+        .ToListAsync();
+
+    if (usersWithoutCode.Any())
+    {
+        var random = new Random();
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        
+        foreach (var user in usersWithoutCode)
+        {
+            string newCode;
+            bool codeExists;
+            do
+            {
+                newCode = new string(Enumerable.Repeat(chars, 6)
+                    .Select(s => s[random.Next(s.Length)]).ToArray());
+                codeExists = dbContext.UserFriendCodes.Any(fc => fc.FriendCode == newCode);
+            } while (codeExists);
+
+            dbContext.UserFriendCodes.Add(new Destined.Models.UserFriendCode
+            {
+                UserId = user.Id,
+                FriendCode = newCode
+            });
+            await dbContext.SaveChangesAsync();
+        }
+    }
 }
 
 // Configure the HTTP request pipeline.

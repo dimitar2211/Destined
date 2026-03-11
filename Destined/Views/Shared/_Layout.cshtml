@@ -55,6 +55,7 @@
                         <div class="user-dropdown">
                              <a asp-area="Identity" asp-page="/Account/Manage/Index" class="dropdown-item">My Passport</a>
                              <a asp-controller="Tickets" asp-action="Index" class="dropdown-item">My Tickets</a>
+                             <a asp-controller="Friends" asp-action="Index" class="dropdown-item">My Friends</a>
                              <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                                 <button type="submit" class="dropdown-item text-danger">Logout</button>
                             </form>

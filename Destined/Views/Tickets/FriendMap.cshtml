@@ -1,0 +1,323 @@
+@model List<Destined.Models.Ticket>
+
+@{
+    ViewData["Title"] = "Карта на приятел";
+    ViewData["FullWidth"] = true;
+    var friendName = ViewBag.FriendName as string;
+    var message = ViewBag.Message as string;
+    
+    // Group tickets by country for easier JS processing
+    var ticketsByCountry = Model
+        .Where(t => !string.IsNullOrEmpty(t.Country))
+        .GroupBy(t => t.Country)
+        .ToDictionary(g => g.Key, g => g.ToList());
+
+    var ticketsJson = System.Text.Json.JsonSerializer.Serialize(ticketsByCountry);
+}
+
+<!-- Include jsVectorMap CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/css/jsvectormap.min.css" />
+
+<div style="position: relative; min-height: 100vh; overflow-x: hidden;">
+    <partial name="_ThemeBackground" />
+
+    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+        <div class="map-wrapper">
+            <div class="actions-bar">
+                 <a asp-controller="Friends" asp-action="Index" class="btn-back">⬅ Назад към приятели</a>
+            </div>
+
+            <h1 class="page-title">Картата на <span class="gradient-text">@friendName</span></h1>
+
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <div class="alert alert-warning text-center" style="background: rgba(255,193,7,0.2); color: #fff; border: 1px solid rgba(255,193,7,0.5);">
+                    @message
+                </div>
+            }
+            else
+            {
+                <div class="completion-banner">
+                    <span class="completion-label">Завършеност на картата:</span>
+                    <span class="completion-value"><span id="completion-pct">0</span>%</span>
+                </div>
+
+                <div class="map-card">
+                    <div id="world-map" style="width: 100%; height: 600px;"></div>
+                    <div class="map-instruction">💡 Кликни върху оцветена държава, за да видиш билетите!</div>
+                </div>
+                
+                <div class="stats-card">
+                    <h3>Посетени държави: <span class="highlight-count">@ticketsByCountry.Count</span></h3>
+                    <div class="country-tags">
+                        @foreach (var country in ticketsByCountry.Keys)
+                        {
+                            <span class="country-tag">@country</span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal/Panel -->
+@if (string.IsNullOrEmpty(message))
+{
+    <div id="ticket-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">×</button>
+            <h2 id="modal-country-title">Country Name</h2>
+            <div id="modal-tickets-list" class="tickets-scroll">
+                <!-- Tickets will be injected here -->
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Include jsVectorMap JS and Map -->
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/js/jsvectormap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.5.3/dist/maps/world-merc.js"></script>
+
+<script>
+    // Data from Model
+    const ticketsData = @Html.Raw(string.IsNullOrEmpty(message) ? ticketsJson : "{}");
+    
+    // --- Country Mapping Logic ---
+    const countryMapping = {
+        "България": "BG", "Bulgaria": "BG",
+        "САЩ": "US", "USA": "US", "United States": "US",
+        "Германия": "DE", "Germany": "DE",
+        "Франция": "FR", "France": "FR",
+        "Италия": "IT", "Italy": "IT",
+        "Испания": "ES", "Spain": "ES",
+        "Гърция": "GR", "Greece": "GR",
+        "Турция": "TR", "Turkey": "TR",
+        "Румъния": "RO", "Romania": "RO",
+        "Сърбия": "RS", "Serbia": "RS",
+        "Македония": "MK", "Macedonia": "MK", "North Macedonia": "MK",
+        "Великобритания": "GB", "UK": "GB", "United Kingdom": "GB", "Англия": "GB",
+        "Русия": "RU", "Russia": "RU",
+        "Китай": "CN", "China": "CN",
+        "Япония": "JP", "Japan": "JP",
+        "Австрия": "AT", "Austria": "AT",
+        "Белгия": "BE", "Belgium": "BE",
+        "Швейцария": "CH", "Switzerland": "CH",
+        "Нидерландия": "NL", "Netherlands": "NL", "Холандия": "NL",
+        "Португалия": "PT", "Portugal": "PT",
+        "Полша": "PL", "Poland": "PL",
+        "Чехия": "CZ", "Czech Republic": "CZ",
+        "Унгария": "HU", "Hungary": "HU",
+        "Хърватия": "HR", "Croatia": "HR",
+        "Украйна": "UA", "Ukraine": "UA",
+        // Extended Mapping
+        "Азербайджан": "AZ", "Azerbaijan": "AZ",
+        "Андора": "AD", "Андорра": "AD", "Andorra": "AD",
+        "Словакия": "SK", "Slovakia": "SK",
+        "Словения": "SI", "Slovenia": "SI",
+        "Черна гора": "ME", "Montenegro": "ME",
+        "Босна и Херцеговина": "BA", "Bosnia and Herzegovina": "BA",
+        "Молдова": "MD", "Moldova": "MD",
+        "Албания": "AL", "Albania": "AL",
+        "Косово": "XK", "Kosovo": "XK",
+        "Кипър": "CY", "Cyprus": "CY",
+        "Малта": "MT", "Malta": "MT",
+        "Лихтенщайн": "LI", "Liechtenstein": "LI",
+        "Сан Марино": "SM", "San Marino": "SM",
+        "Монако": "MC", "Monaco": "MC",
+        "Люксембург": "LU", "Luxembourg": "LU",
+        "Швеция": "SE", "Sweden": "SE",
+        "Норвегия": "NO", "Norway": "NO",
+        "Финландия": "FI", "Finland": "FI",
+        "Дания": "DK", "Denmark": "DK",
+        "Ирландия": "IE", "Ireland": "IE",
+        "Исландия": "IS", "Iceland": "IS",
+        "Естония": "EE", "Estonia": "EE",
+        "Латвия": "LV", "Latvia": "LV",
+        "Литва": "LT", "Lithuania": "LT",
+        "Беларус": "BY", "Belarus": "BY",
+        "Казахстан": "KZ", "Kazakhstan": "KZ",
+        "Армения": "AM", "Armenia": "AM",
+        "Грузия": "GE", "Georgia": "GE"
+    };
+
+    const codeToNameMap = {}; 
+    const selectedRegions = [];
+
+    // Parse data to find regions
+    try {
+        Object.keys(ticketsData).forEach(name => {
+            let code = null;
+            if (name.length === 2 && name === name.toUpperCase()) {
+                code = name;
+            } else {
+                code = countryMapping[name.trim()] || countryMapping[name.trim().charAt(0).toUpperCase() + name.trim().slice(1)];
+            }
+
+            if (code) {
+                selectedRegions.push(code);
+                codeToNameMap[code] = name; 
+            }
+        });
+    } catch (e) {
+        console.error("Error parsing ticket data:", e);
+    }
+
+    function updateCompletionBar(visited, total) {
+        const pctEl = document.getElementById('completion-pct');
+        if (pctEl) {
+            const pct = total > 0 ? Math.round((visited / total) * 100) : 0;
+            pctEl.textContent = pct;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        if (!document.getElementById('world-map')) return; // Exit if no map element (e.g. no permission)
+
+        try {
+            if (typeof jsVectorMap === 'undefined') {
+                throw new Error("jsVectorMap library not loaded!");
+            }
+
+            const map = new jsVectorMap({
+                selector: "#world-map",
+                map: "world_merc",
+                zoomButtons: true,
+                zoomOnScroll: false,
+                regionStyle: {
+                    initial: { fill: "#CFD8DC", stroke: "#607D8B", strokeWidth: 0.5, fillOpacity: 1 },
+                    hover: { fillOpacity: 0.8, cursor: 'pointer' },
+                    selected: { fill: "#4CAF50" }
+                },
+                selectedRegions: selectedRegions,
+                
+                onRegionClick(event, code) {
+                    const countryName = codeToNameMap[code];
+                    if (countryName && ticketsData[countryName]) {
+                        showTicketsForCountry(countryName, ticketsData[countryName]);
+                    }
+                },
+                
+                onRegionTooltipShow(event, tooltip, code) {
+                    const countryName = codeToNameMap[code];
+                    if (countryName) {
+                        const count = ticketsData[countryName].length;
+                        tooltip.text(tooltip.text() + ` (${count} билета)`);
+                    }
+                }
+            });
+
+            const totalCountries = Object.keys(map.regions || {}).length || 247;
+            updateCompletionBar(selectedRegions.length, totalCountries);
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('world-map').innerHTML = `<div style="color:white; text-align:center; padding:20px;">Unable to load map. Please check your internet connection or try again later.<br><small>${err.message}</small></div>`;
+            updateCompletionBar(selectedRegions.length, 247);
+        }
+    });
+
+    function showTicketsForCountry(countryName, tickets) {
+        document.getElementById('modal-country-title').innerText = countryName;
+        const listContainer = document.getElementById('modal-tickets-list');
+        listContainer.innerHTML = '';
+
+        tickets.forEach(ticket => {
+            const date = new Date(ticket.DepartureTime).toLocaleDateString('bg-BG');
+            const time = new Date(ticket.DepartureTime).toLocaleTimeString('bg-BG', {hour: '2-digit', minute:'2-digit'});
+            
+            const card = document.createElement('div');
+            card.className = 'ticket-mini-card';
+            card.innerHTML = `
+                <div class="ticket-header">
+                    <span class="route">${ticket.From || '???'} ➝ ${ticket.To}</span>
+                    <span class="date">${date}</span>
+                </div>
+                <div class="ticket-details">
+                    <div>🕒 ${time}</div>
+                    <div>👥 ${ticket.NumberOfPassengers} пътници</div>
+                </div>
+                <div class="ticket-id">ID: ${ticket.Id}</div>
+            `;
+            listContainer.appendChild(card);
+        });
+
+        document.getElementById('ticket-modal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('ticket-modal').classList.remove('active');
+    }
+    
+    // Close on outside click
+    window.onclick = function(event) {
+        const modal = document.getElementById('ticket-modal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
+
+<style>
+    .map-wrapper { max-width: 1200px; margin: 0 auto; color: white; }
+    .page-title { font-size: 3rem; font-weight: 800; text-align: center; margin-bottom: 2rem; color: #fff; }
+    .gradient-text { background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    .actions-bar { margin-bottom: 20px; text-align: left; }
+
+    .completion-banner { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .completion-label { color: rgba(255,255,255,0.75); font-size: 1rem; font-weight: 600; }
+    .completion-value { font-size: 1.4rem; font-weight: 800; color: #4CAF50; }
+    
+    .btn-back { 
+        color: #fff; text-decoration: none; font-weight: 600; font-size: 1.1rem; 
+        display: inline-flex; align-items: center; padding: 10px 20px; 
+        background: rgba(255,255,255,0.1); border-radius: 30px; border: 1px solid rgba(255,255,255,0.2);
+        transition: 0.3s; 
+    }
+    .btn-back:hover { background: rgba(255,255,255,0.2); transform: translateX(-5px); color: #fff; }
+
+    .map-card {
+        background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px;
+        padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        margin-bottom: 30px; overflow: hidden; position: relative;
+    }
+    .map-instruction { text-align: center; color: rgba(255,255,255,0.7); margin-top: 10px; font-style: italic; }
+    
+    .stats-card { background: rgba(0, 0, 0, 0.4); border-radius: 15px; padding: 25px; color: #fff; border: 1px solid rgba(255,255,255,0.1); }
+    .highlight-count { color: #4CAF50; font-size: 1.5em; font-weight: bold; }
+    .country-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+    .country-tag { background: linear-gradient(145deg, #4CAF50, #45a049); color: white; padding: 8px 16px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+    
+    .jvm-zoom-btn { background-color: #37474f !important; border: 1px solid #546e7a !important; padding: 3px; border-radius: 4px; color: white !important; font-weight: bold; }
+    .jvm-tooltip { background-color: #333 !important; border-radius: 3px !important; color: white !important; font-family: sans-serif; padding: 5px 10px !important; z-index: 1000; }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 9999;
+        display: none; justify-content: center; align-items: center;
+        opacity: 0; transition: opacity 0.3s ease;
+    }
+    .modal-overlay.active { display: flex; opacity: 1; }
+    
+    .modal-content {
+        background: #fff; width: 90%; max-width: 500px; border-radius: 20px; padding: 25px;
+        position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: slideUp 0.3s ease; color: #333;
+    }
+    @@keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; }}
+    
+    .close-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 2rem; cursor: pointer; color: #666; transition: 0.2s; }
+    .close-btn:hover { color: #f44336; }
+    
+    #modal-country-title { margin-top: 0; margin-bottom: 20px; color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+    .tickets-scroll { max-height: 60vh; overflow-y: auto; padding-right: 5px; }
+    
+    .ticket-mini-card { background: #f8f9fa; border-left: 5px solid #4CAF50; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s; }
+    .ticket-mini-card:hover { transform: translateX(5px); }
+    
+    .ticket-header { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 8px; color: #333; }
+    .ticket-details { display: flex; justify-content: space-between; font-size: 0.9rem; color: #666; }
+    .ticket-id { font-size: 0.75rem; color: #aaa; text-align: right; margin-top: 5px; }
+</style>

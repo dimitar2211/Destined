@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Destined.Data;
+using Destined.Models;
 
 namespace Destined.Areas.Identity.Pages.Account
 {
@@ -29,13 +31,15 @@ namespace Destined.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _dbContext;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext dbContext)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -43,6 +47,7 @@ namespace Destined.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _dbContext = dbContext;
         }
 
         /// <summary>
@@ -129,6 +134,25 @@ namespace Destined.Areas.Identity.Pages.Account
 
                     // Save display username as a claim
                     await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("display_username", Input.Username));
+
+                    // Generate a unique 6-character Friend Code
+                    string newCode;
+                    bool codeExists;
+                    var random = new Random();
+                    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                    do
+                    {
+                        newCode = new string(Enumerable.Repeat(chars, 6)
+                            .Select(s => s[random.Next(s.Length)]).ToArray());
+                        codeExists = _dbContext.UserFriendCodes.Any(fc => fc.FriendCode == newCode);
+                    } while (codeExists);
+
+                    _dbContext.UserFriendCodes.Add(new UserFriendCode
+                    {
+                        UserId = user.Id,
+                        FriendCode = newCode
+                    });
+                    await _dbContext.SaveChangesAsync();
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

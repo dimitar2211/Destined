@@ -183,6 +183,81 @@ namespace Destined.Controllers
             return View(publicTickets);
         }
 
+        public async Task<IActionResult> FriendTickets(string friendId)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(currentUserId) || string.IsNullOrEmpty(friendId)) return NotFound();
+
+            var friendship = await _context.Friendships.FirstOrDefaultAsync(f => f.UserId == friendId && f.FriendId == currentUserId);
+            if (friendship == null) return Forbid(); // Not friends
+
+            var friend = await _userManager.FindByIdAsync(friendId);
+            if (friend == null) return NotFound();
+
+            var fClaims = await _userManager.GetClaimsAsync(friend);
+            var fName = fClaims.FirstOrDefault(c => c.Type == "display_username")?.Value ?? friend.UserName;
+            ViewBag.FriendName = fName;
+
+            var query = _context.Tickets.Where(t => t.UserId == friendId).AsQueryable();
+
+            switch (friendship.SharingSetting)
+            {
+                case SharingSetting.None:
+                    query = query.Where(t => false); // returns empty
+                    ViewBag.Message = "This user does not share any tickets with you.";
+                    break;
+                case SharingSetting.PublicOnly:
+                    query = query.Where(t => t.IsPublic);
+                    break;
+                case SharingSetting.PrivateOnly:
+                    query = query.Where(t => !t.IsPublic);
+                    break;
+                case SharingSetting.All:
+                    // no filter
+                    break;
+            }
+
+            var tickets = await query.OrderBy(t => t.OrderIndex).ToListAsync();
+            return View(tickets);
+        }
+
+        public async Task<IActionResult> FriendMap(string friendId)
+        {
+            var currentUserId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(currentUserId) || string.IsNullOrEmpty(friendId)) return NotFound();
+
+            var friendship = await _context.Friendships.FirstOrDefaultAsync(f => f.UserId == friendId && f.FriendId == currentUserId);
+            if (friendship == null) return Forbid(); // Not friends
+
+            var friend = await _userManager.FindByIdAsync(friendId);
+            if (friend == null) return NotFound();
+
+            var fClaims = await _userManager.GetClaimsAsync(friend);
+            var fName = fClaims.FirstOrDefault(c => c.Type == "display_username")?.Value ?? friend.UserName;
+            ViewBag.FriendName = fName;
+
+            var query = _context.Tickets.Where(t => t.UserId == friendId && !string.IsNullOrEmpty(t.Country)).AsQueryable();
+
+            switch (friendship.SharingSetting)
+            {
+                case SharingSetting.None:
+                    query = query.Where(t => false);
+                    ViewBag.Message = "This user does not share any tickets with you.";
+                    break;
+                case SharingSetting.PublicOnly:
+                    query = query.Where(t => t.IsPublic);
+                    break;
+                case SharingSetting.PrivateOnly:
+                    query = query.Where(t => !t.IsPublic);
+                    break;
+                case SharingSetting.All:
+                    break;
+            }
+
+            var tickets = await query.OrderByDescending(t => t.DepartureTime).ToListAsync();
+            return View(tickets);
+        }
+
         public async Task<IActionResult> MapCompletion()
         {
             var userId = _userManager.GetUserId(User);
