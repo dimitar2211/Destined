@@ -69,7 +69,6 @@
 
                             <div class="ticket-right" style="background:@ticket.RightColor;">
                                 <div class="barcode"></div>
-                                <div class="serial-number">ID: @ticket.Id</div>
                                 <div class="actions mt-auto">
                                     <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" asp-route-readOnly="true" class="btn btn-journal" title="Дневник">Дневник</a>
                                     @if (ticket.IsPublic)

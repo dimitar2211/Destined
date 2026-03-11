@@ -29,7 +29,6 @@
 
                 <div class="ticket-right" style="background-color:@Model.RightColor; color:@Model.TextColor;">
                     <div class="barcode"></div>
-                    <div class="serial-number">ID: @Model.Id</div>
                     <div class="actions">
                         <a class="btn btn-journal" href="@Url.Action("Page", "Journal", new { ticketId = Model.Id, readOnly = true })">Прегледай дневник</a>
                         @if (!string.IsNullOrEmpty(Context.Request.Query["returnUrl"]))
