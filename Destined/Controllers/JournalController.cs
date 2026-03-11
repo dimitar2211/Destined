@@ -26,10 +26,26 @@ namespace Destined.Controllers
 
             var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            if (!ticket.IsPublic && ticket.UserId != currentUserId)
+            bool canContribute = ticket.UserId == currentUserId;
+            bool canView = canContribute || ticket.IsPublic;
+
+            if (!canView && currentUserId != null)
+            {
+                var friendship = await _context.Friendships.FirstOrDefaultAsync(f => f.UserId == ticket.UserId && f.FriendId == currentUserId);
+                if (friendship != null)
+                {
+                    if (friendship.SharingSetting == SharingSetting.All || 
+                       (friendship.SharingSetting == SharingSetting.PrivateOnly && !ticket.IsPublic))
+                    {
+                        canView = true;
+                    }
+                }
+            }
+
+            if (!canView)
                 return NotFound();
 
-            if (ticket.IsPublic && readOnly == false && ticket.UserId != currentUserId)
+            if (!canContribute && !readOnly)
                 return Forbid();
 
             var journalPage = await _context.JournalPages

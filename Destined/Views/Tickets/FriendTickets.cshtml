@@ -70,6 +70,13 @@
                             <div class="ticket-right" style="background:@ticket.RightColor;">
                                 <div class="barcode"></div>
                                 <div class="serial-number">ID: @ticket.Id</div>
+                                <div class="actions mt-auto">
+                                    <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" asp-route-readOnly="true" class="btn btn-journal" title="Дневник">Дневник</a>
+                                    @if (ticket.IsPublic)
+                                    {
+                                        <a asp-controller="Comments" asp-action="Ticket" asp-route-ticketId="@ticket.Id" class="btn btn-comments" title="Коментари">Коментари</a>
+                                    }
+                                </div>
                             </div>
                         </div>
                     }
@@ -110,6 +117,12 @@
     .ticket-right { background: #fff; box-shadow: inset 0 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: space-between; border-left: 1.5px dashed #999; }
     .barcode { width: 100%; height: 60px; background: repeating-linear-gradient( to right, #000, #000 3px, #fff 3px, #fff 6px, #000 6px, #000 9px, #fff 9px, #fff 12px, #000 12px, #000 15px, #fff 15px, #fff 18px ); border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); margin-bottom: 18px; }
     .serial-number { font-size: 0.9rem; font-family: 'Courier New', Courier, monospace; color: #666; margin-bottom: 15px; text-align: center; }
+
+    .actions { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+    .btn { padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; box-shadow: 0 3px 8px rgba(0,0,0,0.15); border: none; color: white; display: inline-block; text-align: center; }
+    .btn-journal { background: #9c27b0; }
+    .btn-comments { background: #2196f3; }
+    .btn:hover { transform: translateY(-3px); color: white; }
 
     @@media (max-width: 768px) {
         .real-ticket { flex-direction: column; } .ticket-left { border-radius: 15px 15px 0 0; border-right: none; } .ticket-center-wrapper { display: none; } .ticket-right { border-radius: 0 0 15px 15px; border-left: none; }

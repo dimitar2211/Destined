@@ -75,7 +75,12 @@ namespace Destined.Controllers
                 .Where(c => userIds.Contains(c.UserId) && c.ClaimType == "profile_picture")
                 .ToDictionaryAsync(c => c.UserId, c => c.ClaimValue);
 
+            var displayUsernames = await _context.UserClaims
+                .Where(c => userIds.Contains(c.UserId) && c.ClaimType == "display_username")
+                .ToDictionaryAsync(c => c.UserId, c => c.ClaimValue);
+
             ViewBag.ProfilePictures = profilePictures;
+            ViewBag.DisplayUsernames = displayUsernames;
             // -----------------------------
 
             ViewBag.Ticket = ticket;
@@ -95,6 +100,7 @@ namespace Destined.Controllers
                 return RedirectToAction("Ticket", new { ticketId, sort, seed });
 
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return Unauthorized();
 
             var comment = new TicketComment
             {

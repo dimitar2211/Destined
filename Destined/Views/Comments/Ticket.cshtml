@@ -61,6 +61,7 @@
             else
             {
                 var pics = ViewBag.ProfilePictures as Dictionary<string, string>;
+                var dnames = ViewBag.DisplayUsernames as Dictionary<string, string>;
 
                 <div class="comments-list">
                     @foreach (var c in Model)
@@ -75,7 +76,12 @@
                                     {
                                         <img src="@picUrl" alt="@c.User.UserName" class="comment-avatar" />
                                     }
-                                    <span class="author">@c.User.UserName</span>
+                                    @{
+                                        var dname = dnames != null && dnames.TryGetValue(c.UserId, out var val) ? val : c.User.UserName;
+                                        var atIdx = dname.IndexOf("@");
+                                        var finalName = atIdx > 0 ? dname.Substring(0, atIdx) : dname;
+                                    }
+                                    <span class="author">@finalName</span>
                                 </div>
                                 <span class="date">@c.CreatedOn.ToString("dd.MM.yyyy HH:mm")</span>
                             </div>
@@ -117,7 +123,12 @@
                                                             {
                                                                 <img src="@replyPicUrl" alt="@reply.User.UserName" class="reply-avatar" />
                                                             }
-                                                            <span class="reply-author">@reply.User.UserName</span>
+                                                            @{
+                                                                var rname = dnames != null && dnames.TryGetValue(reply.UserId, out var rval) ? rval : reply.User.UserName;
+                                                                var rAtIdx = rname.IndexOf("@");
+                                                                var finalRName = rAtIdx > 0 ? rname.Substring(0, rAtIdx) : rname;
+                                                            }
+                                                            <span class="reply-author">@finalRName</span>
                                                         </div>
                                                         <span class="reply-content">@reply.Content</span>
                                                     </div>
