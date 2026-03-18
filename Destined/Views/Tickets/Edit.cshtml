@@ -234,7 +234,10 @@
 
             function applyTextColor() {
                 const leftInputs = ticketLeft.querySelectorAll('input.edit-input');
-                const leftTextElements = [...leftInputs, arrow, dateTimeLabel, passengersLabel];
+                const leftStrongTags = ticketLeft.querySelectorAll('strong');
+                const leftLabels = ticketLeft.querySelectorAll('.form-check-label');
+                
+                const leftTextElements = [...leftInputs, arrow, dateTimeLabel, passengersLabel, ...leftStrongTags, ...leftLabels];
                 leftTextElements.forEach(el => {
                     el.style.transition = "none";
                     el.style.color = currentTextColor;
