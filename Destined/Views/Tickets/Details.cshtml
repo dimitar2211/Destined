@@ -1,4 +1,4 @@
-﻿@model Destined.Models.Ticket
+@model Destined.Models.Ticket
 
 @{
     ViewData["Title"] = "Детайли на билет";
@@ -31,6 +31,8 @@
                     <div class="barcode"></div>
                     <div class="actions">
                         <a class="btn btn-journal" href="@Url.Action("Page", "Journal", new { ticketId = Model.Id, readOnly = true })">Прегледай дневник</a>
+                        <a class="btn btn-edit" asp-action="Edit" asp-route-id="@Model?.Id">Редактирай</a>
+                        <a class="btn btn-delete" asp-action="Delete" asp-route-id="@Model?.Id">Изтрий</a>
                         @if (!string.IsNullOrEmpty(Context.Request.Query["returnUrl"]))
                         {
                             <a href="@Context.Request.Query["returnUrl"]" class="btn btn-secondary">Назад</a>
@@ -166,33 +168,34 @@
         padding-bottom: 10px;
     }
 
-    .btn-journal {
-        background: transparent;
-        color: black;
-        border: none;
-        box-shadow: none;
-        padding: 10px 22px;
-        border-radius: 25px;
-        font-size: 0.95rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: transform 0.2s ease;
+    .btn {
+        padding: 8px 16px; 
+        border-radius: 20px; 
+        text-decoration: none; 
+        font-size: 0.95rem; 
+        font-weight: 600; 
+        cursor: pointer; 
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+        border: 1px solid rgba(0,0,0,0.1); 
+        color: #333; 
+        display: inline-block; 
+        text-align: center;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .btn:hover { 
+        transform: translateY(-2px) scale(1.02); 
+        color: #000; 
+        background: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        border: 1px solid rgba(0,0,0,0.15); 
     }
 
-        .btn-journal:hover {
-            background: transparent;
-            color: black;
-            transform: translateY(-2px);
-        }
-    
-    .btn-secondary {
-        background: #9ca3af;
-        color: white;
-        padding: 10px 22px;
-        border-radius: 25px;
-        text-decoration: none;
-        font-weight: 700;
-        border:none;
-    }
-    .btn-secondary:hover { background: #6b7280; color: white; }
+    .btn-journal { border-bottom: 2px solid rgba(156, 39, 176, 0.4); }
+    .btn-edit { border-bottom: 2px solid rgba(255, 152, 0, 0.4); } 
+    .btn-delete { border-bottom: 2px solid rgba(244, 67, 54, 0.4); } 
+    .btn-secondary { border-bottom: 2px solid rgba(156, 163, 175, 0.4); }
 </style>

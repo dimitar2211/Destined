@@ -1,4 +1,4 @@
-﻿@model Destined.Models.Ticket
+@model Destined.Models.Ticket
 
 @{
     ViewData["Title"] = "Изтриване на билет";
@@ -156,37 +156,31 @@
     }
 
     .btn {
-        padding: 10px 22px;
-        border-radius: 25px;
-        text-decoration: none;
-        font-size: 0.95rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background 0.3s ease, transform 0.2s ease;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-        user-select: none;
-        border: none;
+        padding: 8px 16px; 
+        border-radius: 20px; 
+        text-decoration: none; 
+        font-size: 0.95rem; 
+        font-weight: 600; 
+        cursor: pointer; 
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+        border: 1px solid rgba(0,0,0,0.1); 
+        color: #333; 
+        display: inline-block; 
+        text-align: center;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .btn:hover { 
+        transform: translateY(-2px) scale(1.02); 
+        color: #000; 
+        background: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        border: 1px solid rgba(0,0,0,0.15); 
     }
 
-    .btn-delete {
-        background: #f44336;
-        color: white;
-    }
-
-        .btn-delete:hover {
-            background: #d32f2f;
-            transform: translateY(-3px);
-        }
-
-    .btn-journal {
-        background: transparent;
-        color: black;
-        box-shadow: none;
-    }
-
-        .btn-journal:hover {
-            background: transparent;
-            color: black;
-            transform: translateY(-2px);
-        }
+    .btn-delete { border-bottom: 2px solid rgba(244, 67, 54, 0.4); } 
+    .btn-journal { border-bottom: 2px solid rgba(156, 163, 175, 0.4); } 
 </style>

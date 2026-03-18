@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Destined.Models.Ticket>
+@model IEnumerable<Destined.Models.Ticket>
 
 @{
     ViewData["Title"] = "Билети";
@@ -181,9 +181,37 @@
     .barcode { width: 100%; height: 60px; background: repeating-linear-gradient( to right, #000, #000 3px, #fff 3px, #fff 6px, #000 6px, #000 9px, #fff 9px, #fff 12px, #000 12px, #000 15px, #fff 15px, #fff 18px ); border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.25); margin-bottom: 18px; }
     .serial-number { font-size: 0.9rem; font-family: 'Courier New', Courier, monospace; color: #666; margin-bottom: 15px; text-align: center; user-select: text; }
     .actions { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 5px; }
-    .btn { padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: background 0.3s ease, transform 0.2s ease; box-shadow: 0 3px 8px rgba(0,0,0,0.15); border: none; color: white; display: inline-block; text-align: center; }
-    .btn-detail { background: #2196f3; } .btn-edit { background: #ff9800; } .btn-delete { background: #f44336; } .btn-journal { background: #9c27b0; }
-    .btn:hover { transform: translateY(-3px); color: white; }
+    .btn { 
+        padding: 8px 16px; 
+        border-radius: 20px; 
+        text-decoration: none; 
+        font-size: 0.9rem; 
+        font-weight: 600; 
+        cursor: pointer; 
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+        border: 1px solid rgba(0,0,0,0.1); 
+        color: #333; 
+        display: inline-block; 
+        text-align: center;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    /* Optional subtle tinting per action type */
+    .btn-detail { border-bottom: 2px solid rgba(33, 150, 243, 0.4); } 
+    .btn-edit { border-bottom: 2px solid rgba(255, 152, 0, 0.4); } 
+    .btn-delete { border-bottom: 2px solid rgba(244, 67, 54, 0.4); } 
+    .btn-journal { border-bottom: 2px solid rgba(156, 39, 176, 0.4); }
+    
+    .btn:hover { 
+        transform: translateY(-2px) scale(1.02); 
+        color: #000; 
+        background: rgba(255, 255, 255, 0.6);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        border: 1px solid rgba(0,0,0,0.15); 
+    }
 
     @@media (max-width: 768px) {
         .real-ticket { flex-direction: column; } .ticket-left { border-radius: 15px 15px 0 0; border-right: none; } .ticket-center-wrapper { display: none; } .ticket-right { border-radius: 0 0 15px 15px; border-left: none; }
