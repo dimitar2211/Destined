@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -29,6 +29,9 @@ namespace Destined.Models
 
         [Display(Name = "Публичен билет")]
         public bool IsPublic { get; set; } = false;
+
+        [Display(Name = "Comment section")]
+        public bool AllowComments { get; set; } = false;
 
         [Display(Name = "Цвят на лявата част")]
         public string LeftColor { get; set; } = "#e0f2f1";

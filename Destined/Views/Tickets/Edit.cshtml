@@ -1,4 +1,4 @@
-﻿@model Destined.Models.Ticket
+@model Destined.Models.Ticket
 @{
     ViewData["Title"] = "Редактиране на билет";
     ViewData["FullWidth"] = true;
@@ -50,9 +50,15 @@
                             </div>
                         </div>
                         <div class="form-group form-check" style="margin-top: 15px;">
-                            <input asp-for="IsPublic" class="form-check-input" type="checkbox" />
+                            <input asp-for="IsPublic" class="form-check-input" type="checkbox" id="IsPublic" />
                             <label asp-for="IsPublic" class="form-check-label">Публичен билет?</label>
                             <span asp-validation-for="IsPublic" class="text-danger"></span>
+                        </div>
+                        <div id="allowCommentsWrapper" style="margin-top: 8px; display: none;">
+                            <div class="form-group form-check">
+                                <input asp-for="AllowComments" class="form-check-input" type="checkbox" id="AllowComments" />
+                                <label asp-for="AllowComments" class="form-check-label" style="font-size: 0.95rem;">Comment section</label>
+                            </div>
                         </div>
                     </div>
 
@@ -272,6 +278,23 @@
             ticketLeft.style.backgroundColor = currentLeftColor;
             ticketRight.style.backgroundColor = currentRightColor;
             applyTextColor();
+
+            // --- Comment section checkbox visibility ---
+            const isPublicCb = document.getElementById('IsPublic');
+            const allowCommentsWrapper = document.getElementById('allowCommentsWrapper');
+            const allowCommentsCb = document.getElementById('AllowComments');
+
+            function updateCommentsVisibility() {
+                if (isPublicCb.checked) {
+                    allowCommentsWrapper.style.display = 'block';
+                } else {
+                    allowCommentsWrapper.style.display = 'none';
+                    allowCommentsCb.checked = false;
+                }
+            }
+
+            isPublicCb.addEventListener('change', updateCommentsVisibility);
+            updateCommentsVisibility(); // apply on page load
         });
     </script>
 }

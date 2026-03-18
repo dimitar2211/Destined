@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Destined.Models.Ticket>
+@model IEnumerable<Destined.Models.Ticket>
 
 @{
     ViewData["Title"] = "Публични билети";
@@ -7,6 +7,7 @@
         ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
         : null;
     var userDisplayNames = ViewData["UserDisplayNames"] as Dictionary<string, string> ?? new Dictionary<string, string>();
+    var commentCounts = ViewData["CommentCounts"] as Dictionary<int, int> ?? new Dictionary<int, int>();
 }
 
 
@@ -86,10 +87,14 @@
                                    asp-route-readOnly="true"
                                    class="btn btn-journal">Дневник</a>
 
-                                <a asp-controller="Comments"
-                                   asp-action="Ticket"
-                                   asp-route-ticketId="@ticket.Id"
-                                   class="btn btn-detail">Коментари</a>
+                                @if (commentCounts.TryGetValue(ticket.Id, out var cCount) && cCount > 0)
+                                {
+                                    <a asp-controller="Comments"
+                                       asp-action="Ticket"
+                                       asp-route-ticketId="@ticket.Id"
+                                       class="btn btn-detail">Коментари</a>
+                                }
+
 
                                 <button type="button" 
                                         class="btn btn-report" 

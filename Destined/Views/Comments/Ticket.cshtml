@@ -1,4 +1,4 @@
-﻿@model List<Destined.Models.TicketComment>
+@model List<Destined.Models.TicketComment>
 @{
     var ticket = ViewBag.Ticket as Destined.Models.Ticket;
     ViewData["Title"] = "Коментари към билет";
@@ -16,7 +16,9 @@
             <h2 class="page-title">Коментари</h2>
             <h3 class="ticket-subtitle">за билет: @ticket.From ➔ @ticket.To</h3>
 
-            <!-- New Comment Form -->
+            @* New Comment Form – only visible when the ticket owner has enabled commenting *@
+            @if (ViewBag.AllowComments == true)
+            {
             <div class="glass-panel create-box">
                 <form asp-controller="Comments" asp-action="Add" method="post">
                     <input type="hidden" name="ticketId" value="@ticket.Id" />
@@ -34,6 +36,13 @@
                     </div>
                 </form>
             </div>
+            }
+            else
+            {
+                <div class="no-comments" style="margin-bottom: 20px;">
+                    <p>Коментирането за този билет е изключено.</p>
+                </div>
+            }
 
             <!-- Sort & Filter -->
             @{
@@ -95,6 +104,8 @@
                                     <summary class="btn-link">Отговори (@(c.Replies?.Count ?? 0))</summary>
 
                                     <div class="reply-section">
+                                        @if (ViewBag.AllowComments == true)
+                                        {
                                         <form asp-controller="Comments" asp-action="Add" method="post" class="reply-form">
                                             <input type="hidden" name="ticketId" value="@ticket.Id" />
                                             <input type="hidden" name="parentCommentId" value="@c.Id" />
@@ -108,6 +119,7 @@
                                                 <button class="btn-action secondary small">Прати</button>
                                             </div>
                                         </form>
+                                        }
 
                                         @if (c.Replies != null)
                                         {

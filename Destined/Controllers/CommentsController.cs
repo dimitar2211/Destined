@@ -1,4 +1,4 @@
-﻿using Destined.Data;
+using Destined.Data;
 using Destined.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -85,6 +85,7 @@ namespace Destined.Controllers
 
             ViewBag.Ticket = ticket;
             ViewBag.Sort = sort;
+            ViewBag.AllowComments = ticket.AllowComments;
 
             return View(comments);
         }
@@ -95,6 +96,10 @@ namespace Destined.Controllers
             var ticket = await _context.Tickets.FindAsync(ticketId);
             if (ticket == null || !ticket.IsPublic)
                 return NotFound();
+
+            // Block commenting if the ticket owner has disabled it
+            if (!ticket.AllowComments)
+                return RedirectToAction("Ticket", new { ticketId, sort, seed });
 
             if (string.IsNullOrWhiteSpace(content))
                 return RedirectToAction("Ticket", new { ticketId, sort, seed });

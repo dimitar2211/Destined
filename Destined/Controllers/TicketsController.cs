@@ -1,4 +1,4 @@
-﻿using Destined.Data;
+using Destined.Data;
 using Destined.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -84,7 +84,7 @@ namespace Destined.Controllers
         // POST: Tickets/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,From,To,DepartureTime,NumberOfPassengers,IsPublic,LeftColor,RightColor,TextColor,Country")] Ticket ticket)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,From,To,DepartureTime,NumberOfPassengers,IsPublic,AllowComments,LeftColor,RightColor,TextColor,Country,OrderIndex")] Ticket ticket)
         {
             if (id != ticket.Id) return NotFound();
 
@@ -178,8 +178,17 @@ namespace Destined.Controllers
                 }
             }
 
+            // Build comment counts map so the view can hide the button when 0 comments
+            var ticketIds = publicTickets.Select(t => t.Id).ToList();
+            var commentCounts = await _context.TicketComments
+                .Where(c => ticketIds.Contains(c.TicketId))
+                .GroupBy(c => c.TicketId)
+                .Select(g => new { TicketId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.TicketId, x => x.Count);
+
             ViewData["SearchCountry"] = searchCountry;
             ViewData["UserDisplayNames"] = userDisplayNames;
+            ViewData["CommentCounts"] = commentCounts;
             return View(publicTickets);
         }
 
