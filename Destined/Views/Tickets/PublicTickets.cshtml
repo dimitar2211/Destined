@@ -87,7 +87,11 @@
                                    asp-route-readOnly="true"
                                    class="btn btn-journal">Дневник</a>
 
-                                @if (commentCounts.TryGetValue(ticket.Id, out var cCount) && cCount > 0)
+                                @{
+                                    bool hasComments = commentCounts.TryGetValue(ticket.Id, out var cCount) && cCount > 0;
+                                    bool showCommentsButton = ticket.AllowComments || hasComments;
+                                }
+                                @if (showCommentsButton)
                                 {
                                     <a asp-controller="Comments"
                                        asp-action="Ticket"
