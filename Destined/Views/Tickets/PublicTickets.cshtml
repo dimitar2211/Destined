@@ -34,8 +34,10 @@
         <div class="controls-container">
             <form method="get" asp-action="PublicTickets" style="display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap;">
                 <input type="text" name="searchCountry" value="@ViewData["SearchCountry"]" placeholder="Търси държава..." class="glass-input" />
+                <input type="text" name="searchTo" value="@ViewData["SearchTo"]" placeholder="Търси дестинация (До)..." class="glass-input" />
+                <input type="text" name="searchUser" value="@ViewData["SearchUser"]" placeholder="Търси потребител..." class="glass-input" />
                 <button type="submit" class="btn-glass">Търси</button>
-                @if (ViewData["SearchCountry"] != null)
+                @if (ViewData["SearchCountry"] != null || ViewData["SearchTo"] != null || ViewData["SearchUser"] != null)
                 {
                     <a href="@Url.Action("PublicTickets")" class="btn-clear" title="Изчисти търсенето">✖</a>
                 }
@@ -179,7 +181,7 @@
         outline: none;
         transition: 0.3s;
         font-family: inherit;
-        width: 250px;
+        width: 200px;
     }
 
     .glass-select {

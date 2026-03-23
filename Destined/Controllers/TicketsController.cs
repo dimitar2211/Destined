@@ -134,7 +134,7 @@ namespace Destined.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> PublicTickets(string? searchCountry)
+        public async Task<IActionResult> PublicTickets(string? searchCountry, string? searchTo, string? searchUser)
         {
             var query = _context.Tickets
                 .Where(t => t.IsPublic)
@@ -144,6 +144,29 @@ namespace Destined.Controllers
             if (!string.IsNullOrEmpty(searchCountry))
             {
                 query = query.Where(t => t.Country.Contains(searchCountry));
+            }
+
+            if (!string.IsNullOrEmpty(searchTo))
+            {
+                query = query.Where(t => t.To.Contains(searchTo));
+            }
+
+            if (!string.IsNullOrEmpty(searchUser))
+            {
+                // Find users where display_username claim or actual username matches
+                var matchedUserIds = await _context.UserClaims
+                    .Where(c => c.ClaimType == "display_username" && c.ClaimValue.Contains(searchUser))
+                    .Select(c => c.UserId)
+                    .ToListAsync();
+
+                var matchedUserIdsByUsername = await _userManager.Users
+                    .Where(u => u.UserName.Contains(searchUser))
+                    .Select(u => u.Id)
+                    .ToListAsync();
+
+                var allMatchedIds = matchedUserIds.Union(matchedUserIdsByUsername).ToList();
+
+                query = query.Where(t => allMatchedIds.Contains(t.UserId));
             }
 
             var publicTickets = await query
@@ -187,6 +210,8 @@ namespace Destined.Controllers
                 .ToDictionaryAsync(x => x.TicketId, x => x.Count);
 
             ViewData["SearchCountry"] = searchCountry;
+            ViewData["SearchTo"] = searchTo;
+            ViewData["SearchUser"] = searchUser;
             ViewData["UserDisplayNames"] = userDisplayNames;
             ViewData["CommentCounts"] = commentCounts;
             return View(publicTickets);
