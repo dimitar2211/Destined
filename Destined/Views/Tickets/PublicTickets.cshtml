@@ -8,6 +8,8 @@
         : null;
     var userDisplayNames = ViewData["UserDisplayNames"] as Dictionary<string, string> ?? new Dictionary<string, string>();
     var commentCounts = ViewData["CommentCounts"] as Dictionary<int, int> ?? new Dictionary<int, int>();
+    var friendIds = ViewData["FriendIds"] as List<string> ?? new List<string>();
+    var pendingRequestIds = ViewData["PendingRequestIds"] as List<string> ?? new List<string>();
 }
 
 
@@ -73,7 +75,9 @@
                             {
                                 <p style="color:@textColor"><strong>Държава:</strong> @ticket.Country</p>
                             }
-                            <p style="color:@textColor"><strong>От:</strong> @(ticket.UserId != null && userDisplayNames.ContainsKey(ticket.UserId) ? userDisplayNames[ticket.UserId] : "Непознат")</p>
+                            <p style="color:@textColor" class="ticket-sender" data-user-id="@ticket.UserId">
+                                <strong>От:</strong> @(ticket.UserId != null && userDisplayNames.ContainsKey(ticket.UserId) ? userDisplayNames[ticket.UserId] : "Непознат")
+                            </p>
                         </div>
                         
                         <div class="ticket-center-wrapper">
@@ -143,6 +147,12 @@
     </div>
 </div>
 
+<!-- Context Menu for User -->
+<div id="user-context-menu" class="user-context-menu" style="display: none;">
+    <button id="menu-add-friend" onclick="actionAddFriend()">➕ Добави приятел</button>
+    <button id="menu-block-user" onclick="actionBlockUser()" style="color: #ff6b6b;">🚫 Блокирай</button>
+</div>
+
 <style>
     /* Global Styles */
     .page-title {
@@ -182,6 +192,54 @@
         transition: 0.3s;
         font-family: inherit;
         width: 200px;
+    }
+
+    /* User Context Menu Styles */
+    .user-context-menu {
+        position: fixed;
+        z-index: 5000;
+        background: rgba(30, 30, 47, 0.95);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 5px 0;
+        min-width: 170px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: menuFade 0.2s ease-out;
+    }
+
+    @@keyframes menuFade {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .user-context-menu button {
+        background: transparent;
+        border: none;
+        color: white;
+        padding: 10px 15px;
+        text-align: left;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .user-context-menu button:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .ticket-sender {
+        cursor: pointer;
+        transition: color 0.2s;
+        display: inline-block;
+    }
+    .ticket-sender:hover {
+        opacity: 0.8;
+        text-decoration: underline;
     }
 
     .glass-select {
@@ -499,6 +557,71 @@
         const select = document.getElementById('sortSelect');
         const container = document.querySelector('.ticket-wrapper');
         
+        // Context Menu Logic
+        const contextMenu = document.getElementById('user-context-menu');
+        const addFriendBtn = document.getElementById('menu-add-friend');
+        let activeUserId = null;
+
+        const friendIds = @Html.Raw(Json.Serialize(friendIds));
+        const pendingIds = @Html.Raw(Json.Serialize(pendingRequestIds));
+        const currentUserId = "@currentUserId";
+
+        document.querySelectorAll('.ticket-sender').forEach(el => {
+            el.addEventListener('dblclick', function(e) {
+                e.preventDefault();
+                const userId = this.getAttribute('data-user-id');
+                if (!userId || userId === currentUserId) return;
+
+                activeUserId = userId;
+                
+                // Show/hide Add Friend option
+                const isFriend = friendIds.includes(userId);
+                const isPending = pendingIds.includes(userId);
+                
+                if (isFriend || isPending) {
+                    addFriendBtn.style.display = 'none';
+                } else {
+                    addFriendBtn.style.display = 'block';
+                }
+
+                contextMenu.style.left = e.clientX + 'px';
+                contextMenu.style.top = e.clientY + 'px';
+                contextMenu.style.display = 'flex';
+            });
+        });
+
+        // Hide menu on click outside
+        window.addEventListener('click', () => {
+             contextMenu.style.display = 'none';
+        });
+
+        window.actionAddFriend = function() {
+            if (!activeUserId) return;
+            fetch(`/Friends/SendRequestById?friendId=${activeUserId}`, { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    showToast(data.message);
+                    if (data.success) {
+                        pendingIds.push(activeUserId);
+                    }
+                });
+        };
+
+        window.actionBlockUser = function() {
+            if (!activeUserId || !confirm('Сигурни ли сте, че искате да блокирате този потребител?')) return;
+            
+            const formData = new FormData();
+            formData.append('friendId', activeUserId);
+
+            fetch(`/Friends/Block`, { 
+                method: 'POST',
+                body: formData 
+            }).then(() => {
+                showToast("Потребителят е блокиран!");
+                setTimeout(() => location.reload(), 1000); // Reload to filter out their tickets
+            });
+        };
+
         // Cache all tickets on load so we don't lose them when filtering
         const allTickets = Array.from(container.querySelectorAll('.real-ticket'));
 

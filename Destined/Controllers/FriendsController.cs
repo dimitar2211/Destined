@@ -306,6 +306,57 @@ namespace Destined.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> SendRequestById(string friendId)
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return Unauthorized();
+
+            if (currentUser.Id == friendId)
+            {
+                return BadRequest("You cannot add yourself.");
+            }
+
+            // Check if already friends
+            bool alreadyFriends = await _context.Friendships.AnyAsync(f => f.UserId == currentUser.Id && f.FriendId == friendId);
+            if (alreadyFriends)
+            {
+                return Json(new { success = false, message = "Вече сте приятели." });
+            }
+
+            // Check if blocked
+            bool isBlocked = await _context.BlockedUsers.AnyAsync(b => 
+                (b.BlockerId == currentUser.Id && b.BlockedId == friendId) || 
+                (b.BlockerId == friendId && b.BlockedId == currentUser.Id));
+            if (isBlocked)
+            {
+                return Json(new { success = false, message = "Потребителят не е намерен." });
+            }
+
+            // Check pending
+            bool requestPending = await _context.FriendRequests.AnyAsync(fr => 
+                (fr.SenderId == currentUser.Id && fr.ReceiverId == friendId && fr.Status == FriendRequestStatus.Pending) ||
+                (fr.SenderId == friendId && fr.ReceiverId == currentUser.Id && fr.Status == FriendRequestStatus.Pending));
+            
+            if (requestPending)
+            {
+                return Json(new { success = false, message = "Вече има изпратена или получена покана." });
+            }
+
+            var friendRequest = new FriendRequest
+            {
+                SenderId = currentUser.Id,
+                ReceiverId = friendId,
+                Status = FriendRequestStatus.Pending,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.FriendRequests.Add(friendRequest);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Поканата за приятелство бе изпратена!" });
+        }
+
+        [HttpPost]
         public async Task<IActionResult> Unblock(string friendId)
         {
             var user = await _userManager.GetUserAsync(User);

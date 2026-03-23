@@ -230,6 +230,27 @@ namespace Destined.Controllers
             ViewData["SearchUser"] = searchUser;
             ViewData["UserDisplayNames"] = userDisplayNames;
             ViewData["CommentCounts"] = commentCounts;
+
+            // Fetch Friend IDs and Pending Request IDs for UI logic
+            var friendIds = new List<string>();
+            var pendingRequestIds = new List<string>();
+            if (!string.IsNullOrEmpty(currentUserId))
+            {
+                friendIds = await _context.Friendships
+                    .Where(f => f.UserId == currentUserId)
+                    .Select(f => f.FriendId)
+                    .ToListAsync();
+
+                pendingRequestIds = await _context.FriendRequests
+                    .Where(r => r.Status == FriendRequestStatus.Pending && 
+                                (r.SenderId == currentUserId || r.ReceiverId == currentUserId))
+                    .Select(r => r.SenderId == currentUserId ? r.ReceiverId : r.SenderId)
+                    .ToListAsync();
+            }
+            ViewData["FriendIds"] = friendIds;
+            ViewData["PendingRequestIds"] = pendingRequestIds;
+            ViewData["CurrentUserId"] = currentUserId;
+
             return View(publicTickets);
         }
 
