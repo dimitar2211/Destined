@@ -226,7 +226,7 @@
             const dateTimeLabel = ticketLeft.querySelector('.date-time strong');
             const passengersLabel = ticketLeft.querySelector('.passengers strong');
 
-            const buttonTextColor = "#ffffff";
+            const buttonTextColor = "#333333";
 
             let currentTextColor = textPicker.value;
             let currentLeftColor = leftPicker.value;
@@ -256,7 +256,6 @@
                 });
 
                 ticketRight.querySelectorAll('.actions button, .actions a').forEach(btn => {
-                    btn.style.transition = "none";
                     btn.style.color = buttonTextColor;
                 });
             }
