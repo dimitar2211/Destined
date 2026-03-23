@@ -57,6 +57,9 @@ namespace Destined.Controllers
             ViewBag.FriendDisplayUsernames = friendDisplayUsernames;
             ViewBag.ShowBlockedLink = blockedByMe.Any();
 
+            var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
+            ViewBag.AdminUserIds = adminUsers.Select(u => u.Id).ToList();
+
             return View(friends);
         }
 
@@ -280,6 +283,14 @@ namespace Destined.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
+
+            // Prevent blocking Admin
+            var friendUser = await _userManager.FindByIdAsync(friendId);
+            if (friendUser != null && await _userManager.IsInRoleAsync(friendUser, "Admin"))
+            {
+                TempData["Error"] = "Администратор не може да бъде блокиран!";
+                return RedirectToAction(nameof(Index));
+            }
 
             // Check if already blocked
             var alreadyBlocked = await _context.BlockedUsers.AnyAsync(b => b.BlockerId == user.Id && b.BlockedId == friendId);

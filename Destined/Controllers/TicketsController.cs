@@ -251,6 +251,10 @@ namespace Destined.Controllers
             ViewData["PendingRequestIds"] = pendingRequestIds;
             ViewData["CurrentUserId"] = currentUserId;
 
+            var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
+            var adminUserIds = adminUsers.Select(u => u.Id).ToList();
+            ViewData["AdminUserIds"] = adminUserIds;
+
             return View(publicTickets);
         }
 

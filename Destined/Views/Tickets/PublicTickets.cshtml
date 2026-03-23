@@ -10,6 +10,7 @@
     var commentCounts = ViewData["CommentCounts"] as Dictionary<int, int> ?? new Dictionary<int, int>();
     var friendIds = ViewData["FriendIds"] as List<string> ?? new List<string>();
     var pendingRequestIds = ViewData["PendingRequestIds"] as List<string> ?? new List<string>();
+    var adminUserIds = ViewData["AdminUserIds"] as List<string> ?? new List<string>();
 }
 
 
@@ -560,10 +561,12 @@
         // Context Menu Logic
         const contextMenu = document.getElementById('user-context-menu');
         const addFriendBtn = document.getElementById('menu-add-friend');
+        const blockUserBtn = document.getElementById('menu-block-user');
         let activeUserId = null;
 
         const friendIds = @Html.Raw(Json.Serialize(friendIds));
         const pendingIds = @Html.Raw(Json.Serialize(pendingRequestIds));
+        const adminIds = @Html.Raw(Json.Serialize(adminUserIds));
         const currentUserId = "@currentUserId";
 
         document.querySelectorAll('.ticket-sender').forEach(el => {
@@ -582,6 +585,13 @@
                     addFriendBtn.style.display = 'none';
                 } else {
                     addFriendBtn.style.display = 'block';
+                }
+
+                // Show/hide Block option (Hide for Admins)
+                if (adminIds.includes(userId)) {
+                    blockUserBtn.style.display = 'none';
+                } else {
+                    blockUserBtn.style.display = 'block';
                 }
 
                 contextMenu.style.left = e.clientX + 'px';

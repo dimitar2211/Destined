@@ -6,6 +6,7 @@
     var friendCode = ViewBag.FriendCode as string;
     var displayUsername = ViewBag.DisplayUsername as string;
     var friendDisplayUsernames = ViewBag.FriendDisplayUsernames as Dictionary<string, string>;
+    var adminUserIds = ViewBag.AdminUserIds as List<string> ?? new List<string>();
 }
 
 @Html.AntiForgeryToken()
@@ -83,12 +84,15 @@
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h4 class="card-title text-white mb-0">@friendDisplayUsernames?[friendship.FriendId]</h4>
                                         <div class="d-flex align-items-center gap-2">
-                                            <form asp-action="Block" method="post" onsubmit="return confirm('Сигурни ли сте, че искате да блокирате този потребител?');">
-                                                <input type="hidden" name="friendId" value="@friendship.FriendId" />
-                                                <button type="submit" class="btn-icon-danger" title="Блокирай" style="background: rgba(255, 107, 107, 0.1); border-color: rgba(255, 107, 107, 0.3);">
-                                                    🚫
-                                                </button>
-                                            </form>
+                                            @if (!adminUserIds.Contains(friendship.FriendId))
+                                            {
+                                                <form asp-action="Block" method="post" onsubmit="return confirm('Сигурни ли сте, че искате да блокирате този потребител?');">
+                                                    <input type="hidden" name="friendId" value="@friendship.FriendId" />
+                                                    <button type="submit" class="btn-icon-danger" title="Блокирай" style="background: rgba(255, 107, 107, 0.1); border-color: rgba(255, 107, 107, 0.3);">
+                                                        🚫
+                                                    </button>
+                                                </form>
+                                            }
                                             <form asp-action="Remove" method="post" onsubmit="return confirm('Сигурни ли сте, че искате да премахнете този приятел?');">
                                                 <input type="hidden" name="friendId" value="@friendship.FriendId" />
                                                 <button type="submit" class="btn-icon-danger" title="Премахни">
