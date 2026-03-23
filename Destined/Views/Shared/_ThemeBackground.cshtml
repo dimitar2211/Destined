@@ -43,6 +43,8 @@
         <div class="theme-option" data-theme="theme-sunset">🌅 Залез</div>
         <div class="theme-option" data-theme="theme-ocean">🌊 Океан</div>
         <div class="theme-option" data-theme="theme-forest">🌲 Гора</div>
+        <div class="theme-option" data-theme="theme-custom" id="theme-custom-opt">🖼️ Снимка</div>
+        <input type="file" id="custom-bg-upload" style="display:none" accept="image/*">
     </div>
 </div>
 
@@ -52,18 +54,15 @@
         const themeMenu = document.getElementById('theme-menu');
         const backgroundContainer = document.getElementById('page-background');
         const themeOptions = document.querySelectorAll('.theme-option');
+        const fileInput = document.getElementById('custom-bg-upload');
         
-        // Server-side theme loading
-        // Theme is applied via class on #page-background, but we should set it initially if possible
-        // Ideally, we read the claim in Razor and output it to JS
         const userSavedTheme = '@(User.FindFirst("user_theme")?.Value ?? "theme-space")';
+        let customBgPath = '@(User.FindFirst("user_custom_background")?.Value ?? "")';
         
-        // Fallback to space if the saved theme was 'theme-light' which is now removed
         const effectiveTheme = userSavedTheme === 'theme-light' ? 'theme-space' : userSavedTheme;
         
-        setTheme(effectiveTheme);
+        setTheme(effectiveTheme, customBgPath);
 
-        // Toggle menu
         if (themeBtn) {
             themeBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -71,46 +70,74 @@
             });
         }
 
-        // Close menu when clicking outside
         document.addEventListener('click', (e) => {
             if (themeMenu && !themeMenu.contains(e.target) && e.target !== themeBtn) {
                 themeMenu.classList.add('hidden');
             }
         });
 
-        // Handle selection
         if(themeOptions) {
             themeOptions.forEach(option => {
                 option.addEventListener('click', () => {
                     const selectedTheme = option.dataset.theme;
-                    setTheme(selectedTheme);
                     
-                    // Save to server
-                    fetch('/api/Theme/SetTheme', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(selectedTheme)
-                    }).then(response => {
-                        if (response.ok) {
-                            console.log('Theme saved');
-                        } else {
-                            console.error('Failed to save theme');
-                        }
-                    });
-
+                    if (selectedTheme === 'theme-custom') {
+                        fileInput.click();
+                    } else {
+                        saveTheme(selectedTheme);
+                    }
+                    
                     themeMenu.classList.add('hidden');
                 });
             });
         }
 
-        function setTheme(themeName) {
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files && fileInput.files[0]) {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+
+                fetch('/api/Theme/UploadBackground', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.path) {
+                        customBgPath = data.path; // Update local cache
+                        saveTheme('theme-custom', data.path);
+                    }
+                })
+                .catch(err => console.error('Upload failed', err));
+            }
+        });
+
+        function saveTheme(themeName, customPath = null) {
+            setTheme(themeName, customPath || customBgPath);
+            
+            fetch('/api/Theme/SetTheme', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(themeName)
+            }).then(response => {
+                if (response.ok) console.log('Theme saved');
+            });
+        }
+
+        function setTheme(themeName, customPath) {
             if(!backgroundContainer) return;
-            // Remove all existing theme classes
-            backgroundContainer.classList.remove('theme-space', 'theme-sunset', 'theme-ocean', 'theme-forest', 'theme-light');
-            // Add new class
+            backgroundContainer.classList.remove('theme-space', 'theme-sunset', 'theme-ocean', 'theme-forest', 'theme-light', 'theme-custom');
             backgroundContainer.classList.add(themeName);
+            
+            if (themeName === 'theme-custom' && customPath) {
+                backgroundContainer.style.backgroundImage = `url('${customPath}')`;
+                backgroundContainer.style.backgroundSize = 'cover';
+                backgroundContainer.style.backgroundPosition = 'center';
+                backgroundContainer.style.backgroundRepeat = 'no-repeat';
+                backgroundContainer.style.backgroundAttachment = 'fixed';
+            } else {
+                backgroundContainer.style.backgroundImage = '';
+            }
         }
     });
 </script>
