@@ -1,4 +1,4 @@
-﻿using Destined.Models;
+using Destined.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +19,7 @@ namespace Destined.Data
         public DbSet<UserFriendCode> UserFriendCodes { get; set; }
         public DbSet<FriendRequest> FriendRequests { get; set; }
         public DbSet<Friendship> Friendships { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -52,6 +53,18 @@ namespace Destined.Data
                 .HasOne(fs => fs.Friend)
                 .WithMany()
                 .HasForeignKey(fs => fs.FriendId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ChatMessage>()
+                .HasOne(cm => cm.Sender)
+                .WithMany()
+                .HasForeignKey(cm => cm.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ChatMessage>()
+                .HasOne(cm => cm.Receiver)
+                .WithMany()
+                .HasForeignKey(cm => cm.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
