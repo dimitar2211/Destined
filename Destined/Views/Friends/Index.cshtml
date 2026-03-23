@@ -20,6 +20,10 @@
             <div class="actions-bar d-flex justify-content-center mb-4">
                 <a asp-action="Pending" class="btn-secondary-glass me-2 text-warning border-warning">Изпратени покани</a>
                 <a asp-action="Received" class="btn-secondary-glass ms-2 text-info border-info">Получени покани</a>
+                @if (ViewBag.ShowBlockedLink == true)
+                {
+                    <a asp-action="Blocked" class="btn-secondary-glass ms-2 text-danger border-danger">Блокирани потребители</a>
+                }
             </div>
 
             @if (TempData["Success"] != null)
@@ -78,12 +82,20 @@
                                 <div class="card-body d-flex flex-column h-100">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
                                         <h4 class="card-title text-white mb-0">@friendDisplayUsernames?[friendship.FriendId]</h4>
-                                        <form asp-action="Remove" method="post" onsubmit="return confirm('Сигурни ли сте, че искате да премахнете този приятел?');">
-                                            <input type="hidden" name="friendId" value="@friendship.FriendId" />
-                                            <button type="submit" class="btn-icon-danger" title="Премахни">
-                                                🗑️
-                                            </button>
-                                        </form>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <form asp-action="Block" method="post" onsubmit="return confirm('Сигурни ли сте, че искате да блокирате този потребител?');">
+                                                <input type="hidden" name="friendId" value="@friendship.FriendId" />
+                                                <button type="submit" class="btn-icon-danger" title="Блокирай" style="background: rgba(255, 107, 107, 0.1); border-color: rgba(255, 107, 107, 0.3);">
+                                                    🚫
+                                                </button>
+                                            </form>
+                                            <form asp-action="Remove" method="post" onsubmit="return confirm('Сигурни ли сте, че искате да премахнете този приятел?');">
+                                                <input type="hidden" name="friendId" value="@friendship.FriendId" />
+                                                <button type="submit" class="btn-icon-danger" title="Премахни">
+                                                    🗑️
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                     
                                     <hr style="border-color: rgba(255,255,255,0.2);" />

@@ -46,6 +46,14 @@ namespace Destined.Controllers
             var currentUserId = _userManager.GetUserId(User);
             if (!ticket.IsPublic && ticket.UserId != currentUserId) return NotFound();
 
+            if (!string.IsNullOrEmpty(currentUserId))
+            {
+                var isBlocked = await _context.BlockedUsers.AnyAsync(b => 
+                    (b.BlockerId == currentUserId && b.BlockedId == ticket.UserId) || 
+                    (b.BlockerId == ticket.UserId && b.BlockedId == currentUserId));
+                if (isBlocked) return NotFound();
+            }
+
             return View(ticket);
         }
 
@@ -140,6 +148,14 @@ namespace Destined.Controllers
                 .Where(t => t.IsPublic)
                 .Include(t => t.User)
                 .AsQueryable();
+
+            var currentUserId = _userManager.GetUserId(User);
+            if (!string.IsNullOrEmpty(currentUserId))
+            {
+                var blockedByMe = _context.BlockedUsers.Where(b => b.BlockerId == currentUserId).Select(b => b.BlockedId);
+                var blockedMe = _context.BlockedUsers.Where(b => b.BlockedId == currentUserId).Select(b => b.BlockerId);
+                query = query.Where(t => !blockedByMe.Contains(t.UserId) && !blockedMe.Contains(t.UserId));
+            }
 
             if (!string.IsNullOrEmpty(searchCountry))
             {

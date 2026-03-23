@@ -28,6 +28,12 @@ namespace Destined.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
 
+            // Check if blocked
+            var isBlocked = await _context.BlockedUsers.AnyAsync(b => 
+                (b.BlockerId == user.Id && b.BlockedId == friendId) || 
+                (b.BlockerId == friendId && b.BlockedId == user.Id));
+            if (isBlocked) return Forbid();
+
             var messages = await _context.ChatMessages
                 .Where(m => (m.SenderId == user.Id && m.ReceiverId == friendId) ||
                             (m.SenderId == friendId && m.ReceiverId == user.Id))
@@ -54,6 +60,12 @@ namespace Destined.Controllers
 
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
+
+            // Check if blocked
+            var isBlocked = await _context.BlockedUsers.AnyAsync(b => 
+                (b.BlockerId == user.Id && b.BlockedId == friendId) || 
+                (b.BlockerId == friendId && b.BlockedId == user.Id));
+            if (isBlocked) return Forbid();
 
             // Verify they are friends
             var isFriend = await _context.Friendships.AnyAsync(f => f.UserId == user.Id && f.FriendId == friendId);

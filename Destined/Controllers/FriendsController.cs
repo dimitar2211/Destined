@@ -40,6 +40,14 @@ namespace Destined.Controllers
 
             // Fetch display usernames for friends
             var friendDisplayUsernames = new Dictionary<string, string>();
+            
+            // Get blocked user IDs (both ways)
+            var blockedByMe = await _context.BlockedUsers.Where(b => b.BlockerId == user.Id).Select(b => b.BlockedId).ToListAsync();
+            var blockedMe = await _context.BlockedUsers.Where(b => b.BlockedId == user.Id).Select(b => b.BlockerId).ToListAsync();
+            var allBlockedIds = blockedByMe.Union(blockedMe).ToList();
+
+            friends = friends.Where(f => !allBlockedIds.Contains(f.FriendId)).ToList();
+
             foreach(var f in friends)
             {
                 var fClaims = await _userManager.GetClaimsAsync(f.Friend);
@@ -47,6 +55,7 @@ namespace Destined.Controllers
                 friendDisplayUsernames[f.FriendId] = fName;
             }
             ViewBag.FriendDisplayUsernames = friendDisplayUsernames;
+            ViewBag.ShowBlockedLink = blockedByMe.Any();
 
             return View(friends);
         }
@@ -137,6 +146,17 @@ namespace Destined.Controllers
             if (alreadyFriends)
             {
                 TempData["Error"] = "You are already friends with this user.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Check if blocked (either way)
+            bool isBlocked = await _context.BlockedUsers.AnyAsync(b => 
+                (b.BlockerId == currentUser.Id && b.BlockedId == foundUser.Id) || 
+                (b.BlockerId == foundUser.Id && b.BlockedId == currentUser.Id));
+            
+            if (isBlocked)
+            {
+                TempData["Error"] = "User not found or friend code is incorrect."; // Hidden as per requirement
                 return RedirectToAction(nameof(Index));
             }
 
@@ -253,6 +273,77 @@ namespace Destined.Controllers
 
             TempData["Success"] = "Sharing settings updated.";
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Block(string friendId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            // Check if already blocked
+            var alreadyBlocked = await _context.BlockedUsers.AnyAsync(b => b.BlockerId == user.Id && b.BlockedId == friendId);
+            if (!alreadyBlocked)
+            {
+                var block = new BlockedUser { BlockerId = user.Id, BlockedId = friendId };
+                _context.BlockedUsers.Add(block);
+
+                // IMPORTANT: Remove friendship if it exists
+                var f1 = await _context.Friendships.FirstOrDefaultAsync(f => f.UserId == user.Id && f.FriendId == friendId);
+                var f2 = await _context.Friendships.FirstOrDefaultAsync(f => f.UserId == friendId && f.FriendId == user.Id);
+                if (f1 != null) _context.Friendships.Remove(f1);
+                if (f2 != null) _context.Friendships.Remove(f2);
+
+                // Also remove pending requests
+                var r1 = await _context.FriendRequests.Where(r => (r.SenderId == user.Id && r.ReceiverId == friendId) || (r.SenderId == friendId && r.ReceiverId == user.Id)).ToListAsync();
+                _context.FriendRequests.RemoveRange(r1);
+
+                await _context.SaveChangesAsync();
+            }
+
+            TempData["Success"] = "Потребителят е блокиран.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Unblock(string friendId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var block = await _context.BlockedUsers.FirstOrDefaultAsync(b => b.BlockerId == user.Id && b.BlockedId == friendId);
+            if (block != null)
+            {
+                _context.BlockedUsers.Remove(block);
+                await _context.SaveChangesAsync();
+            }
+
+            TempData["Success"] = "Потребителят е отблокиран.";
+            return RedirectToAction(nameof(Blocked));
+        }
+
+        public async Task<IActionResult> Blocked()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var blockedUsers = await _context.BlockedUsers
+                .Include(b => b.Blocked)
+                .Where(b => b.BlockerId == user.Id)
+                .ToListAsync();
+
+            var blockedDisplayNames = new Dictionary<string, string>();
+            var blockedPhotos = new Dictionary<string, string>();
+            foreach (var b in blockedUsers)
+            {
+                var claims = await _userManager.GetClaimsAsync(b.Blocked);
+                blockedDisplayNames[b.BlockedId] = claims.FirstOrDefault(c => c.Type == "display_username")?.Value ?? b.Blocked.UserName;
+                blockedPhotos[b.BlockedId] = claims.FirstOrDefault(c => c.Type == "profile_picture")?.Value;
+            }
+            ViewBag.BlockedDisplayNames = blockedDisplayNames;
+            ViewBag.BlockedPhotos = blockedPhotos;
+
+            return View(blockedUsers);
         }
     }
 }
