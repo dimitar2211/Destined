@@ -11,6 +11,7 @@
     var friendIds = ViewData["FriendIds"] as List<string> ?? new List<string>();
     var pendingRequestIds = ViewData["PendingRequestIds"] as List<string> ?? new List<string>();
     var adminUserIds = ViewData["AdminUserIds"] as List<string> ?? new List<string>();
+    var likedTicketIds = ViewData["LikedTicketIds"] as List<int> ?? new List<int>();
 }
 
 
@@ -51,6 +52,11 @@
                 <option value="mineFirst">Моите билети най-отгоре</option>
                 <option value="foreignOnly">Само чужди билети</option>
             </select>
+
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <a asp-action="LikedTickets" class="btn-glass linked-tickets-nav">Харесани билети ❤️</a>
+            }
         </div>
 
         <div class="ticket-wrapper">
@@ -112,6 +118,19 @@
                                         onclick="checkAndOpenReportModal(@ticket.Id)">
                                     Report
                                 </button>
+
+                                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                                {
+                                    bool isLiked = likedTicketIds.Contains(ticket.Id);
+                                    <button type="button" 
+                                            class="btn-like @(isLiked ? "liked" : "")" 
+                                            onclick="toggleLike(this, @ticket.Id)"
+                                            title="@(isLiked ? "Unlike" : "Like")">
+                                        <svg viewBox="0 0 24 24" class="heart-icon">
+                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                        </svg>
+                                    </button>
+                                }
                             </div>
                         </div>
                     </div>
@@ -282,6 +301,21 @@
     }
     .btn-glass:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
 
+    .linked-tickets-nav {
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255, 71, 87, 0.2) !important;
+        border: 1px solid rgba(255, 71, 87, 0.3) !important;
+        color: #ff4757 !important;
+    }
+    
+    .linked-tickets-nav:hover {
+        background: rgba(255, 71, 87, 0.3) !important;
+        transform: translateY(-2px);
+    }
+
     .btn-clear {
         color: #ff6b6b; font-size: 1.5rem; text-decoration: none; transition: 0.3s;
     }
@@ -444,6 +478,39 @@
     .btn-journal { border-bottom: 2px solid rgba(103, 58, 183, 0.4); }
     .btn-detail { border-bottom: 2px solid rgba(3, 169, 244, 0.4); }
     .btn-report { border-bottom: 2px solid rgba(229, 57, 53, 0.4); }
+
+    .btn-like {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+        transition: transform 0.2s, filter 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .heart-icon {
+        width: 28px;
+        height: 28px;
+        fill: transparent;
+        stroke: #ff4757;
+        stroke-width: 2;
+        transition: fill 0.3s, stroke 0.3s, transform 0.3s;
+    }
+
+    .btn-like.liked .heart-icon {
+        fill: #ff4757;
+        stroke: #ff4757;
+    }
+
+    .btn-like:hover {
+        transform: scale(1.15);
+    }
+
+    .btn-like:active {
+        transform: scale(0.9);
+    }
 
     .btn:hover { 
         transform: translateY(-2px) scale(1.02); 
@@ -680,5 +747,25 @@
                 mixed.forEach(t => container.appendChild(t));
             }
         }
+
+        window.toggleLike = function(btn, ticketId) {
+            fetch(`/Tickets/ToggleLike?ticketId=${ticketId}`, { method: 'POST' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.liked) {
+                        btn.classList.add('liked');
+                        btn.title = "Unlike";
+                        showToast("Билетът е добавен в харесани!");
+                    } else {
+                        btn.classList.remove('liked');
+                        btn.title = "Like";
+                        showToast("Билетът е премахнат от харесани.");
+                    }
+                })
+                .catch(err => {
+                    console.error("Error toggling like:", err);
+                    showToast("Възникна грешка при харесване.");
+                });
+        };
     });
 </script>

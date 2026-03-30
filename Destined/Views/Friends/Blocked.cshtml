@@ -10,12 +10,12 @@
 <div style="position: relative; min-height: 100vh; overflow-x: hidden;">
     <partial name="_ThemeBackground" />
 
-    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+    <div id="page-content" style="position: relative; z-index: 10; padding: 100px 20px 40px 20px;">
         <div class="friends-wrapper">
             <h1 class="page-title">Блокирани <span class="gradient-text">Потребители</span></h1>
 
             <div class="actions-bar d-flex justify-content-center mb-4">
-                <a asp-action="Index" class="btn-secondary-glass me-2">⬅ Обратно към Приятели</a>
+                <a asp-action="Index" class="btn-back-glass">⬅ Обратно към Приятели</a>
             </div>
 
             @if (TempData["Success"] != null)
@@ -80,8 +80,12 @@
     }
     .btn-primary-glow { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; box-shadow: 0 0 15px rgba(255, 65, 108, 0.5); }
     .btn-primary-glow:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(255, 65, 108, 0.8); color: white; }
-    .btn-secondary-glass { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; }
-    .btn-secondary-glass:hover { background: rgba(255,255,255,0.2); transform: translateY(-3px); color: white; border: 1px solid rgba(255,255,255,0.4); }
+    .btn-back-glass { 
+        padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; 
+        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; display: inline-block;
+        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .btn-back-glass:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px) translateX(-5px); color: white; border: 1px solid rgba(255,255,255,0.4); }
 
     .friend-card {
         background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15);

@@ -21,6 +21,7 @@ namespace Destined.Data
         public DbSet<Friendship> Friendships { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<BlockedUser> BlockedUsers { get; set; }
+        public DbSet<LikedTicket> LikedTickets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -79,6 +80,18 @@ namespace Destined.Data
                 .WithMany()
                 .HasForeignKey(bu => bu.BlockedId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<LikedTicket>()
+                .HasOne(lt => lt.User)
+                .WithMany()
+                .HasForeignKey(lt => lt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<LikedTicket>()
+                .HasOne(lt => lt.Ticket)
+                .WithMany()
+                .HasForeignKey(lt => lt.TicketId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

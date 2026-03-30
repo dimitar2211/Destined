@@ -21,10 +21,10 @@
 <div style="position: relative; min-height: 100vh; overflow-x: hidden;">
     <partial name="_ThemeBackground" />
 
-    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+    <div id="page-content" style="position: relative; z-index: 10; padding: 100px 20px 40px 20px;">
         <div class="map-wrapper">
             <div class="actions-bar">
-                 <a asp-controller="Friends" asp-action="Index" class="btn-back">⬅ Назад към приятели</a>
+                 <a asp-controller="Friends" asp-action="Index" class="btn-back-glass">⬅ Назад към приятели</a>
             </div>
 
             <h1 class="page-title">Картата на <span class="gradient-text">@friendName</span></h1>
@@ -215,13 +215,12 @@
     .completion-label { color: rgba(255,255,255,0.75); font-size: 1rem; font-weight: 600; }
     .completion-value { font-size: 1.4rem; font-weight: 800; color: #4CAF50; }
     
-    .btn-back { 
-        color: #fff; text-decoration: none; font-weight: 600; font-size: 1.1rem; 
-        display: inline-flex; align-items: center; padding: 10px 20px; 
-        background: rgba(255,255,255,0.1); border-radius: 30px; border: 1px solid rgba(255,255,255,0.2);
-        transition: 0.3s; 
+    .btn-back-glass { 
+        padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; 
+        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; display: inline-block;
+        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     }
-    .btn-back:hover { background: rgba(255,255,255,0.2); transform: translateX(-5px); color: #fff; }
+    .btn-back-glass:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px) translateX(-5px); color: #fff; border: 1px solid rgba(255,255,255,0.4); }
 
     .map-card {
         background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);

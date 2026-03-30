@@ -1,4 +1,4 @@
-﻿@page
+@page
 @model RegisterModel
 @{
     ViewData["Title"] = "Регистрация";
@@ -177,6 +177,15 @@
             url('https://www.transparenttextures.com/patterns/shattered-island.png');
         background-color: #f1e6d4;
     }
+
+    .passport-right {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .passport-content {
+        flex-grow: 1;
+    }
     
     .passport-right::before {
         content: "";
@@ -214,18 +223,18 @@
     }
     
     .passport-footer-code {
-        position: absolute;
-        bottom: 30px;
-        left: 40px;
-        right: 40px;
+        margin-top: 40px;
         font-family: 'OCR-B', monospace; 
         letter-spacing: 2px;
         font-weight: bold;
         color: #333;
         word-break: break-all;
-        line-height: 1.4;
+        line-height: 1.2;
         opacity: 0.7;
-        font-size: 1.1rem;
+        font-size: 1.15rem;
+        text-transform: uppercase;
+        border-top: 1px dashed rgba(0,0,0,0.1);
+        padding-top: 15px;
     }
 
     /* Input Styling */
@@ -287,7 +296,7 @@
         color: #bf360c;
         font-weight: bold;
         text-decoration: none;
-        font-size: 0.9rem;
+        font-size: 1.1rem;
     }
     .small-links a:hover { text-decoration: underline; color: #e64a19; }
 

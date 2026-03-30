@@ -9,11 +9,11 @@
 <div style="position: relative; min-height: 100vh; overflow-x: hidden;">
     <partial name="_ThemeBackground" />
 
-    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+    <div id="page-content" style="position: relative; z-index: 10; padding: 100px 20px 40px 20px;">
         <div class="requests-wrapper">
             <h1 class="page-title"><span class="gradient-text">Получени</span> Покани</h1>
             <div class="actions-bar mb-4 text-center">
-                <a asp-action="Index" class="btn-secondary-glass">⬅ Назад към приятели</a>
+                <a asp-action="Index" class="btn-back-glass">⬅ Назад към приятели</a>
             </div>
 
             @if (TempData["Success"] != null)
@@ -61,11 +61,12 @@
     .page-title { font-size: 3rem; font-weight: 800; text-align: center; margin-bottom: 2rem; color: #fff; }
     .gradient-text { background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-    .btn-secondary-glass { 
-        padding: 10px 20px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; 
+    .btn-back-glass { 
+        padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; 
         background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; display: inline-block;
+        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     }
-    .btn-secondary-glass:hover { background: rgba(255,255,255,0.2); transform: translateY(-3px); color: white; border: 1px solid rgba(255,255,255,0.4); }
+    .btn-back-glass:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px) translateX(-5px); color: white; border: 1px solid rgba(255,255,255,0.4); }
 
     .btn-success-glass {
         padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(76, 175, 80, 0.4);

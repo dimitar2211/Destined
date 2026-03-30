@@ -255,7 +255,102 @@ namespace Destined.Controllers
             var adminUserIds = adminUsers.Select(u => u.Id).ToList();
             ViewData["AdminUserIds"] = adminUserIds;
 
+            var likedTicketIds = new List<int>();
+            if (!string.IsNullOrEmpty(currentUserId))
+            {
+                likedTicketIds = await _context.LikedTickets
+                    .Where(lt => lt.UserId == currentUserId)
+                    .Select(lt => lt.TicketId)
+                    .ToListAsync();
+            }
+            ViewData["LikedTicketIds"] = likedTicketIds;
+
             return View(publicTickets);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleLike(int ticketId)
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+            var likedTicket = await _context.LikedTickets
+                .FirstOrDefaultAsync(lt => lt.TicketId == ticketId && lt.UserId == userId);
+
+            if (likedTicket != null)
+            {
+                _context.LikedTickets.Remove(likedTicket);
+                await _context.SaveChangesAsync();
+                return Json(new { liked = false });
+            }
+            else
+            {
+                var newLike = new LikedTicket
+                {
+                    TicketId = ticketId,
+                    UserId = userId,
+                    LikedAt = DateTime.UtcNow
+                };
+                _context.LikedTickets.Add(newLike);
+                await _context.SaveChangesAsync();
+                return Json(new { liked = true });
+            }
+        }
+
+        public async Task<IActionResult> LikedTickets()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId)) return RedirectToAction("Login", "Account", new { area = "Identity" });
+
+            var likedTickets = await _context.LikedTickets
+                .Where(lt => lt.UserId == userId)
+                .Include(lt => lt.Ticket)
+                .ThenInclude(t => t.User)
+                .OrderByDescending(lt => lt.LikedAt)
+                .Select(lt => lt.Ticket)
+                .ToListAsync();
+
+            // Build userId → display username map
+            var userIds = likedTickets
+                .Where(t => t.UserId != null)
+                .Select(t => t.UserId!)
+                .Distinct()
+                .ToList();
+
+            var userDisplayNames = new Dictionary<string, string>();
+            foreach (var uid in userIds)
+            {
+                var u = await _userManager.FindByIdAsync(uid);
+                if (u != null)
+                {
+                    var claims = await _userManager.GetClaimsAsync(u);
+                    var displayClaim = claims.FirstOrDefault(c => c.Type == "display_username");
+                    if (displayClaim != null && !string.IsNullOrEmpty(displayClaim.Value))
+                    {
+                        userDisplayNames[uid] = displayClaim.Value;
+                    }
+                    else
+                    {
+                        var name = u.UserName ?? string.Empty;
+                        var atIdx = name.IndexOf('@');
+                        userDisplayNames[uid] = atIdx >= 0 ? name.Substring(0, atIdx) : name;
+                    }
+                }
+            }
+
+            // Build comment counts map
+            var ticketIds = likedTickets.Select(t => t.Id).ToList();
+            var commentCounts = await _context.TicketComments
+                .Where(c => ticketIds.Contains(c.TicketId))
+                .GroupBy(c => c.TicketId)
+                .Select(g => new { TicketId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.TicketId, x => x.Count);
+
+            ViewData["UserDisplayNames"] = userDisplayNames;
+            ViewData["CommentCounts"] = commentCounts;
+            ViewData["CurrentUserId"] = userId;
+
+            return View(likedTickets);
         }
 
         public async Task<IActionResult> FriendTickets(string friendId)
@@ -293,6 +388,13 @@ namespace Destined.Controllers
             }
 
             var tickets = await query.OrderBy(t => t.OrderIndex).ToListAsync();
+
+            var likedTicketIds = await _context.LikedTickets
+                .Where(lt => lt.UserId == currentUserId)
+                .Select(lt => lt.TicketId)
+                .ToListAsync();
+            ViewData["LikedTicketIds"] = likedTicketIds;
+
             return View(tickets);
         }
 
