@@ -12,6 +12,7 @@
     var pendingRequestIds = ViewData["PendingRequestIds"] as List<string> ?? new List<string>();
     var adminUserIds = ViewData["AdminUserIds"] as List<string> ?? new List<string>();
     var likedTicketIds = ViewData["LikedTicketIds"] as List<int> ?? new List<int>();
+    var likeCounts = ViewData["LikeCounts"] as Dictionary<int, int> ?? new Dictionary<int, int>();
 }
 
 
@@ -122,14 +123,19 @@
                                 @if (User.Identity != null && User.Identity.IsAuthenticated)
                                 {
                                     bool isLiked = likedTicketIds.Contains(ticket.Id);
-                                    <button type="button" 
-                                            class="btn-like @(isLiked ? "liked" : "")" 
-                                            onclick="toggleLike(this, @ticket.Id)"
-                                            title="@(isLiked ? "Unlike" : "Like")">
-                                        <svg viewBox="0 0 24 24" class="heart-icon">
-                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                        </svg>
-                                    </button>
+                                    int tLikes = likeCounts.TryGetValue(ticket.Id, out var lCount) ? lCount : 0;
+                                    <div class="like-container">
+                                        <button type="button" 
+                                                class="btn-like @(isLiked ? "liked" : "")" 
+                                                onclick="toggleLike(this, @ticket.Id)"
+                                                title="@(isLiked ? "Unlike" : "Like")"
+                                                data-heart-color="@ticket.HeartColor">
+                                            <svg viewBox="0 0 24 24" class="heart-icon" style="stroke: @ticket.HeartColor; fill: @(isLiked ? ticket.HeartColor : "transparent");">
+                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                            </svg>
+                                        </button>
+                                        <span class="like-count" id="like-count-@ticket.Id" style="color: @ticket.LikeCountColor;">@tLikes</span>
+                                    </div>
                                 }
                             </div>
                         </div>
@@ -508,6 +514,32 @@
         transform: scale(1.15);
     }
 
+    .like-container {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(255, 255, 255, 0.4);
+        padding: 4px 12px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+    .like-container:hover {
+        background: rgba(255, 255, 255, 0.6);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .like-count {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #ff4757;
+        min-width: 15px;
+        text-align: center;
+    }
+
     .btn-like:active {
         transform: scale(0.9);
     }
@@ -752,13 +784,23 @@
             fetch(`/Tickets/ToggleLike?ticketId=${ticketId}`, { method: 'POST' })
                 .then(r => r.json())
                 .then(data => {
+                    const countEl = document.getElementById(`like-count-${ticketId}`);
+                    if (countEl) {
+                        countEl.innerText = data.totalLikes;
+                    }
+
+                    const icon = btn.querySelector('.heart-icon');
+                    const heartColor = btn.getAttribute('data-heart-color') || '#ff4757';
+
                     if (data.liked) {
                         btn.classList.add('liked');
                         btn.title = "Unlike";
+                        if (icon) icon.style.fill = heartColor;
                         showToast("Билетът е добавен в харесани!");
                     } else {
                         btn.classList.remove('liked');
                         btn.title = "Like";
+                        if (icon) icon.style.fill = 'transparent';
                         showToast("Билетът е премахнат от харесани.");
                     }
                 })

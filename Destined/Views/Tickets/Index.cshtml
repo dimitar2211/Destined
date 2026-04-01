@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Билети";
     ViewData["FullWidth"] = true;
+    var likeCounts = ViewData["LikeCounts"] as Dictionary<int, int> ?? new Dictionary<int, int>();
+    var commentCounts = ViewData["CommentCounts"] as Dictionary<int, int> ?? new Dictionary<int, int>();
 }
 
 @Html.AntiForgeryToken()
@@ -82,7 +84,25 @@
                                     <a asp-action="Details" asp-route-id="@ticket.Id" class="btn btn-detail" title="Детайли">Детайли</a>
                                     <a asp-action="Edit" asp-route-id="@ticket.Id" class="btn btn-edit" title="Редактирай">Редактирай</a>
                                     <a asp-action="Delete" asp-route-id="@ticket.Id" class="btn btn-delete" title="Изтрий">Изтрий</a>
+                                    @{
+                                        bool hasComments = commentCounts.TryGetValue(ticket.Id, out var cCount) && cCount > 0;
+                                        bool showCommentsButton = ticket.IsPublic && (ticket.AllowComments || hasComments);
+                                    }
+                                    @if (showCommentsButton)
+                                    {
+                                        <a asp-controller="Comments" asp-action="Ticket" asp-route-ticketId="@ticket.Id" class="btn btn-comments" title="Коментари">Коментари</a>
+                                    }
                                     <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" class="btn btn-journal" title="Дневник">Дневник</a>
+                                    
+                                    @if (likeCounts.TryGetValue(ticket.Id, out var count) && count > 0)
+                                    {
+                                        <div class="my-ticket-likes-badge" title="Брой харесвания от други потребители" style="border-color: @(ticket.HeartColor)88;">
+                                            <svg viewBox="0 0 24 24" class="heart-icon-mini" style="fill: @ticket.HeartColor; filter: drop-shadow(0 2px 4px @(ticket.HeartColor)44);">
+                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                            </svg>
+                                            <span class="like-count-text" style="color: @ticket.LikeCountColor;">@count</span>
+                                        </div>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -211,6 +231,39 @@
         background: rgba(255, 255, 255, 0.6);
         box-shadow: 0 8px 25px rgba(0,0,0,0.1);
         border: 1px solid rgba(0,0,0,0.15); 
+    }
+
+    .my-ticket-likes-badge {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 6px 14px;
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0,0,0,0.1);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        margin-left: 5px;
+    }
+
+    .my-ticket-likes-badge:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.7);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+
+    .heart-icon-mini {
+        width: 18px;
+        height: 18px;
+        fill: #ff4757;
+        filter: drop-shadow(0 2px 4px rgba(255, 71, 87, 0.3));
+    }
+
+    .like-count-text {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #ff4757;
     }
 
     @@media (max-width: 768px) {

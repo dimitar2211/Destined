@@ -1,50 +1,54 @@
-﻿@model Destined.Models.Ticket
+@model Destined.Models.Ticket
 
 @{
-    ViewData["Title"] = "Create Ticket";
+    ViewData["Title"] = "Нов Билет";
     ViewData["FullWidth"] = true;
 }
 
 <div style="position: relative; min-height: 100vh; overflow-x: hidden;">
     <partial name="_ThemeBackground" />
 
-    <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
+    <div id="page-content" style="position: relative; z-index: 10; padding: 100px 20px 40px 20px;">
         <div class="ticket-wrapper">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <a asp-action="Index" class="btn-back-glass shadow-sm">⬅ Назад към моите билети</a>
+            </div>
+
             <h1 class="page-title">Нов билет</h1>
 
             <form method="post" asp-action="Create">
+                <div class="color-controls">
+                    <label>Цвят лява част: <input asp-for="LeftColor" type="color" id="leftColorPicker" value="#e0f2f1" /></label>
+                    <label>Цвят дясна част: <input asp-for="RightColor" type="color" id="rightColorPicker" value="#ffffff" /></label>
+                    <label>Цвят на текста: <input asp-for="TextColor" type="color" id="textColorPicker" value="#000000" /></label>
+                    <label>Цвят на сърцето: <input asp-for="HeartColor" type="color" id="heartColorPicker" value="#ff4757" /></label>
+                    <label>Цвят на числото: <input asp-for="LikeCountColor" type="color" id="likeCountColorPicker" value="#ff4757" /></label>
+                </div>
                 <div class="real-ticket">
-                    <div class="ticket-left">
-                        <div class="from-to-wrapper">
-                            <label>
-                                <strong>От:</strong>
-                                <input asp-for="From" class="fake-input" placeholder="Град на тръгване" maxlength="22" />
-                                <span asp-validation-for="From" class="text-danger"></span>
-                            </label>
-                            <div class="arrow">→</div>
-                            <label>
-                                <strong>До:</strong>
-                                <input asp-for="To" class="fake-input" placeholder="Дестинация" maxlength="22" required />
-                                <span asp-validation-for="To" class="text-danger"></span>
-                            </label>
-                        </div>
-                        <label>
+                    <div class="ticket-left" id="ticketLeft" style="background:#e0f2f1; color:#000000;">
+                        <h2>
+                            <input asp-for="From" class="edit-input location-input" placeholder="Откъде" maxlength="22" />
+                            <span class="arrow">➔</span>
+                            <input asp-for="To" class="edit-input location-input" placeholder="Докъде" maxlength="22" required />
+                        </h2>
+                        <p class="date-time">
                             <strong>Дата и час:</strong>
-                            <input asp-for="DepartureTime" type="datetime-local" class="fake-input small-input" required />
+                            <input asp-for="DepartureTime" type="datetime-local" class="edit-input" required />
                             <span asp-validation-for="DepartureTime" class="text-danger"></span>
-                        </label>
-                        <label>
+                        </p>
+                        <p class="passengers">
                             <strong>Пътници:</strong>
-                            <input asp-for="NumberOfPassengers" class="fake-input small-input" min="1" value="1" required />
+                            <input asp-for="NumberOfPassengers" type="number" min="1" value="1" class="edit-input small-input" required />
                             <span asp-validation-for="NumberOfPassengers" class="text-danger"></span>
-                        </label>
+                        </p>
+                        
                         <div class="dropdown-container">
-                            <label>
-                                <strong>Държава:</strong>
-                                <input type="text" id="countrySearch" class="fake-input dropdown-search" placeholder="Търси държава..." autocomplete="off">
-                                <input asp-for="Country" type="hidden" id="selectedCountry" />
-                                <span asp-validation-for="Country" class="text-danger"></span>
-                            </label>
+                            <p style="margin:0;">
+                                 <strong>Държава:</strong>
+                            </p>
+                            <input type="text" id="countrySearch" class="dropdown-search edit-input" placeholder="Търси държава..." autocomplete="off">
+                            <input asp-for="Country" type="hidden" id="selectedCountry" />
+                            <span asp-validation-for="Country" class="text-danger"></span>
                             <div id="countryList" class="dropdown-list">
                                 <!-- Countries will be populated here -->
                             </div>
@@ -52,12 +56,20 @@
                     </div>
 
                     <div class="ticket-center-wrapper">
-                        <div class="ticket-center"></div>
+                        <div class="ticket-center">
+                            <div class="perforation"></div>
+                        </div>
                     </div>
 
-                    <div class="ticket-right">
+                    <div class="ticket-right" id="ticketRight" style="background:#ffffff; color:#000000;">
                         <div class="barcode"></div>
                         <div class="actions">
+                            <div class="preview-like-container" style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.05); padding: 5px 15px; border-radius: 20px;">
+                                <svg viewBox="0 0 24 24" id="previewHeart" style="width: 24px; height: 24px; fill: #ff4757; stroke: #ff4757; stroke-width: 2;">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                                <span id="previewLikeCount" style="font-weight: 700; color: #ff4757;">1</span>
+                            </div>
                             <button type="submit" class="btn-create">Създай билет</button>
                         </div>
                     </div>
@@ -67,152 +79,221 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const maxLength = 22;
-            const inputs = document.querySelectorAll('input[asp-for="From"], input[asp-for="To"]');
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const maxLength = 22;
+        const inputs = document.querySelectorAll('input[name="From"], input[name="To"]');
 
-            inputs.forEach(input => {
-                input.addEventListener('input', () => {
-                    if (input.value.length > maxLength) {
-                        input.value = input.value.slice(0, maxLength);
-                    }
-                });
-            });
-
-            // Country Dropdown Logic
-            const countries = [
-                // Европа
-                "Албания","Андора","Австрия","Беларус","Белгия","Босна и Херцеговина","България",
-                "Ватикана","Великобритания","Германия","Гърция","Дания","Естония","Ирландия",
-                "Исландия","Испания","Италия","Кипър","Латвия","Литва","Лихтенщайн","Люксембург",
-                "Малта","Молдова","Монако","Нидерландия","Норвегия","Полша","Португалия",
-                "Румъния","Сан Марино","Северна Македония","Словакия","Словения","Сърбия",
-                "Украйна","Унгария","Финландия","Франция","Хърватия","Черна гора","Чехия",
-                "Швейцария","Швеция","Русия","Косово",
-
-                // Азия
-                "Афганистан","Армения","Азербайджан","Бангладеш","Бахрейн","Бруней","Бутан",
-                "Виетнам","Грузия","Израел","Индия","Индонезия","Ирак","Иран","Йордания",
-                "Казахстан","Камбоджа","Катар","Киргизстан","Китай","Кувейт","Лаос","Ливан",
-                "Малайзия","Малдиви","Монголия","Мианмар","Непал","ОАЕ","Оман","Пакистан",
-                "Саудитска Арабия","Северна Корея","Сингапур","Сирия","Таджикистан","Тайланд",
-                "Туркменистан","Турция","Узбекистан","Филипини","Шри Ланка","Южна Корея",
-                "Япония","Палестина","Тимор-Лесте","Йемен",
-
-                // Африка
-                "Алжир","Ангола","Бенин","Ботсвана","Буркина Фасо","Бурунди","Габон","Гамбия",
-                "Гана","Гвинея","Гвинея-Бисау","Джибути","Египет","Екваториална Гвинея",
-                "Еритрея","Есватини","Етиопия","Замбия","Зимбабве","Кабо Верде","Камерун",
-                "Кения","Коморски острови","Конго","ДР Конго","Кот д’Ивоар","Лесото","Либерия",
-                "Либия","Мадагаскар","Малави","Мали","Мароко","Мавритания","Мавриций",
-                "Мозамбик","Намибия","Нигер","Нигерия","Руанда","Сао Томе и Принсипи",
-                "Сейшели","Сенегал","Сиера Леоне","Сомалия","Судан","Южен Судан","Танзания",
-                "Того","Тунис","Уганда","Централноафриканска република","Чад","ЮАР",
-
-                // Северна и Централна Америка
-                "Антигуа и Барбуда","Бахами","Барбадос","Белиз","Гватемала","Доминика",
-                "Доминиканска република","Канада","Коста Рика","Куба","Мексико","Никарагуа",
-                "Панама","Салвадор","САЩ","Сейнт Китс и Невис","Сейнт Лусия",
-                "Сейнт Винсент и Гренадини","Тринидад и Тобаго","Хаити","Хондурас","Ямайка",
-                "Гренада",
-
-                // Южна Америка
-                "Аржентина","Боливия","Бразилия","Венецуела","Гаяна","Колумбия","Парагвай",
-                "Перу","Суринам","Уругвай","Чили","Еквадор",
-
-                // Океания
-                "Австралия","Вануату","Кирибати","Маршалови острови","Микронезия","Науру",
-                "Нова Зеландия","Палау","Папуа Нова Гвинея","Самоа","Соломонови острови",
-                "Тонга","Тувалу","Фиджи"
-            ]; // Updated list
-
-            const searchInput = document.getElementById('countrySearch');
-            const countryList = document.getElementById('countryList');
-            const hiddenInput = document.getElementById('selectedCountry');
-
-            // Move to body
-            document.body.appendChild(countryList);
-
-            function updateDropdownPosition() {
-                const rect = searchInput.getBoundingClientRect();
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-                
-                countryList.style.top = (rect.bottom + scrollTop) + 'px';
-                countryList.style.left = (rect.left + scrollLeft) + 'px';
-                countryList.style.width = rect.width + 'px';
-            }
-
-            function populateList(filter = "") {
-                countryList.innerHTML = '';
-                const filtered = countries.filter(c => c.toLowerCase().includes(filter.toLowerCase()));
-                
-                // Show all if filter is empty
-                let showList = filter === "" ? countries : filtered;
-
-                if (showList.length === 0) {
-                    const noResult = document.createElement('div');
-                    noResult.className = 'dropdown-item';
-                    noResult.textContent = 'Няма резултати';
-                    
-                    noResult.style.color = '#999';
-                    noResult.style.cursor = 'default';
-                    countryList.appendChild(noResult);
-                    return;
-                }
-
-                showList.forEach(country => {
-                    const item = document.createElement('div');
-                    item.className = 'dropdown-item';
-                    item.textContent = country;
-                    item.addEventListener('click', () => {
-                        searchInput.value = country;
-                        hiddenInput.value = country;
-                        countryList.style.display = 'none';
-                    });
-                    countryList.appendChild(item);
-                });
-            }
-
-            searchInput.addEventListener('input', () => {
-                populateList(searchInput.value);
-                countryList.style.display = 'block';
-                updateDropdownPosition();
-            });
-
-            searchInput.addEventListener('focus', () => {
-                populateList(searchInput.value);
-                countryList.style.display = 'block';
-                updateDropdownPosition();
-            });
-
-            window.addEventListener('resize', () => {
-                if (countryList.style.display === 'block') updateDropdownPosition();
-            });
-            window.addEventListener('scroll', () => {
-                 if (countryList.style.display === 'block') updateDropdownPosition();
-            }, true);
-
-            document.addEventListener('click', (e) => {
-                if (!searchInput.contains(e.target) && !countryList.contains(e.target)) {
-                    countryList.style.display = 'none';
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.value.length > maxLength) {
+                    input.value = input.value.slice(0, maxLength);
                 }
             });
         });
-    </script>
+
+        // Country Dropdown Logic
+        const countries = [
+            // Европа
+            "Албания","Андора","Австрия","Беларус","Белгия","Босна и Херцеговина","България",
+            "Ватикана","Великобритания","Германия","Гърция","Дания","Естония","Ирландия",
+            "Исландия","Испания","Италия","Кипър","Латвия","Литва","Лихтенщайн","Люксембург",
+            "Малта","Молдова","Монако","Нидерландия","Норвегия","Полша","Португалия",
+            "Румъния","Сан Марино","Северна Македония","Словакия","Словения","Сърбия",
+            "Украйна","Унгария","Финландия","Франция","Хърватия","Черна гора","Чехия",
+            "Швейцария","Швеция","Русия","Косово",
+
+            // Азия
+            "Афганистан","Армения","Азербайджан","Бангладеш","Бахрейн","Бруней","Бутан",
+            "Виетнам","Грузия","Израел","Индия","Индонезия","Ирак","Иран","Йордания",
+            "Казахстан","Камбоджа","Катар","Киргизстан","Китай","Кувейт","Лаос","Ливан",
+            "Малайзия","Малдиви","Монголия","Мианмар","Непал","ОАЕ","Оман","Пакистан",
+            "Саудитска Арабия","Северна Корея","Сингапур","Сирия","Таджикистан","Тайланд",
+            "Туркменистан","Турция","Узбекистан","Филипини","Шри Ланка","Южна Корея",
+            "Япония","Палестина","Тимор-Лесте","Йемен",
+
+            // Африка
+            "Алжир","Ангола","Бенин","Ботсвана","Буркина Фасо","Бурунди","Габон","Гамбия",
+            "Гана","Гвинея","Гвинея-Бисау","Джибути","Египет","Екваториална Гвинея",
+            "Еритрея","Есватини","Етиопия","Замбия","Зимбабве","Кабо Верде","Камерун",
+            "Кения","Коморски острови","Конго","ДР Конго","Кот д’Ивоар","Лесото","Либерия",
+            "Либия","Мадагаскар","Малави","Мали","Мароко","Мавритания","Мавриций",
+            "Мозамбик","Намибия","Нигер","Нигерия","Руанда","Сао Томе и Принсипи",
+            "Сейшели","Сенегал","Сиера Леоне","Сомалия","Судан","Южен Судан","Танзания",
+            "Того","Тунис","Уганда","Централноафриканска република","Чад","ЮАР",
+
+            // Северна и Централна Америка
+            "Антигуа и Барбуда","Бахами","Барбадос","Белиз","Гватемала","Доминика",
+            "Доминиканска република","Канада","Коста Рика","Куба","Мексико","Никарагуа",
+            "Панама","Салвадор","САЩ","Сейнт Китс и Невис","Сейнт Лусия",
+            "Сейнт Винсент и Гренадини","Тринидад и Тобаго","Хаити","Хондурас","Ямайка",
+            "Гренада",
+
+            // Южна Америка
+            "Аржентина","Боливия","Бразилия","Венецуела","Гаяна","Колумбия","Парагвай",
+            "Перу","Суринам","Уругвай","Чили","Еквадор",
+
+            // Океания
+            "Австралия","Вануату","Кирибати","Маршалови острови","Микронезия","Науру",
+            "Нова Зеландия","Палау","Папуа Нова Гвинея","Самоа","Соломонови острови",
+            "Тонга","Тувалу","Фиджи"
+        ]; 
+
+        const searchInput = document.getElementById('countrySearch');
+        const countryList = document.getElementById('countryList');
+        const hiddenInput = document.getElementById('selectedCountry');
+
+        // Move to body
+        document.body.appendChild(countryList);
+
+        function updateDropdownPosition() {
+            const rect = searchInput.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+            
+            countryList.style.top = (rect.bottom + scrollTop) + 'px';
+            countryList.style.left = (rect.left + scrollLeft) + 'px';
+            countryList.style.width = rect.width + 'px';
+        }
+
+        function populateList(filter = "") {
+            countryList.innerHTML = '';
+            const filtered = countries.filter(c => c.toLowerCase().includes(filter.toLowerCase()));
+            
+            let showList = filter === "" ? countries : filtered;
+
+            if (showList.length === 0) {
+                const noResult = document.createElement('div');
+                noResult.className = 'dropdown-item';
+                noResult.textContent = 'Няма резултати';
+                noResult.style.color = '#999';
+                noResult.style.cursor = 'default';
+                countryList.appendChild(noResult);
+                return;
+            }
+
+            showList.forEach(country => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.textContent = country;
+                item.addEventListener('click', () => {
+                    searchInput.value = country;
+                    hiddenInput.value = country;
+                    countryList.style.display = 'none';
+                });
+                countryList.appendChild(item);
+            });
+        }
+
+        searchInput.addEventListener('input', () => {
+            populateList(searchInput.value);
+            countryList.style.display = 'block';
+            updateDropdownPosition();
+        });
+
+        searchInput.addEventListener('focus', () => {
+            populateList(searchInput.value);
+            countryList.style.display = 'block';
+            updateDropdownPosition();
+        });
+
+        window.addEventListener('resize', () => {
+            if (countryList.style.display === 'block') updateDropdownPosition();
+        });
+        window.addEventListener('scroll', () => {
+             if (countryList.style.display === 'block') updateDropdownPosition();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target !== searchInput && e.target !== countryList) {
+                countryList.style.display = 'none';
+            }
+        });
+
+        // Live Color Preview
+        const leftPicker = document.getElementById('leftColorPicker');
+        const rightPicker = document.getElementById('rightColorPicker');
+        const textPicker = document.getElementById('textColorPicker');
+        const heartPicker = document.getElementById('heartColorPicker');
+        const likeCountPicker = document.getElementById('likeCountColorPicker');
+
+        const ticketLeft = document.getElementById('ticketLeft');
+        const ticketRight = document.getElementById('ticketRight');
+
+        const arrow = ticketLeft.querySelector('.arrow');
+        const previewHeart = document.getElementById('previewHeart');
+        const previewLikeCountText = document.getElementById('previewLikeCount');
+
+        const buttonTextColor = "#ffffff";
+
+        function applyColors() {
+            const textColor = textPicker.value;
+            const leftColor = leftPicker.value;
+            const rightColor = rightPicker.value;
+            const heartColor = heartPicker.value;
+            const likeCountColor = likeCountPicker.value;
+
+            ticketLeft.style.backgroundColor = leftColor;
+            ticketRight.style.backgroundColor = rightColor;
+
+            // Update text elements in left part
+            const leftInputs = ticketLeft.querySelectorAll('.edit-input');
+            const leftStrongTags = ticketLeft.querySelectorAll('strong');
+            
+            leftInputs.forEach(input => {
+                input.style.color = textColor;
+                input.style.borderColor = textColor;
+            });
+
+            leftStrongTags.forEach(strong => {
+                strong.style.color = textColor;
+            });
+
+            if (arrow) arrow.style.color = textColor;
+
+            // Update heart and like count preview
+            if (previewHeart) {
+                previewHeart.style.fill = heartColor;
+                previewHeart.style.stroke = heartColor;
+            }
+            if (previewLikeCountText) {
+                previewLikeCountText.style.color = likeCountColor;
+            }
+
+            // Update text elements in right part
+            const rightTextElements = ticketRight.querySelectorAll('*:not(.barcode):not(.actions):not(.preview-like-container *)');
+            rightTextElements.forEach(el => {
+                if (el.tagName !== 'BUTTON' && el.tagName !== 'A') {
+                    el.style.color = textColor;
+                }
+            });
+
+            ticketRight.querySelectorAll('.actions button, .actions a').forEach(btn => {
+                btn.style.color = buttonTextColor;
+            });
+        }
+
+        leftPicker.addEventListener('input', applyColors);
+        rightPicker.addEventListener('input', applyColors);
+        textPicker.addEventListener('input', applyColors);
+        heartPicker.addEventListener('input', applyColors);
+        likeCountPicker.addEventListener('input', applyColors);
+
+        // Initial apply
+        applyColors();
+    });
+</script>
+
+@section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
 
 <style>
-    /* Removed body background to let theme shine through */
-
     .ticket-wrapper {
         max-width: 1000px;
-        margin: 0 auto; 
+        margin: 0 auto;
         padding: 0 20px;
     }
 
@@ -220,28 +301,47 @@
         text-align: center;
         font-size: 2.5rem;
         margin-bottom: 30px;
-        color: #fff; /* White for dark themes by default */
+        color: #fff;
         font-weight: 700;
         letter-spacing: 1.2px;
         text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
     
-    form {
-        user-select: none;
+    .color-controls {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        border: 1px solid rgba(255,255,255,0.2);
+        flex-wrap: wrap;
+    }
+
+    .color-controls label {
+        font-weight: 600;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
     }
 
     .real-ticket {
         display: flex;
         background: linear-gradient(145deg, #fafafa, #e6e6e6);
         border-radius: 15px;
+        margin-bottom: 30px;
         filter: drop-shadow(0 10px 10px rgba(0,0,0,0.15));
         cursor: default;
         transition: transform 0.3s ease, filter 0.3s ease;
         border: 1.5px solid #bbb;
         position: relative;
         font-weight: 600;
-
-        /* Mask for transparent notches */
+        user-select: none;
+        
         -webkit-mask: 
             radial-gradient(circle at center top, transparent 15px, black 15.5px) top center / 100% 51% no-repeat,
             radial-gradient(circle at center bottom, transparent 15px, black 15.5px) bottom center / 100% 51% no-repeat;
@@ -249,12 +349,6 @@
             radial-gradient(circle at center top, transparent 15px, black 15.5px) top center / 100% 51% no-repeat,
             radial-gradient(circle at center bottom, transparent 15px, black 15.5px) bottom center / 100% 51% no-repeat;
     }
-
-        .real-ticket:hover {
-            transform: translateY(-6px);
-            filter: drop-shadow(0 18px 20px rgba(0,0,0,0.3));
-            border-color: #4caf50;
-        }
 
     .ticket-left, .ticket-right {
         padding: 25px 30px;
@@ -265,31 +359,23 @@
 
     .ticket-left {
         background: #e0f2f1;
-        border-radius: 15px 0 0 15px; /* Added to maintain rounded corners without overflow:hidden */
         border-right: 1.5px dashed #999;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        position: relative;
+        border-radius: 15px 0 0 15px;
     }
 
-        .ticket-left label {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 18px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: #00796b;
-        }
+    .dropdown-container {
+        position: relative;
+        width: 100%;
+        margin-bottom: 10px;
+        margin-top: 10px;
+    }
 
-            .ticket-left label strong {
-                margin-bottom: 6px;
-                color: #00796b;
-                text-shadow: 0 1px 1px #a0d4cf;
-                letter-spacing: 1.2px;
-            }
-
-    input.fake-input {
+    .dropdown-search {
+        width: 100%;
+        margin-bottom: 5px;
         background: transparent;
         border: none;
         border-bottom: 1.5px dashed #004d40;
@@ -297,121 +383,15 @@
         font-weight: 600;
         font-size: 1.1rem;
         padding: 6px 4px;
-        transition: border-color 0.3s ease;
-        max-width: 100%;
     }
 
-        input.fake-input::placeholder {
-            color: #00796b88;
-        }
-
-        input.fake-input:focus {
-            outline: none;
-            border-color: #4caf50;
-            background: transparent;
-        }
-
-    input.small-input {
-        max-width: 150px;
-        font-size: 1.1rem;
-        text-align: left;
+    .dropdown-search::placeholder {
+        color: #00796b88;
     }
 
-    .ticket-left .from-to-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 18px;
-    }
-
-        .ticket-left .from-to-wrapper label {
-            flex: 1;
-            margin-bottom: 0;
-        }
-
-    .ticket-left .arrow {
-        font-size: 2.8rem;
-        color: #00796b;
-        user-select: none;
-        font-weight: 700;
-        text-shadow: 0 1px 1px #a0d4cf;
-        line-height: 1;
-        display: flex;
-        align-items: center;
-    }
-
-    .ticket-center-wrapper {
-        width: 30px;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .ticket-center {
-        width: 30px;
-        height: 100%;
-        background: repeating-linear-gradient( to bottom, transparent, transparent 8px, #999 8px, #999 10px );
-        position: relative;
-    }
-
-    /* Notches removed, handled by mask */
-
-    .ticket-right {
-        background: #fff;
-        box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        border-left: 1.5px dashed #999;
-        border-radius: 0 15px 15px 0; /* Added to maintain rounded corners without overflow:hidden */
-    }
-
-    .barcode {
-        width: 100%;
-        height: 60px;
-        background: repeating-linear-gradient( to right, #000, #000 3px, #fff 3px, #fff 6px, #000 6px, #000 9px, #fff 9px, #fff 12px, #000 12px, #000 15px, #fff 15px, #fff 18px );
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-        margin-bottom: 18px;
-    }
-
-    .actions {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        padding-bottom: 10px;
-    }
-
-    .btn-create {
-        background: #4caf50;
-        color: white;
-        padding: 14px 36px;
-        border-radius: 30px;
-        text-decoration: none;
-        font-weight: 700;
-        font-size: 1.1rem;
-        box-shadow: 0 6px 12px rgba(76,175,80,0.6);
-        transition: background 0.3s ease, transform 0.2s ease;
-        border: none;
-        cursor: pointer;
-        user-select: none;
-    }
-
-        .btn-create:hover {
-            background: #388e3c;
-            transform: translateY(-3px);
-            box-shadow: 0 12px 20px rgba(56,142,60,0.8);
-        }
-
-    /* Custom Dropdown Styles */
-    .dropdown-container {
-        position: relative;
-        width: 100%;
-        margin-bottom: 20px;
-    }
-
-    .dropdown-search {
-        width: 100%;
-        margin-bottom: 5px;
+    .dropdown-search:focus {
+        outline: none;
+        border-color: #4caf50;
     }
 
     .dropdown-list {
@@ -430,10 +410,129 @@
         padding: 8px 12px;
         cursor: pointer;
         transition: background 0.2s;
+        color: #333;
+        text-shadow: none;
     }
 
     .dropdown-item:hover {
         background: #e0f2f1;
         color: #00796b;
     }
+
+    .ticket-left h2 {
+        font-size: 2rem;
+        margin-bottom: 12px;
+        color: #00796b;
+        text-shadow: 0 1px 1px #a0d4cf;
+        letter-spacing: 1.2px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .ticket-left p {
+        font-size: 1.1rem;
+        color: #004d40;
+        margin: 6px 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .ticket-left h2 .arrow {
+        font-size: 2rem;
+        transition: color 0.3s ease;
+    }
+
+    .edit-input {
+        background: transparent;
+        border: none;
+        border-bottom: 1.5px dashed #004d40;
+        color: #004d40;
+        font-weight: 600;
+        font-size: 1.1rem;
+        padding: 6px 4px;
+        transition: border-color 0.3s ease, color 0.3s ease;
+        max-width: 100%;
+    }
+
+    .edit-input:focus {
+        outline: none;
+        border-color: #4caf50;
+    }
+
+    .location-input {
+        width: 100%;
+    }
+
+    .small-input {
+        max-width: 150px;
+        font-size: 1.1rem;
+    }
+
+    .ticket-center-wrapper {
+        width: 30px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .ticket-center {
+        width: 30px;
+        height: 100%;
+        background: repeating-linear-gradient(to bottom, transparent, transparent 8px, #999 8px, #999 10px);
+        position: relative;
+    }
+    
+    .ticket-right {
+        background: #fff;
+        box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border-left: 1.5px dashed #999;
+        border-radius: 0 15px 15px 0;
+    }
+
+    .barcode {
+        width: 100%;
+        height: 60px;
+        background: repeating-linear-gradient(to right, #000, #000 3px, #fff 3px, #fff 6px, #000 6px, #000 9px, #fff 9px, #fff 12px, #000 12px, #000 15px, #fff 15px, #fff 18px);
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        margin-bottom: 18px;
+    }
+
+    .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-create {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        width: 100%;
+    }
+
+    .btn-create:hover {
+        background: #388e3c;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
+    }
+
+    .btn-back-glass { 
+        padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; 
+        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; display: inline-block;
+        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    .btn-back-glass:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px) translateX(-5px); color: #fff; border: 1px solid rgba(255,255,255,0.4); }
+
 </style>

@@ -18,6 +18,8 @@
                     <label>Цвят лява част: <input asp-for="LeftColor" type="color" id="leftColorPicker" /></label>
                     <label>Цвят дясна част: <input asp-for="RightColor" type="color" id="rightColorPicker" /></label>
                     <label>Цвят на текста: <input asp-for="TextColor" type="color" id="textColorPicker" /></label>
+                    <label>Цвят на сърцето: <input asp-for="HeartColor" type="color" id="heartColorPicker" /></label>
+                    <label>Цвят на числото: <input asp-for="LikeCountColor" type="color" id="likeCountColorPicker" /></label>
                 </div>
 
                 <div class="real-ticket">
@@ -71,6 +73,12 @@
                     <div class="ticket-right" id="ticketRight" style="background:@Model.RightColor; color:@Model.TextColor;">
                         <div class="barcode"></div>
                         <div class="actions">
+                            <div class="preview-like-container" style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.05); padding: 5px 15px; border-radius: 20px;">
+                                <svg viewBox="0 0 24 24" id="previewHeart" style="width: 24px; height: 24px; fill: @Model.HeartColor; stroke: @Model.HeartColor; stroke-width: 2;">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                                <span id="previewLikeCount" style="font-weight: 700; color: @Model.LikeCountColor;">1</span>
+                            </div>
                             <button type="submit" class="btn btn-edit">Запази</button>
                             <a asp-action="Index" class="btn btn-delete">Отказ</a>
                         </div>
@@ -218,6 +226,8 @@
             const leftPicker = document.getElementById('leftColorPicker');
             const rightPicker = document.getElementById('rightColorPicker');
             const textPicker = document.getElementById('textColorPicker');
+            const heartPicker = document.getElementById('heartColorPicker');
+            const likeCountPicker = document.getElementById('likeCountColorPicker');
 
             const ticketLeft = document.getElementById('ticketLeft');
             const ticketRight = document.getElementById('ticketRight');
@@ -225,12 +235,17 @@
             const arrow = ticketLeft.querySelector('.arrow');
             const dateTimeLabel = ticketLeft.querySelector('.date-time strong');
             const passengersLabel = ticketLeft.querySelector('.passengers strong');
+            
+            const previewHeart = document.getElementById('previewHeart');
+            const previewLikeCountText = document.getElementById('previewLikeCount');
 
             const buttonTextColor = "#ffffff";
 
             let currentTextColor = textPicker.value;
             let currentLeftColor = leftPicker.value;
             let currentRightColor = rightPicker.value;
+            let currentHeartColor = heartPicker.value;
+            let currentLikeCountColor = likeCountPicker.value;
 
             function applyTextColor() {
                 const leftInputs = ticketLeft.querySelectorAll('input.edit-input');
@@ -255,6 +270,14 @@
                     }
                 });
 
+                if (previewHeart) {
+                    previewHeart.style.fill = currentHeartColor;
+                    previewHeart.style.stroke = currentHeartColor;
+                }
+                if (previewLikeCountText) {
+                    previewLikeCountText.style.color = currentLikeCountColor;
+                }
+
                 ticketRight.querySelectorAll('.actions button, .actions a').forEach(btn => {
                     btn.style.transition = "none";
                     btn.style.color = buttonTextColor;
@@ -275,6 +298,16 @@
 
             textPicker.addEventListener('input', () => {
                 currentTextColor = textPicker.value;
+                applyTextColor();
+            });
+
+            heartPicker.addEventListener('input', () => {
+                currentHeartColor = heartPicker.value;
+                applyTextColor();
+            });
+
+            likeCountPicker.addEventListener('input', () => {
+                currentLikeCountColor = likeCountPicker.value;
                 applyTextColor();
             });
 

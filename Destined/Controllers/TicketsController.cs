@@ -31,6 +31,23 @@ namespace Destined.Controllers
                 .OrderBy(t => t.OrderIndex)
                 .ToListAsync();
 
+            var ticketIds = tickets.Select(t => t.Id).ToList();
+            
+            var likeCounts = await _context.LikedTickets
+                .Where(lt => ticketIds.Contains(lt.TicketId))
+                .GroupBy(lt => lt.TicketId)
+                .Select(g => new { TicketId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.TicketId, x => x.Count);
+
+            var commentCounts = await _context.TicketComments
+                .Where(c => ticketIds.Contains(c.TicketId))
+                .GroupBy(c => c.TicketId)
+                .Select(g => new { TicketId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.TicketId, x => x.Count);
+
+            ViewData["LikeCounts"] = likeCounts;
+            ViewData["CommentCounts"] = commentCounts;
+
             return View(tickets);
         }
 
@@ -63,7 +80,7 @@ namespace Destined.Controllers
         // POST: Tickets/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("From,To,DepartureTime,NumberOfPassengers,LeftColor,RightColor,TextColor,Country")] Ticket ticket)
+        public async Task<IActionResult> Create([Bind("From,To,DepartureTime,NumberOfPassengers,LeftColor,RightColor,TextColor,Country,HeartColor,LikeCountColor")] Ticket ticket)
         {
             if (ModelState.IsValid)
             {
@@ -92,7 +109,7 @@ namespace Destined.Controllers
         // POST: Tickets/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,From,To,DepartureTime,NumberOfPassengers,IsPublic,AllowComments,LeftColor,RightColor,TextColor,Country,OrderIndex")] Ticket ticket)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,From,To,DepartureTime,NumberOfPassengers,IsPublic,AllowComments,LeftColor,RightColor,TextColor,Country,OrderIndex,HeartColor,LikeCountColor")] Ticket ticket)
         {
             if (id != ticket.Id) return NotFound();
 
@@ -263,7 +280,15 @@ namespace Destined.Controllers
                     .Select(lt => lt.TicketId)
                     .ToListAsync();
             }
+
+            var likeCounts = await _context.LikedTickets
+                .Where(lt => ticketIds.Contains(lt.TicketId))
+                .GroupBy(lt => lt.TicketId)
+                .Select(g => new { TicketId = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.TicketId, x => x.Count);
+
             ViewData["LikedTicketIds"] = likedTicketIds;
+            ViewData["LikeCounts"] = likeCounts;
 
             return View(publicTickets);
         }
@@ -277,11 +302,11 @@ namespace Destined.Controllers
             var likedTicket = await _context.LikedTickets
                 .FirstOrDefaultAsync(lt => lt.TicketId == ticketId && lt.UserId == userId);
 
+            bool liked;
             if (likedTicket != null)
             {
                 _context.LikedTickets.Remove(likedTicket);
-                await _context.SaveChangesAsync();
-                return Json(new { liked = false });
+                liked = false;
             }
             else
             {
@@ -292,9 +317,13 @@ namespace Destined.Controllers
                     LikedAt = DateTime.UtcNow
                 };
                 _context.LikedTickets.Add(newLike);
-                await _context.SaveChangesAsync();
-                return Json(new { liked = true });
+                liked = true;
             }
+
+            await _context.SaveChangesAsync();
+            
+            var totalLikes = await _context.LikedTickets.CountAsync(lt => lt.TicketId == ticketId);
+            return Json(new { liked, totalLikes });
         }
 
         public async Task<IActionResult> LikedTickets()

@@ -44,5 +44,11 @@ namespace Destined.Models
         [Display(Name = "Държава")]
         public string Country { get; set; } = string.Empty;
 
+        [Display(Name = "Цвят на сърцето")]
+        public string HeartColor { get; set; } = "#ff4757";
+
+        [Display(Name = "Цвят на броя харесвания")]
+        public string LikeCountColor { get; set; } = "#ff4757";
+
     }
 }
