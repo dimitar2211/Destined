@@ -1,7 +1,7 @@
-﻿@page
+@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Профил";
+    ViewData["Title"] = "Profile";
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 
@@ -19,7 +19,11 @@
                 <button type="submit" asp-page-handler="RemovePicture" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove your profile picture?');">Remove Picture</button>
             </div>
         }
-        <input asp-for="Input.ProfilePicture" type="file" class="form-control" accept="image/*" />
+        <div class="custom-file-upload">
+            <button type="button" class="btn btn-passport-upload" onclick="document.getElementById('profile-upload-input').click()">CHOOSE PHOTO</button>
+            <span id="file-name-display" class="file-name-text">No file chosen</span>
+            <input asp-for="Input.ProfilePicture" type="file" id="profile-upload-input" class="d-none" accept="image/*" onchange="updateFileName(this)" />
+        </div>
         <span asp-validation-for="Input.ProfilePicture" class="text-danger"></span>
     </div>
 
@@ -30,12 +34,12 @@
     </div>
 
     <div class="form-floating mb-3">
-        <input asp-for="Username" class="form-control" placeholder="Потребителско име" disabled />
+        <input asp-for="Username" class="form-control" placeholder="Username" disabled />
         <label asp-for="Username" class="form-label">IDENTITY / USERNAME</label>
     </div>
     
     <div class="form-floating mb-3">
-        <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Телефонен номер"/>
+        <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Phone number"/>
         <label asp-for="Input.PhoneNumber" class="form-label">CONTACT / PHONE NUMBER</label>
         <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
     </div>
@@ -45,4 +49,55 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        function updateFileName(input) {
+            const display = document.getElementById('file-name-display');
+            if (input.files && input.files.length > 0) {
+                display.textContent = input.files[0].name;
+            } else {
+                display.textContent = 'No file chosen';
+            }
+        }
+    </script>
 }
+
+<style>
+    .custom-file-upload {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .btn-passport-upload {
+        background: #8d6e63;
+        color: #f3e5d0;
+        border: none;
+        padding: 8px 16px;
+        font-family: inherit;
+        font-weight: bold;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .btn-passport-upload:hover {
+        background: #5d4037;
+        transform: translateY(-1px);
+        box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
+    }
+
+    .file-name-text {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.9rem;
+        color: #1a237e;
+        font-weight: bold;
+        opacity: 0.8;
+    }
+    
+    .d-none { display: none !important; }
+</style>

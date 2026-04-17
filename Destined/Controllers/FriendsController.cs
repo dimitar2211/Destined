@@ -288,7 +288,7 @@ namespace Destined.Controllers
             var friendUser = await _userManager.FindByIdAsync(friendId);
             if (friendUser != null && await _userManager.IsInRoleAsync(friendUser, "Admin"))
             {
-                TempData["Error"] = "Администратор не може да бъде блокиран!";
+                TempData["Error"] = "Administrator cannot be blocked!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -312,7 +312,7 @@ namespace Destined.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            TempData["Success"] = "Потребителят е блокиран.";
+            TempData["Success"] = "User has been blocked.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -331,7 +331,7 @@ namespace Destined.Controllers
             bool alreadyFriends = await _context.Friendships.AnyAsync(f => f.UserId == currentUser.Id && f.FriendId == friendId);
             if (alreadyFriends)
             {
-                return Json(new { success = false, message = "Вече сте приятели." });
+                return Json(new { success = false, message = "You are already friends." });
             }
 
             // Check if blocked
@@ -340,7 +340,7 @@ namespace Destined.Controllers
                 (b.BlockerId == friendId && b.BlockedId == currentUser.Id));
             if (isBlocked)
             {
-                return Json(new { success = false, message = "Потребителят не е намерен." });
+                return Json(new { success = false, message = "User not found." });
             }
 
             // Check pending
@@ -350,7 +350,7 @@ namespace Destined.Controllers
             
             if (requestPending)
             {
-                return Json(new { success = false, message = "Вече има изпратена или получена покана." });
+                return Json(new { success = false, message = "A request has already been sent or received." });
             }
 
             var friendRequest = new FriendRequest
@@ -364,7 +364,7 @@ namespace Destined.Controllers
             _context.FriendRequests.Add(friendRequest);
             await _context.SaveChangesAsync();
 
-            return Json(new { success = true, message = "Поканата за приятелство бе изпратена!" });
+            return Json(new { success = true, message = "Friend request sent!" });
         }
 
         [HttpPost]
@@ -380,7 +380,7 @@ namespace Destined.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            TempData["Success"] = "Потребителят е отблокиран.";
+            TempData["Success"] = "User has been unblocked.";
             return RedirectToAction(nameof(Blocked));
         }
 

@@ -1,7 +1,7 @@
 @model IEnumerable<Destined.Models.BlockedUser>
 
 @{
-    ViewData["Title"] = "Блокирани Потребители";
+    ViewData["Title"] = "Blocked Users";
     ViewData["FullWidth"] = true;
     var blockedDisplayNames = ViewBag.BlockedDisplayNames as Dictionary<string, string>;
     var blockedPhotos = ViewBag.BlockedPhotos as Dictionary<string, string>;
@@ -12,10 +12,10 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 100px 20px 40px 20px;">
         <div class="friends-wrapper">
-            <h1 class="page-title">Блокирани <span class="gradient-text">Потребители</span></h1>
+            <h1 class="page-title">Blocked <span class="gradient-text">Users</span></h1>
 
             <div class="actions-bar d-flex justify-content-center mb-4">
-                <a asp-action="Index" class="btn-back-glass">⬅ Обратно към Приятели</a>
+                <a asp-action="Index" class="btn-back-glass">⬅ Back to Friends</a>
             </div>
 
             @if (TempData["Success"] != null)
@@ -46,12 +46,12 @@
                                     <form asp-action="Unblock" method="post" class="ms-2">
                                         <input type="hidden" name="friendId" value="@block.BlockedId" />
                                         <button type="submit" class="btn-primary-glow" style="padding: 5px 15px; font-size: 0.85rem;">
-                                            Отблокирай
+                                            Unblock
                                         </button>
                                     </form>
                                 </div>
                                 <div class="text-muted" style="font-size: 0.8rem;">
-                                    Блокиран на: @block.CreatedAt.ToString("dd.MM.yyyy")
+                                    Blocked on: @block.CreatedAt.ToString("dd.MM.yyyy")
                                 </div>
                             </div>
                         </div>
@@ -62,7 +62,7 @@
             @if (!Model.Any())
             {
                 <div class="no-friends-card">
-                    <p>Нямате блокирани потребители.</p>
+                    <p>You don't have any blocked users.</p>
                 </div>
             }
         </div>

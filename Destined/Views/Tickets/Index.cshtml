@@ -1,7 +1,7 @@
 @model IEnumerable<Destined.Models.Ticket>
 
 @{
-    ViewData["Title"] = "Билети";
+    ViewData["Title"] = "Tickets";
     ViewData["FullWidth"] = true;
     var likeCounts = ViewData["LikeCounts"] as Dictionary<int, int> ?? new Dictionary<int, int>();
     var commentCounts = ViewData["CommentCounts"] as Dictionary<int, int> ?? new Dictionary<int, int>();
@@ -15,32 +15,32 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
         <div class="ticket-wrapper">
-            <h1 class="page-title">Твоите <span class="gradient-text">Билети</span></h1>
+            <h1 class="page-title">Your <span class="gradient-text">Tickets</span></h1>
 
             <!-- Animated Quote -->
             <div class="quote-container" onclick="toggleText()">
                 <p class="animated-text">
-                    <span id="first-word">Спомените...</span>
+                    <span id="first-word">Memories...</span>
                 </p>
                 <div id="more-text">
-                    <p>са нещо безценно, което трябва да пазим и носим със себе си навсякъде, където отиваме.</p>
-                    <p>Понякога именно в най-неочакваните места – докато обикаляме света или просто вървим по непозната улица с хората, които обичаме най-много – се случват най-незабравимите моменти.</p>
-                    <p>Не поставяй граници на приключенията си!</p>
-                    <p>Винаги можеш да създадеш нови спомени – без значение дали тръгваш от вкъщи до магазина на съседната пресечка или пътуваш към Париж.</p>
+                    <p>are something priceless that we must keep and carry with us everywhere we go.</p>
+                    <p>Sometimes it is precisely in the most unexpected places – while traveling the world or simply walking down an unfamiliar street with the people we love most – that the most unforgettable moments happen.</p>
+                    <p>Don't set boundaries for your adventures!</p>
+                    <p>You can always create new memories – whether you're leaving home for the store around the corner or traveling to Paris.</p>
                 </div>
             </div>
 
             <!-- Action Buttons -->
             <div class="new-ticket">
-                <a asp-action="Create" class="btn-primary-glow">Нов билет 🚀</a>
+                <a asp-action="Create" class="btn-primary-glow">New Ticket 🚀</a>
                 <a asp-action="MapCompletion" class="btn-secondary-glass" style="background: rgba(76, 175, 80, 0.2); border-color: rgba(76, 175, 80, 0.4);">Map Completion 🗺️</a>
-                <a asp-controller="Tickets" asp-action="PublicTickets" class="btn-secondary-glass">Публични билети 🌍</a>
+                <a asp-controller="Tickets" asp-action="PublicTickets" class="btn-secondary-glass">Public Tickets 🌍</a>
             </div>
 
             @if (!Model.Any())
             {
                 <div class="no-tickets-card">
-                    <p>Все още нямаш билети. Създай първия си спомен сега!</p>
+                    <p>You don't have any tickets yet. Create your first memory now!</p>
                 </div>
             }
             else
@@ -64,11 +64,11 @@
                                 {
                                     <h2 style="color:@textColor">@shortTo</h2>
                                 }
-                                <p style="color:@textColor"><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
-                                <p style="color:@textColor"><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
+                                <p style="color:@textColor"><strong>Date and Time:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+                                <p style="color:@textColor"><strong>Passengers:</strong> @ticket.NumberOfPassengers</p>
                                 @if (!string.IsNullOrEmpty(ticket.Country))
                                 {
-                                    <p style="color:@textColor"><strong>Държава:</strong> @ticket.Country</p>
+                                    <p style="color:@textColor"><strong>Country:</strong> @ticket.Country</p>
                                 }
                             </div>
 
@@ -81,22 +81,22 @@
                             <div class="ticket-right" style="background:@ticket.RightColor;">
                                 <div class="barcode"></div>
                                 <div class="actions">
-                                    <a asp-action="Details" asp-route-id="@ticket.Id" class="btn btn-detail" title="Детайли">Детайли</a>
-                                    <a asp-action="Edit" asp-route-id="@ticket.Id" class="btn btn-edit" title="Редактирай">Редактирай</a>
-                                    <a asp-action="Delete" asp-route-id="@ticket.Id" class="btn btn-delete" title="Изтрий">Изтрий</a>
+                                    <a asp-action="Details" asp-route-id="@ticket.Id" class="btn btn-detail" title="Details">Details</a>
+                                    <a asp-action="Edit" asp-route-id="@ticket.Id" class="btn btn-edit" title="Edit">Edit</a>
+                                    <a asp-action="Delete" asp-route-id="@ticket.Id" class="btn btn-delete" title="Delete">Delete</a>
                                     @{
                                         bool hasComments = commentCounts.TryGetValue(ticket.Id, out var cCount) && cCount > 0;
                                         bool showCommentsButton = ticket.IsPublic && (ticket.AllowComments || hasComments);
                                     }
                                     @if (showCommentsButton)
                                     {
-                                        <a asp-controller="Comments" asp-action="Ticket" asp-route-ticketId="@ticket.Id" class="btn btn-comments" title="Коментари">Коментари</a>
+                                        <a asp-controller="Comments" asp-action="Ticket" asp-route-ticketId="@ticket.Id" class="btn btn-comments" title="Comments">Comments</a>
                                     }
-                                    <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" class="btn btn-journal" title="Дневник">Дневник</a>
+                                    <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" class="btn btn-journal" title="Journal">Journal</a>
                                     
                                     @if (likeCounts.TryGetValue(ticket.Id, out var count) && count > 0)
                                     {
-                                        <div class="my-ticket-likes-badge" title="Брой харесвания от други потребители" style="border-color: @(ticket.HeartColor)88;">
+                                        <div class="my-ticket-likes-badge" title="Number of likes from other users" style="border-color: @(ticket.HeartColor)88;">
                                             <svg viewBox="0 0 24 24" class="heart-icon-mini" style="fill: @ticket.HeartColor; filter: drop-shadow(0 2px 4px @(ticket.HeartColor)44);">
                                                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                             </svg>

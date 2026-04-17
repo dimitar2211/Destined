@@ -18,7 +18,7 @@ namespace Destined.Models
         public IdentityUser? Reporter { get; set; }
 
         [Required]
-        [StringLength(300, ErrorMessage = "Причината не може да бъде по-дълга от 300 символа.")]
+        [StringLength(300, ErrorMessage = "The reason cannot be longer than 300 characters.")]
         public string Reason { get; set; } = string.Empty;
 
         public DateTime Timestamp { get; set; } = DateTime.Now;

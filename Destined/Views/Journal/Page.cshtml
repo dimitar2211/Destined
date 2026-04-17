@@ -1,7 +1,7 @@
 @model Destined.Models.JournalPage
 
 @{
-    ViewData["Title"] = "Дневник";
+    ViewData["Title"] = "Journal";
     ViewData["FullWidth"] = true;
     bool readOnly = ViewBag.ReadOnly == true;
     var currentStyle = string.IsNullOrEmpty(Model.PageStyle) ? "lined" : Model.PageStyle;
@@ -12,12 +12,12 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
         
-        <h2 class="page-title">Дневник <span style="font-size: 0.6em; opacity: 0.8; display: block; margin-top: 5px;">Страница @Model.PageNumber</span></h2>
+        <h2 class="page-title">Journal <span style="font-size: 0.6em; opacity: 0.8; display: block; margin-top: 5px;">Page @Model.PageNumber</span></h2>
 
         @if (readOnly && string.IsNullOrWhiteSpace(Model.Content))
         {
             <div class="alert-glass">
-                Този билет все още няма създаден дневник.
+                No journal has been created for this ticket yet.
             </div>
         }
 
@@ -31,41 +31,41 @@
             {
                 <div class="toolbar-glass mb-4">
                     <!-- Text Tools -->
-                    <button type="button" class="btn-tool" onclick="document.execCommand('bold', false, null)" title="Удебели"><b>B</b></button>
-                    <button type="button" class="btn-tool" onclick="document.execCommand('italic', false, null)" title="Наклонен"><i>I</i></button>
-                    <button type="button" class="btn-tool" onclick="document.execCommand('removeFormat', false, null)" title="Изчисти формат">Tx</button>
+                    <button type="button" class="btn-tool" onclick="document.execCommand('bold', false, null)" title="Bold"><b>B</b></button>
+                    <button type="button" class="btn-tool" onclick="document.execCommand('italic', false, null)" title="Italic"><i>I</i></button>
+                    <button type="button" class="btn-tool" onclick="document.execCommand('removeFormat', false, null)" title="Clear Format">Tx</button>
                     
                     <div class="separator"></div>
 
                     <!-- Alignment -->
-                    <button type="button" class="btn-tool" onclick="document.execCommand('justifyLeft', false, null)" title="Ляво">⇤</button>
-                    <button type="button" class="btn-tool" onclick="document.execCommand('justifyCenter', false, null)" title="Центрирай">↔</button>
+                    <button type="button" class="btn-tool" onclick="document.execCommand('justifyLeft', false, null)" title="Left">⇤</button>
+                    <button type="button" class="btn-tool" onclick="document.execCommand('justifyCenter', false, null)" title="Center">↔</button>
                     
                     <div class="separator"></div>
 
                     <!-- Color -->
-                    <button type="button" class="btn-tool" onclick="setTextColor()" title="Цвят на текста">🎨</button>
+                    <button type="button" class="btn-tool" onclick="setTextColor()" title="Text Color">🎨</button>
                     <input type="color" id="textColorPicker" style="display:none" />
 
                     <div class="separator"></div>
 
                     <!-- Media -->
-                    <label for="imageUpload" class="btn-tool" title="Добави снимка">📷</label>
+                    <label for="imageUpload" class="btn-tool" title="Add Photo">📷</label>
                     <input type="file" id="imageUpload" accept="image/*" />
 
-                    <label for="videoUpload" class="btn-tool" title="Добави видео">🎥</label>
+                    <label for="videoUpload" class="btn-tool" title="Add Video">🎥</label>
                     <input type="file" id="videoUpload" accept="video/*" />
 
                     <div class="separator"></div>
 
                     <!-- Themes -->
                     <div class="theme-selector">
-                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('lined')" title="Линии">≡</button>
-                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('grid')" title="Квадратчета">▦</button>
-                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('dotted')" title="Точки">⁙</button>
-                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('plain')" title="Празен">⬜</button>
-                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('vintage')" title="Винтидж">📜</button>
-                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('dark')" title="Чертеж">🌃</button>
+                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('lined')" title="Lined">≡</button>
+                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('grid')" title="Grid">▦</button>
+                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('dotted')" title="Dotted">⁙</button>
+                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('plain')" title="Plain">⬜</button>
+                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('vintage')" title="Vintage">📜</button>
+                        <button type="button" class="btn-tool theme-btn" onclick="setPageStyle('dark')" title="Blueprint">🌃</button>
                     </div>
                 </div>
             }
@@ -88,7 +88,7 @@
             @if (!readOnly)
             {
                 <div style="text-align: center; margin-top: 20px;">
-                    <button type="submit" class="btn-save">Запази страницата</button>
+                    <button type="submit" class="btn-save">Save page</button>
                 </div>
             }
         </form>
@@ -96,18 +96,18 @@
         <div class="mt-4 navigation" style="text-align: center;">
             @if (Model.PageNumber > 1)
             {
-                <a class="btn-nav prev" href="@Url.Action("Page", "Journal", new { ticketId = Model.TicketId, page = Model.PageNumber - 1, readOnly = ViewBag.ReadOnly })">← Предишна</a>
+                <a class="btn-nav prev" href="@Url.Action("Page", "Journal", new { ticketId = Model.TicketId, page = Model.PageNumber - 1, readOnly = ViewBag.ReadOnly })">← Previous</a>
             }
 
             @if (Model.HasNextPage || !readOnly)
             {
                 if(Model.HasNextPage) {
-                     <a class="btn-nav next" href="@Url.Action("Page", "Journal", new { ticketId = Model.TicketId, page = Model.PageNumber + 1, readOnly = ViewBag.ReadOnly })">Следваща →</a>
+                     <a class="btn-nav next" href="@Url.Action("Page", "Journal", new { ticketId = Model.TicketId, page = Model.PageNumber + 1, readOnly = ViewBag.ReadOnly })">Next →</a>
                 }
             }
             
              <div style="margin-top: 20px;">
-                <a asp-controller="Tickets" asp-action="Index" class="btn-back">Обратно към билетите</a>
+                <a asp-controller="Tickets" asp-action="Index" class="btn-back">Back to tickets</a>
             </div>
         </div>
 
@@ -466,10 +466,10 @@
                             makeDraggable(wrapper);
                             editor.appendChild(wrapper);
                         } else {
-                            alert('Грешка при качване.');
+                            alert('Upload error.');
                         }
                     })
-                    .catch(() => alert('Грешка при качване.'));
+                    .catch(() => alert('Upload error.'));
 
                 this.value = '';
             });
@@ -509,10 +509,10 @@
                             makeDraggable(wrapper);
                             editor.appendChild(wrapper);
                         } else {
-                            alert('Грешка при качване.');
+                            alert('Upload error.');
                         }
                     })
-                    .catch(() => alert('Грешка при качване.'));
+                    .catch(() => alert('Upload error.'));
 
                 this.value = '';
             });

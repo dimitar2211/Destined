@@ -1,7 +1,7 @@
 @model IEnumerable<Destined.Models.Ticket>
 
 @{
-    ViewData["Title"] = "Приятелски Билети";
+    ViewData["Title"] = "Friend Tickets";
     ViewData["FullWidth"] = true;
     var friendName = ViewBag.FriendName as string;
     var message = ViewBag.Message as string;
@@ -15,10 +15,10 @@
     <div id="page-content" style="position: relative; z-index: 10; padding: 100px 20px 40px 20px;">
         <div class="ticket-wrapper">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <a asp-controller="Friends" asp-action="Index" class="btn-back-glass">⬅ Назад към приятели</a>
+                <a asp-controller="Friends" asp-action="Index" class="btn-back-glass">⬅ Back to friends</a>
             </div>
 
-            <h1 class="page-title">Билетите на <span class="gradient-text">@friendName</span></h1>
+            <h1 class="page-title">Tickets of <span class="gradient-text">@friendName</span></h1>
 
             @if (!string.IsNullOrEmpty(message))
             {
@@ -29,7 +29,7 @@
             else if (!Model.Any())
             {
                 <div class="no-tickets-card">
-                    <p>Този потребител няма билети, които да сподели с теб.</p>
+                    <p>This user has no tickets shared with you.</p>
                 </div>
             }
             else
@@ -53,11 +53,11 @@
                                 {
                                     <h2 style="color:@textColor">@shortTo</h2>
                                 }
-                                <p style="color:@textColor"><strong>Дата и час:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
-                                <p style="color:@textColor"><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
+                                <p style="color:@textColor"><strong>Date and Time:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+                                <p style="color:@textColor"><strong>Passengers:</strong> @ticket.NumberOfPassengers</p>
                                 @if (!string.IsNullOrEmpty(ticket.Country))
                                 {
-                                    <p style="color:@textColor"><strong>Държава:</strong> @ticket.Country</p>
+                                    <p style="color:@textColor"><strong>Country:</strong> @ticket.Country</p>
                                 }
                             </div>
 
@@ -70,10 +70,10 @@
                             <div class="ticket-right" style="background:@ticket.RightColor;">
                                 <div class="barcode"></div>
                                 <div class="actions mt-auto">
-                                    <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" asp-route-readOnly="true" class="btn btn-journal" title="Дневник">Дневник</a>
+                                    <a asp-controller="Journal" asp-action="Page" asp-route-ticketId="@ticket.Id" asp-route-page="1" asp-route-readOnly="true" class="btn btn-journal" title="Journal">Journal</a>
                                     @if (ticket.IsPublic)
                                     {
-                                        <a asp-controller="Comments" asp-action="Ticket" asp-route-ticketId="@ticket.Id" class="btn btn-comments" title="Коментари">Коментари</a>
+                                        <a asp-controller="Comments" asp-action="Ticket" asp-route-ticketId="@ticket.Id" class="btn btn-comments" title="Comments">Comments</a>
                                     }
 
                                     @{
@@ -253,17 +253,17 @@
                     btn.classList.add('liked');
                     btn.title = "Unlike";
                     if (icon) icon.style.fill = heartColor;
-                    showToast("Билетът е добавен в харесани!");
+                    showToast("Ticket added to favorites!");
                 } else {
                     btn.classList.remove('liked');
                     btn.title = "Like";
                     if (icon) icon.style.fill = 'transparent';
-                    showToast("Билетът е премахнат от харесани.");
+                    showToast("Ticket removed from favorites.");
                 }
             })
             .catch(err => {
                 console.error("Error toggling like:", err);
-                showToast("Възникна грешка при харесване.");
+                showToast("An error occurred while liking.");
             });
     };
 </script>

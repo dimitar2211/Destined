@@ -1,7 +1,7 @@
 @model Destined.Models.Ticket
 
 @{
-    ViewData["Title"] = "Нов Билет";
+    ViewData["Title"] = "New Ticket";
     ViewData["FullWidth"] = true;
 }
 
@@ -11,42 +11,42 @@
     <div id="page-content" style="position: relative; z-index: 10; padding: 100px 20px 40px 20px;">
         <div class="ticket-wrapper">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <a asp-action="Index" class="btn-back-glass shadow-sm">⬅ Назад към моите билети</a>
+                <a asp-action="Index" class="btn-back-glass shadow-sm">⬅ Back to my tickets</a>
             </div>
 
-            <h1 class="page-title">Нов билет</h1>
+            <h1 class="page-title">New Ticket</h1>
 
             <form method="post" asp-action="Create">
                 <div class="color-controls">
-                    <label>Цвят лява част: <input asp-for="LeftColor" type="color" id="leftColorPicker" value="#e0f2f1" /></label>
-                    <label>Цвят дясна част: <input asp-for="RightColor" type="color" id="rightColorPicker" value="#ffffff" /></label>
-                    <label>Цвят на текста: <input asp-for="TextColor" type="color" id="textColorPicker" value="#000000" /></label>
-                    <label>Цвят на сърцето: <input asp-for="HeartColor" type="color" id="heartColorPicker" value="#ff4757" /></label>
-                    <label>Цвят на числото: <input asp-for="LikeCountColor" type="color" id="likeCountColorPicker" value="#ff4757" /></label>
+                    <label>Left part color: <input asp-for="LeftColor" type="color" id="leftColorPicker" value="#e0f2f1" /></label>
+                    <label>Right part color: <input asp-for="RightColor" type="color" id="rightColorPicker" value="#ffffff" /></label>
+                    <label>Text color: <input asp-for="TextColor" type="color" id="textColorPicker" value="#000000" /></label>
+                    <label>Heart color: <input asp-for="HeartColor" type="color" id="heartColorPicker" value="#ff4757" /></label>
+                    <label>Number color: <input asp-for="LikeCountColor" type="color" id="likeCountColorPicker" value="#ff4757" /></label>
                 </div>
                 <div class="real-ticket">
                     <div class="ticket-left" id="ticketLeft" style="background:#e0f2f1; color:#000000;">
                         <h2>
-                            <input asp-for="From" class="edit-input location-input" placeholder="Откъде" maxlength="22" />
+                            <input asp-for="From" class="edit-input location-input" placeholder="From" maxlength="22" />
                             <span class="arrow">➔</span>
-                            <input asp-for="To" class="edit-input location-input" placeholder="Докъде" maxlength="22" required />
+                            <input asp-for="To" class="edit-input location-input" placeholder="To" maxlength="22" required />
                         </h2>
                         <p class="date-time">
-                            <strong>Дата и час:</strong>
+                            <strong>Date and Time:</strong>
                             <input asp-for="DepartureTime" type="datetime-local" class="edit-input" required />
                             <span asp-validation-for="DepartureTime" class="text-danger"></span>
                         </p>
                         <p class="passengers">
-                            <strong>Пътници:</strong>
+                            <strong>Passengers:</strong>
                             <input asp-for="NumberOfPassengers" type="number" min="1" value="1" class="edit-input small-input" required />
                             <span asp-validation-for="NumberOfPassengers" class="text-danger"></span>
                         </p>
                         
                         <div class="dropdown-container">
                             <p style="margin:0;">
-                                 <strong>Държава:</strong>
+                                 <strong>Country:</strong>
                             </p>
-                            <input type="text" id="countrySearch" class="dropdown-search edit-input" placeholder="Търси държава..." autocomplete="off">
+                            <input type="text" id="countrySearch" class="dropdown-search edit-input" placeholder="Search country..." autocomplete="off">
                             <input asp-for="Country" type="hidden" id="selectedCountry" />
                             <span asp-validation-for="Country" class="text-danger"></span>
                             <div id="countryList" class="dropdown-list">
@@ -70,7 +70,7 @@
                                 </svg>
                                 <span id="previewLikeCount" style="font-weight: 700; color: #ff4757;">1</span>
                             </div>
-                            <button type="submit" class="btn-create">Създай билет</button>
+                            <button type="submit" class="btn-create">Create Ticket</button>
                         </div>
                     </div>
                 </div>
@@ -94,49 +94,49 @@
 
         // Country Dropdown Logic
         const countries = [
-            // Европа
-            "Албания","Андора","Австрия","Беларус","Белгия","Босна и Херцеговина","България",
-            "Ватикана","Великобритания","Германия","Гърция","Дания","Естония","Ирландия",
-            "Исландия","Испания","Италия","Кипър","Латвия","Литва","Лихтенщайн","Люксембург",
-            "Малта","Молдова","Монако","Нидерландия","Норвегия","Полша","Португалия",
-            "Румъния","Сан Марино","Северна Македония","Словакия","Словения","Сърбия",
-            "Украйна","Унгария","Финландия","Франция","Хърватия","Черна гора","Чехия",
-            "Швейцария","Швеция","Русия","Косово",
+            // Europe
+            "Albania","Andorra","Austria","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria",
+            "Vatican City","United Kingdom","Germany","Greece","Denmark","Estonia","Ireland",
+            "Iceland","Spain","Italy","Cyprus","Latvia","Lithuania","Liechtenstein","Luxembourg",
+            "Malta","Moldova","Monaco","Netherlands","Norway","Poland","Portugal",
+            "Romania","San Marino","North Macedonia","Slovakia","Slovenia","Serbia",
+            "Ukraine","Hungary","Finland","France","Croatia","Montenegro","Czech Republic",
+            "Switzerland","Sweden","Russia","Kosovo",
 
-            // Азия
-            "Афганистан","Армения","Азербайджан","Бангладеш","Бахрейн","Бруней","Бутан",
-            "Виетнам","Грузия","Израел","Индия","Индонезия","Ирак","Иран","Йордания",
-            "Казахстан","Камбоджа","Катар","Киргизстан","Китай","Кувейт","Лаос","Ливан",
-            "Малайзия","Малдиви","Монголия","Мианмар","Непал","ОАЕ","Оман","Пакистан",
-            "Саудитска Арабия","Северна Корея","Сингапур","Сирия","Таджикистан","Тайланд",
-            "Туркменистан","Турция","Узбекистан","Филипини","Шри Ланка","Южна Корея",
-            "Япония","Палестина","Тимор-Лесте","Йемен",
+            // Asia
+            "Afghanistan","Armenia","Azerbaijan","Bangladesh","Bahrain","Brunei","Bhutan",
+            "Vietnam","Georgia","Israel","India","Indonesia","Iraq","Iran","Jordan",
+            "Kazakhstan","Cambodia","Qatar","Kyrgyzstan","China","Kuwait","Laos","Lebanon",
+            "Malaysia","Maldives","Mongolia","Myanmar","Nepal","UAE","Oman","Pakistan",
+            "Saudi Arabia","North Korea","Singapore","Syria","Tajikistan","Thailand",
+            "Turkmenistan","Turkey","Uzbekistan","Philippines","Sri Lanka","South Korea",
+            "Japan","Palestine","Timor-Leste","Yemen",
 
-            // Африка
-            "Алжир","Ангола","Бенин","Ботсвана","Буркина Фасо","Бурунди","Габон","Гамбия",
-            "Гана","Гвинея","Гвинея-Бисау","Джибути","Египет","Екваториална Гвинея",
-            "Еритрея","Есватини","Етиопия","Замбия","Зимбабве","Кабо Верде","Камерун",
-            "Кения","Коморски острови","Конго","ДР Конго","Кот д’Ивоар","Лесото","Либерия",
-            "Либия","Мадагаскар","Малави","Мали","Мароко","Мавритания","Мавриций",
-            "Мозамбик","Намибия","Нигер","Нигерия","Руанда","Сао Томе и Принсипи",
-            "Сейшели","Сенегал","Сиера Леоне","Сомалия","Судан","Южен Судан","Танзания",
-            "Того","Тунис","Уганда","Централноафриканска република","Чад","ЮАР",
+            // Africa
+            "Algeria","Angola","Benin","Botswana","Burkina Faso","Burundi","Gabon","Gambia",
+            "Ghana","Guinea","Guinea-Bissau","Djibouti","Egypt","Equatorial Guinea",
+            "Eritrea","Eswatini","Ethiopia","Zambia","Zimbabwe","Cape Verde","Cameroon",
+            "Kenya","Comoros","Congo","DR Congo","Ivory Coast","Lesotho","Liberia",
+            "Libya","Madagascar","Malawi","Mali","Morocco","Mauritania","Mauritius",
+            "Mozambique","Namibia","Niger","Nigeria","Rwanda","Sao Tome and Principe",
+            "Seychelles","Senegal","Sierra Leone","Somalia","Sudan","South Sudan","Tanzania",
+            "Togo","Tunisia","Uganda","Central African Republic","Chad","South Africa",
 
-            // Северна и Централна Америка
-            "Антигуа и Барбуда","Бахами","Барбадос","Белиз","Гватемала","Доминика",
-            "Доминиканска република","Канада","Коста Рика","Куба","Мексико","Никарагуа",
-            "Панама","Салвадор","САЩ","Сейнт Китс и Невис","Сейнт Лусия",
-            "Сейнт Винсент и Гренадини","Тринидад и Тобаго","Хаити","Хондурас","Ямайка",
-            "Гренада",
+            // North and Central America
+            "Antigua and Barbuda","Bahamas","Barbados","Belize","Guatemala","Dominica",
+            "Dominican Republic","Canada","Costa Rica","Cuba","Mexico","Nicaragua",
+            "Panama","El Salvador","USA","Saint Kitts and Nevis","Saint Lucia",
+            "Saint Vincent and the Grenadines","Trinidad and Tobago","Haiti","Honduras","Jamaica",
+            "Grenada",
 
-            // Южна Америка
-            "Аржентина","Боливия","Бразилия","Венецуела","Гаяна","Колумбия","Парагвай",
-            "Перу","Суринам","Уругвай","Чили","Еквадор",
+            // South America
+            "Argentina","Bolivia","Brazil","Venezuela","Guyana","Colombia","Paraguay",
+            "Peru","Suriname","Uruguay","Chile","Ecuador",
 
-            // Океания
-            "Австралия","Вануату","Кирибати","Маршалови острови","Микронезия","Науру",
-            "Нова Зеландия","Палау","Папуа Нова Гвинея","Самоа","Соломонови острови",
-            "Тонга","Тувалу","Фиджи"
+            // Oceania
+            "Australia","Vanuatu","Kiribati","Marshall Islands","Micronesia","Nauru",
+            "New Zealand","Palau","Papua New Guinea","Samoa","Solomon Islands",
+            "Tonga","Tuvalu","Fiji"
         ]; 
 
         const searchInput = document.getElementById('countrySearch');
@@ -165,7 +165,7 @@
             if (showList.length === 0) {
                 const noResult = document.createElement('div');
                 noResult.className = 'dropdown-item';
-                noResult.textContent = 'Няма резултати';
+                noResult.textContent = 'No results';
                 noResult.style.color = '#999';
                 noResult.style.cursor = 'default';
                 countryList.appendChild(noResult);

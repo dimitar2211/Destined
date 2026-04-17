@@ -1,7 +1,7 @@
 @model IEnumerable<Destined.Models.TicketReport>
 
 @{
-    ViewData["Title"] = "Докладвани билети";
+    ViewData["Title"] = "Reported Tickets";
     ViewData["FullWidth"] = true;
 }
 
@@ -9,16 +9,16 @@
 
 <div class="admin-container">
     <div class="admin-header">
-        <h1>Админ Панел</h1>
-        <p>Управление на докладвани билети и сигурност</p>
+        <h1>Admin Panel</h1>
+        <p>Manage reported tickets and security</p>
     </div>
 
     <div class="glass-table-wrapper">
         @if (!Model.Any())
         {
             <div class="empty-state">
-                <h3>Всичко е спокойно</h3>
-                <p>Няма нови доклади за преглед.</p>
+                <h3>Everything is calm</h3>
+                <p>No new reports for review.</p>
             </div>
         }
         else
@@ -26,11 +26,11 @@
             <table class="glass-table">
                 <thead>
                     <tr>
-                        <th width="15%">Дата</th>
-                        <th width="15%">Докладващ</th>
-                        <th width="20%">Билет</th>
-                        <th width="30%">Причина</th>
-                        <th width="20%" class="text-center">Действия</th>
+                        <th width="15%">Date</th>
+                        <th width="15%">Reporter</th>
+                        <th width="20%">Ticket</th>
+                        <th width="30%">Reason</th>
+                        <th width="20%" class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -53,7 +53,7 @@
                                 }
                                 else
                                 {
-                                    <span class="status-deleted">Изтрит билет</span>
+                                    <span class="status-deleted">Deleted ticket</span>
                                 }
                             </td>
                             <td>
@@ -65,22 +65,21 @@
                                     {
                                         <a asp-controller="Tickets" asp-action="Details" asp-route-id="@item.TicketId" 
                                            asp-route-returnUrl="@Url.Action("Index", "Reports")"
-                                           class="btn-text btn-view" title="Преглед">
-                                            Преглед
+                                           class="btn-text btn-view" title="Review">
+                                            Review
                                         </a>
                                         
                                         <form asp-action="DeleteTicket" asp-route-id="@item.TicketId" method="post" 
-                                              onsubmit="return confirm('⚠️ ВНИМАНИЕ: Това ще изтрие билета завинаги! Продължаване?');">
-                                            <button type="submit" class="btn-text btn-delete-ticket" title="Изтрий Билет">
-                                                Изтриване
+                                              onsubmit="return confirm('⚠️ WARNING: This will delete the ticket forever! Continue?');">
+                                            <button type="submit" class="btn-text btn-delete-ticket" title="Delete Ticket">
+                                                Delete
                                             </button>
                                         </form>
                                     }
 
-                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" 
-                                          onsubmit="return confirm('Изчистване на този доклад?');">
-                                        <button type="submit" class="btn-text btn-dismiss" title="Изчисти Доклад">
-                                            Изчисти
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post">
+                                        <button type="submit" class="btn-text btn-dismiss" title="Dismiss Report">
+                                            Dismiss
                                         </button>
                                     </form>
                                 </div>
@@ -93,7 +92,7 @@
     </div>
 
     <div class="back-link-wrapper">
-        <a asp-controller="Home" asp-action="Index" class="btn-back">Към Начало</a>
+        <a asp-controller="Home" asp-action="Index" class="btn-back">Back to Home</a>
     </div>
 </div>
 

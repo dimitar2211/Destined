@@ -1,7 +1,7 @@
 @model List<Destined.Models.Ticket>
 
 @{
-    ViewData["Title"] = "Карта на приключенията";
+    ViewData["Title"] = "Adventure Map";
     ViewData["FullWidth"] = true;
     
     // Group tickets by country for easier JS processing
@@ -22,24 +22,24 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
         <div class="map-wrapper">
-            <h1 class="page-title">Твоята <span class="gradient-text">Карта</span></h1>
+            <h1 class="page-title">Your <span class="gradient-text">Map</span></h1>
             
             <div class="actions-bar">
-                 <a asp-action="Index" class="btn-back">⬅ Обратно към билетите</a>
+                 <a asp-action="Index" class="btn-back">⬅ Back to tickets</a>
             </div>
 
             <div class="completion-banner">
-                <span class="completion-label">Завършеност на картата:</span>
+                <span class="completion-label">Map completion:</span>
                 <span class="completion-value"><span id="completion-pct">0</span>%</span>
             </div>
 
             <div class="map-card">
                 <div id="world-map" style="width: 100%; height: 600px;"></div>
-                <div class="map-instruction">💡 Кликни върху оцветена държава, за да видиш билетите си!</div>
+                <div class="map-instruction">💡 Click on a colored country to see your tickets!</div>
             </div>
             
             <div class="stats-card">
-                <h3>Посетени държави: <span class="highlight-count">@ticketsByCountry.Count</span></h3>
+                <h3>Countries visited: <span class="highlight-count">@ticketsByCountry.Count</span></h3>
                 <div class="country-tags">
                     @foreach (var country in ticketsByCountry.Keys)
                     {
@@ -141,7 +141,7 @@
                     const countryName = codeToNameMap[code];
                     if (countryName) {
                         const count = ticketsData[countryName].length;
-                        tooltip.text(tooltip.text() + ` (${count} билета)`);
+                        tooltip.text(tooltip.text() + ` (${count} tickets)`);
                     }
                 }
             });
@@ -164,8 +164,8 @@
         listContainer.innerHTML = '';
 
         tickets.forEach(ticket => {
-            const date = new Date(ticket.DepartureTime).toLocaleDateString('bg-BG');
-            const time = new Date(ticket.DepartureTime).toLocaleTimeString('bg-BG', {hour: '2-digit', minute:'2-digit'});
+            const date = new Date(ticket.DepartureTime).toLocaleDateString();
+            const time = new Date(ticket.DepartureTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
             const card = document.createElement('div');
             card.className = 'ticket-mini-card';
@@ -176,7 +176,7 @@
                 </div>
                 <div class="ticket-details">
                     <div>🕒 ${time}</div>
-                    <div>👥 ${ticket.NumberOfPassengers} пътници</div>
+                    <div>👥 ${ticket.NumberOfPassengers} passengers</div>
                 </div>
             `;
             listContainer.appendChild(card);

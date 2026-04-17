@@ -1,7 +1,7 @@
 @model IEnumerable<Destined.Models.Ticket>
 
 @{
-    ViewData["Title"] = "Харесани билети";
+    ViewData["Title"] = "Liked Tickets";
     ViewData["FullWidth"] = true;
     var currentUserId = ViewData["CurrentUserId"] as string;
     var userDisplayNames = ViewData["UserDisplayNames"] as Dictionary<string, string> ?? new Dictionary<string, string>();
@@ -13,7 +13,7 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
         
-        <h1 class="page-title">Харесани билети</h1>
+        <h1 class="page-title">Liked Tickets</h1>
 
         @if (TempData["Error"] != null)
         {
@@ -32,7 +32,7 @@
             @if (!Model.Any())
             {
                 <div class="no-tickets-glass">
-                    <p>Все още нямате харесани билети.</p>
+                    <p>You don't have any liked tickets yet.</p>
                 </div>
             }
             else
@@ -44,14 +44,14 @@
                     <div class="real-ticket" id="ticket-@ticket.Id">
                         <div class="ticket-left" style="background:@ticket.LeftColor;">
                             <h2 style="color:@textColor">@ticket.From ➔ @ticket.To</h2>
-                            <p style="color:@textColor"><strong>Дата:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
-                            <p style="color:@textColor"><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
+                            <p style="color:@textColor"><strong>Date:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+                            <p style="color:@textColor"><strong>Passengers:</strong> @ticket.NumberOfPassengers</p>
                             @if (!string.IsNullOrEmpty(ticket.Country))
                             {
-                                <p style="color:@textColor"><strong>Държава:</strong> @ticket.Country</p>
+                                <p style="color:@textColor"><strong>Country:</strong> @ticket.Country</p>
                             }
                             <p style="color:@textColor" class="ticket-sender">
-                                <strong>От:</strong> @(ticket.UserId != null && userDisplayNames.ContainsKey(ticket.UserId) ? userDisplayNames[ticket.UserId] : "Непознат")
+                                <strong>From:</strong> @(ticket.UserId != null && userDisplayNames.ContainsKey(ticket.UserId) ? userDisplayNames[ticket.UserId] : "Unknown")
                             </p>
                         </div>
                         
@@ -66,7 +66,7 @@
                                    asp-route-ticketId="@ticket.Id"
                                    asp-route-page="1"
                                    asp-route-readOnly="true"
-                                   class="btn btn-journal">Дневник</a>
+                                   class="btn btn-journal">Journal</a>
 
                                 @{
                                     bool hasComments = commentCounts.TryGetValue(ticket.Id, out var cCount) && cCount > 0;
@@ -77,7 +77,7 @@
                                     <a asp-controller="Comments"
                                        asp-action="Ticket"
                                        asp-route-ticketId="@ticket.Id"
-                                       class="btn btn-detail">Коментари</a>
+                                       class="btn btn-detail">Comments</a>
                                 }
 
 
@@ -113,20 +113,20 @@
 <div id="reportModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeReportModal()">&times;</span>
-        <h2>Докладвай билет</h2>
+        <h2>Report Ticket</h2>
         <form asp-controller="Reports" asp-action="SubmitReport" method="post">
             <input type="hidden" id="reportTicketId" name="ticketId" />
             <div class="form-group">
-                <label for="reportReason">Причина за докладване:</label>
+                <label for="reportReason">Reason for reporting:</label>
                 <textarea id="reportReason" name="reason" class="glass-input" rows="4" required 
                           maxlength="300" 
-                          placeholder="Моля, опишете защо докладвате този билет..."
+                          placeholder="Please describe why you are reporting this ticket..."
                           oninput="updateCharCount(this)"></textarea>
                 <div style="text-align: right; font-size: 0.8rem; color: #ccc; margin-top: 5px;">
                     <span id="charCount">0</span>/300
                 </div>
             </div>
-            <button type="submit" class="btn btn-report-submit">Изпрати</button>
+            <button type="submit" class="btn btn-report-submit">Submit</button>
         </form>
     </div>
 </div>
@@ -209,12 +209,12 @@
                             }
                         }, 500);
                     }
-                    showToast("Билетът е премахнат от харесани.");
+                    showToast("Ticket removed from favorites.");
                 }
             })
             .catch(err => {
                 console.error("Error toggling like:", err);
-                showToast("Възникна грешка.");
+                showToast("An error occurred.");
             });
     }
 
@@ -223,7 +223,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.reported) {
-                    showToast("Вече сте изпратили доклад за този билет!");
+                    showToast("You have already submitted a report for this ticket!");
                 } else {
                     openReportModal(ticketId);
                 }

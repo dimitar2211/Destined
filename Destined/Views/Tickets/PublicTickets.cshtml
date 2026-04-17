@@ -1,7 +1,7 @@
 @model IEnumerable<Destined.Models.Ticket>
 
 @{
-    ViewData["Title"] = "Публични билети";
+    ViewData["Title"] = "Public Tickets";
     ViewData["FullWidth"] = true;
     var currentUserId = User.Identity != null && User.Identity.IsAuthenticated
         ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
@@ -21,7 +21,7 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
         
-        <h1 class="page-title">Публични билети</h1>
+        <h1 class="page-title">Public Tickets</h1>
 
         @if (TempData["Error"] != null)
         {
@@ -38,25 +38,25 @@
 
         <div class="controls-container">
             <form method="get" asp-action="PublicTickets" style="display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap;">
-                <input type="text" name="searchCountry" value="@ViewData["SearchCountry"]" placeholder="Търси държава..." class="glass-input" />
-                <input type="text" name="searchTo" value="@ViewData["SearchTo"]" placeholder="Търси дестинация (До)..." class="glass-input" />
-                <input type="text" name="searchUser" value="@ViewData["SearchUser"]" placeholder="Търси потребител..." class="glass-input" />
-                <button type="submit" class="btn-glass">Търси</button>
+                <input type="text" name="searchCountry" value="@ViewData["SearchCountry"]" placeholder="Search country..." class="glass-input" />
+                <input type="text" name="searchTo" value="@ViewData["SearchTo"]" placeholder="Search destination (To)..." class="glass-input" />
+                <input type="text" name="searchUser" value="@ViewData["SearchUser"]" placeholder="Search user..." class="glass-input" />
+                <button type="submit" class="btn-glass">Search</button>
                 @if (ViewData["SearchCountry"] != null || ViewData["SearchTo"] != null || ViewData["SearchUser"] != null)
                 {
-                    <a href="@Url.Action("PublicTickets")" class="btn-clear" title="Изчисти търсенето">✖</a>
+                    <a href="@Url.Action("PublicTickets")" class="btn-clear" title="Clear search">✖</a>
                 }
             </form>
 
             <select id="sortSelect" class="glass-select">
-                <option value="random">Всички разбъркани</option>
-                <option value="mineFirst">Моите билети най-отгоре</option>
-                <option value="foreignOnly">Само чужди билети</option>
+                <option value="random">All shuffled</option>
+                <option value="mineFirst">My tickets first</option>
+                <option value="foreignOnly">Foreign tickets only</option>
             </select>
 
             @if (User.Identity != null && User.Identity.IsAuthenticated)
             {
-                <a asp-action="LikedTickets" class="btn-glass linked-tickets-nav">Харесани билети ❤️</a>
+                <a asp-action="LikedTickets" class="btn-glass linked-tickets-nav">Liked tickets ❤️</a>
             }
         </div>
 
@@ -64,7 +64,7 @@
             @if (!Model.Any())
             {
                 <div class="no-tickets-glass">
-                    <p>Все още няма публични билети.</p>
+                    <p>There are no public tickets yet.</p>
                 </div>
             }
             else
@@ -77,14 +77,14 @@
                     <div class="real-ticket" data-mine="@isMine.ToString().ToLower()">
                         <div class="ticket-left" style="background:@ticket.LeftColor;">
                             <h2 style="color:@textColor">@ticket.From ➔ @ticket.To</h2>
-                            <p style="color:@textColor"><strong>Дата:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
-                            <p style="color:@textColor"><strong>Пътници:</strong> @ticket.NumberOfPassengers</p>
+                            <p style="color:@textColor"><strong>Date:</strong> @ticket.DepartureTime.ToString("dd.MM.yyyy HH:mm")</p>
+                            <p style="color:@textColor"><strong>Passengers:</strong> @ticket.NumberOfPassengers</p>
                             @if (!string.IsNullOrEmpty(ticket.Country))
                             {
-                                <p style="color:@textColor"><strong>Държава:</strong> @ticket.Country</p>
+                                <p style="color:@textColor"><strong>Country:</strong> @ticket.Country</p>
                             }
                             <p style="color:@textColor" class="ticket-sender" data-user-id="@ticket.UserId">
-                                <strong>От:</strong> @(ticket.UserId != null && userDisplayNames.ContainsKey(ticket.UserId) ? userDisplayNames[ticket.UserId] : "Непознат")
+                                <strong>From:</strong> @(ticket.UserId != null && userDisplayNames.ContainsKey(ticket.UserId) ? userDisplayNames[ticket.UserId] : "Unknown")
                             </p>
                         </div>
                         
@@ -99,7 +99,7 @@
                                    asp-route-ticketId="@ticket.Id"
                                    asp-route-page="1"
                                    asp-route-readOnly="true"
-                                   class="btn btn-journal">Дневник</a>
+                                   class="btn btn-journal">Journal</a>
 
                                 @{
                                     bool hasComments = commentCounts.TryGetValue(ticket.Id, out var cCount) && cCount > 0;
@@ -110,7 +110,7 @@
                                     <a asp-controller="Comments"
                                        asp-action="Ticket"
                                        asp-route-ticketId="@ticket.Id"
-                                       class="btn btn-detail">Коментари</a>
+                                       class="btn btn-detail">Comments</a>
                                 }
 
 
@@ -155,28 +155,28 @@
 <div id="reportModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
         <span class="close-modal" onclick="closeReportModal()">&times;</span>
-        <h2>Докладвай билет</h2>
+        <h2>Report Ticket</h2>
         <form asp-controller="Reports" asp-action="SubmitReport" method="post">
             <input type="hidden" id="reportTicketId" name="ticketId" />
             <div class="form-group">
-                <label for="reportReason">Причина за докладване:</label>
+                <label for="reportReason">Reason for reporting:</label>
                 <textarea id="reportReason" name="reason" class="glass-input" rows="4" required 
                           maxlength="300" 
-                          placeholder="Моля, опишете защо докладвате този билет..."
+                          placeholder="Please describe why you are reporting this ticket..."
                           oninput="updateCharCount(this)"></textarea>
                 <div style="text-align: right; font-size: 0.8rem; color: #ccc; margin-top: 5px;">
                     <span id="charCount">0</span>/300
                 </div>
             </div>
-            <button type="submit" class="btn btn-report-submit">Изпрати</button>
+            <button type="submit" class="btn btn-report-submit">Submit</button>
         </form>
     </div>
 </div>
 
 <!-- Context Menu for User -->
 <div id="user-context-menu" class="user-context-menu" style="display: none;">
-    <button id="menu-add-friend" onclick="actionAddFriend()">➕ Добави приятел</button>
-    <button id="menu-block-user" onclick="actionBlockUser()" style="color: #ff6b6b;">🚫 Блокирай</button>
+    <button id="menu-add-friend" onclick="actionAddFriend()">➕ Add friend</button>
+    <button id="menu-block-user" onclick="actionBlockUser()" style="color: #ff6b6b;">🚫 Block</button>
 </div>
 
 <style>
@@ -614,7 +614,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.reported) {
-                    showToast("Вече сте изпратили доклад за този билет!");
+                    showToast("You have already submitted a report for this ticket!");
                 } else {
                     openReportModal(ticketId);
                 }
@@ -720,7 +720,7 @@
         };
 
         window.actionBlockUser = function() {
-            if (!activeUserId || !confirm('Сигурни ли сте, че искате да блокирате този потребител?')) return;
+            if (!activeUserId || !confirm('Are you sure you want to block this user?')) return;
             
             const formData = new FormData();
             formData.append('friendId', activeUserId);
@@ -729,7 +729,7 @@
                 method: 'POST',
                 body: formData 
             }).then(() => {
-                showToast("Потребителят е блокиран!");
+                showToast("User blocked!");
                 setTimeout(() => location.reload(), 1000); // Reload to filter out their tickets
             });
         };
@@ -796,17 +796,17 @@
                         btn.classList.add('liked');
                         btn.title = "Unlike";
                         if (icon) icon.style.fill = heartColor;
-                        showToast("Билетът е добавен в харесани!");
+                        showToast("Ticket added to favorites!");
                     } else {
                         btn.classList.remove('liked');
                         btn.title = "Like";
                         if (icon) icon.style.fill = 'transparent';
-                        showToast("Билетът е премахнат от харесани.");
+                        showToast("Ticket removed from favorites.");
                     }
                 })
                 .catch(err => {
                     console.error("Error toggling like:", err);
-                    showToast("Възникна грешка при харесване.");
+                    showToast("An error occurred while liking.");
                 });
         };
     });

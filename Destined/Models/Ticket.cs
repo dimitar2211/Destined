@@ -8,46 +8,46 @@ namespace Destined.Models
     {
         public int Id { get; set; }
 
-        [Display(Name = "От къде")]
+        [Display(Name = "From")]
         public string? From { get; set; } = string.Empty;
 
         [Required]
-        [Display(Name = "До къде")]
+        [Display(Name = "To")]
         public string To { get; set; } = string.Empty;
 
         [Required]
-        [Display(Name = "Час на тръгване")]
+        [Display(Name = "Departure Time")]
         public DateTime DepartureTime { get; set; }
 
         [Required]
         [Range(1, 100)]
-        [Display(Name = "Брой пътници")]
+        [Display(Name = "Number of Passengers")]
         public int NumberOfPassengers { get; set; }
 
         public string? UserId { get; set; }
         public virtual IdentityUser? User { get; set; }
 
-        [Display(Name = "Публичен билет")]
+        [Display(Name = "Public Ticket")]
         public bool IsPublic { get; set; } = false;
 
         [Display(Name = "Comment section")]
         public bool AllowComments { get; set; } = false;
 
-        [Display(Name = "Цвят на лявата част")]
+        [Display(Name = "Left part color")]
         public string LeftColor { get; set; } = "#e0f2f1";
 
-        [Display(Name = "Цвят на дясната част")]
+        [Display(Name = "Right part color")]
         public string RightColor { get; set; } = "#ffffff";
         public string TextColor { get; set; } = "#000000";
         public int OrderIndex { get; set; }
 
-        [Display(Name = "Държава")]
+        [Display(Name = "Country")]
         public string Country { get; set; } = string.Empty;
 
-        [Display(Name = "Цвят на сърцето")]
+        [Display(Name = "Heart color")]
         public string HeartColor { get; set; } = "#ff4757";
 
-        [Display(Name = "Цвят на броя харесвания")]
+        [Display(Name = "Like count color")]
         public string LikeCountColor { get; set; } = "#ff4757";
 
     }

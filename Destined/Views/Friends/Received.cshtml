@@ -1,7 +1,7 @@
 @model IEnumerable<Destined.Models.FriendRequest>
 
 @{
-    ViewData["Title"] = "Получени Покани";
+    ViewData["Title"] = "Received Invitations";
     ViewData["FullWidth"] = true;
     var senderDisplayNames = ViewBag.SenderDisplayNames as Dictionary<string, string>;
 }
@@ -11,9 +11,9 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 100px 20px 40px 20px;">
         <div class="requests-wrapper">
-            <h1 class="page-title"><span class="gradient-text">Получени</span> Покани</h1>
+            <h1 class="page-title"><span class="gradient-text">Received</span> Invitations</h1>
             <div class="actions-bar mb-4 text-center">
-                <a asp-action="Index" class="btn-back-glass">⬅ Назад към приятели</a>
+                <a asp-action="Index" class="btn-back-glass">⬅ Back to friends</a>
             </div>
 
             @if (TempData["Success"] != null)
@@ -24,7 +24,7 @@
             @if (!Model.Any())
             {
                 <div class="no-requests-card">
-                    <p>Нямате нови покани за приятелство.</p>
+                    <p>You have no new friend invitations.</p>
                 </div>
             }
             else
@@ -35,17 +35,17 @@
                         <div class="glass-list-item d-flex justify-content-between align-items-center">
                             <div>
                                 <strong style="font-size: 1.2rem; display: block; margin-bottom: 5px;">@senderDisplayNames?[request.SenderId]</strong>
-                                <small style="color: rgba(255,255,255,0.6);">Иска да сте приятели</small><br />
-                                <small style="color: rgba(255,255,255,0.4);">Изпратена на: @request.CreatedAt.ToString("g")</small>
+                                <small style="color: rgba(255,255,255,0.6);">Wants to be friends</small><br />
+                                <small style="color: rgba(255,255,255,0.4);">Sent on: @request.CreatedAt.ToString("g")</small>
                             </div>
                             <div class="d-flex gap-2">
                                 <form asp-action="Accept" method="post" class="m-0">
                                     <input type="hidden" name="id" value="@request.Id" />
-                                    <button type="submit" class="btn-success-glass">Приеми</button>
+                                    <button type="submit" class="btn-success-glass">Accept</button>
                                 </form>
-                                <form asp-action="Decline" method="post" class="m-0" onsubmit="return confirm('Отхвърли тази покана за приятелство?');">
+                                <form asp-action="Decline" method="post" class="m-0" onsubmit="return confirm('Decline this friend invitation?');">
                                     <input type="hidden" name="id" value="@request.Id" />
-                                    <button type="submit" class="btn-danger-glass">Отхвърли</button>
+                                    <button type="submit" class="btn-danger-glass">Decline</button>
                                 </form>
                             </div>
                         </div>

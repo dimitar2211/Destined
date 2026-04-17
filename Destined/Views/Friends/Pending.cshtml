@@ -1,7 +1,7 @@
 @model IEnumerable<Destined.Models.FriendRequest>
 
 @{
-    ViewData["Title"] = "Изпратени Покани";
+    ViewData["Title"] = "Sent Invitations";
     ViewData["FullWidth"] = true;
     var receiverDisplayNames = ViewBag.ReceiverDisplayNames as Dictionary<string, string>;
 }
@@ -11,9 +11,9 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 100px 20px 40px 20px;">
         <div class="requests-wrapper">
-            <h1 class="page-title"><span class="gradient-text">Изпратени</span> Покани</h1>
+            <h1 class="page-title"><span class="gradient-text">Sent</span> Invitations</h1>
             <div class="actions-bar mb-4 text-center">
-                <a asp-action="Index" class="btn-back-glass">⬅ Назад към приятели</a>
+                <a asp-action="Index" class="btn-back-glass">⬅ Back to friends</a>
             </div>
 
             @if (TempData["Success"] != null)
@@ -24,7 +24,7 @@
             @if (!Model.Any())
             {
                 <div class="no-requests-card">
-                    <p>Нямате изпратени и чакащи покани за приятелство.</p>
+                    <p>You have no sent or pending friend invitations.</p>
                 </div>
             }
             else
@@ -35,11 +35,11 @@
                         <div class="glass-list-item d-flex justify-content-between align-items-center">
                             <div>
                                 <strong style="font-size: 1.2rem; display: block; margin-bottom: 5px;">@receiverDisplayNames?[request.ReceiverId]</strong>
-                                <small style="color: rgba(255,255,255,0.6);">Изпратена на: @request.CreatedAt.ToString("g")</small>
+                                <small style="color: rgba(255,255,255,0.6);">Sent on: @request.CreatedAt.ToString("g")</small>
                             </div>
-                            <form asp-action="Cancel" method="post" onsubmit="return confirm('Отмени тази покана за приятелство?');">
+                            <form asp-action="Cancel" method="post" onsubmit="return confirm('Cancel this friend invitation?');">
                                 <input type="hidden" name="id" value="@request.Id" />
-                                <button type="submit" class="btn-danger-glass">Oтмени поканата</button>
+                                <button type="submit" class="btn-danger-glass">Cancel invitation</button>
                             </form>
                         </div>
                     }

@@ -84,7 +84,7 @@ namespace Destined.Controllers
             if (string.IsNullOrWhiteSpace(reason) || reason.Length > 300)
             {
                 // Validate length server side too
-                TempData["Error"] = "Съобщението е твърде дълго или празно.";
+                TempData["Error"] = "Report message is too long or empty.";
                 return RedirectToAction("PublicTickets", "Tickets"); 
             }
 
@@ -100,7 +100,7 @@ namespace Destined.Controllers
 
             if (existingReport != null)
             {
-                TempData["Error"] = "Вече сте изпратили доклад за този билет!";
+                TempData["Error"] = "You have already submitted a report for this ticket!";
                 return RedirectToAction("PublicTickets", "Tickets");
             }
 
@@ -116,7 +116,7 @@ namespace Destined.Controllers
             await _context.SaveChangesAsync();
 
             // Optionally add a tempdata message
-            TempData["Message"] = "Билетът беше докладван успешно.";
+            TempData["Message"] = "Ticket reported successfully.";
 
             return RedirectToAction("PublicTickets", "Tickets");
         }

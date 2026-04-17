@@ -1,7 +1,7 @@
 @model IEnumerable<Destined.Models.Friendship>
 
 @{
-    ViewData["Title"] = "Моите Приятели";
+    ViewData["Title"] = "My Friends";
     ViewData["FullWidth"] = true;
     var friendCode = ViewBag.FriendCode as string;
     var displayUsername = ViewBag.DisplayUsername as string;
@@ -16,14 +16,14 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 100px 20px 40px 20px;">
         <div class="friends-wrapper">
-            <h1 class="page-title">Моите <span class="gradient-text">Приятели</span></h1>
+            <h1 class="page-title">My <span class="gradient-text">Friends</span></h1>
 
             <div class="actions-bar d-flex justify-content-center mb-4">
-                <a asp-action="Pending" class="btn-secondary-glass me-2 text-warning border-warning">Изпратени покани</a>
-                <a asp-action="Received" class="btn-secondary-glass ms-2 text-info border-info">Получени покани</a>
+                <a asp-action="Pending" class="btn-secondary-glass me-2 text-warning border-warning">Sent invitations</a>
+                <a asp-action="Received" class="btn-secondary-glass ms-2 text-info border-info">Received invitations</a>
                 @if (ViewBag.ShowBlockedLink == true)
                 {
-                    <a asp-action="Blocked" class="btn-secondary-glass ms-2 text-danger border-danger">Блокирани потребители</a>
+                    <a asp-action="Blocked" class="btn-secondary-glass ms-2 text-danger border-danger">Blocked users</a>
                 }
             </div>
 
@@ -38,39 +38,39 @@
 
             <div class="glass-card mb-4 text-center">
                 <div class="card-body">
-                    <h5 class="card-title text-white">Твоята Информация</h5>
+                    <h5 class="card-title text-white">Your Information</h5>
                     <p class="mb-2 text-light">
-                        <strong style="color: #a0d4cf;">Потребителско име:</strong> @displayUsername <br />
-                        <strong style="color: #a0d4cf;">Твоят Код:</strong> <span class="badge" style="background: linear-gradient(45deg, #3b82f6, #8b5cf6); font-size: 1.1em; padding: 8px 12px; border-radius: 10px;">@friendCode</span>
+                        <strong style="color: #a0d4cf;">Username:</strong> @displayUsername <br />
+                        <strong style="color: #a0d4cf;">Your Code:</strong> <span class="badge" style="background: linear-gradient(45deg, #3b82f6, #8b5cf6); font-size: 1.1em; padding: 8px 12px; border-radius: 10px;">@friendCode</span>
                     </p>
-                    <small class="text-muted" style="color: rgba(255,255,255,0.7) !important;">Сподели своето Потребителско име и Код, за да могат другите да те добавят!</small>
+                    <small class="text-muted" style="color: rgba(255,255,255,0.7) !important;">Share your Username and Code so others can add you!</small>
                 </div>
             </div>
 
             <div class="glass-card mb-5">
                 <div class="card-body">
-                    <h5 class="card-title text-center text-white mb-4">Добави Приятел</h5>
+                    <h5 class="card-title text-center text-white mb-4">Add Friend</h5>
                     <form asp-action="Search" method="post" class="row gx-3 gy-3 align-items-center justify-content-center">
                         <div class="col-sm-4">
-                            <label class="visually-hidden" for="username">Потребителско име</label>
-                            <input type="text" class="form-control glass-input" id="username" name="username" placeholder="Потребителско име" required>
+                            <label class="visually-hidden" for="username">Username</label>
+                            <input type="text" class="form-control glass-input" id="username" name="username" placeholder="Username" required>
                         </div>
                         <div class="col-sm-4">
-                            <label class="visually-hidden" for="friendCode">Код</label>
-                            <input type="text" class="form-control glass-input" id="friendCode" name="friendCode" placeholder="6-Символен Код" maxlength="6" required>
+                            <label class="visually-hidden" for="friendCode">Code</label>
+                            <input type="text" class="form-control glass-input" id="friendCode" name="friendCode" placeholder="6-Character Code" maxlength="6" required>
                         </div>
                         <div class="col-auto">
-                            <button type="submit" class="btn-primary-glow">Изпрати Поканата</button>
+                            <button type="submit" class="btn-primary-glow">Send Invitation</button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <h3 class="text-center text-white mb-4">Списък с приятели</h3>
+            <h3 class="text-center text-white mb-4">Friends List</h3>
             @if (!Model.Any())
             {
                 <div class="no-friends-card">
-                    <p>Все още нямаш приятели. Използвай търсачката по-горе, за да добавиш някого!</p>
+                    <p>You don't have any friends yet. Use the search above to add someone!</p>
                 </div>
             }
             else
@@ -86,16 +86,16 @@
                                         <div class="d-flex align-items-center gap-2">
                                             @if (!adminUserIds.Contains(friendship.FriendId))
                                             {
-                                                <form asp-action="Block" method="post" onsubmit="return confirm('Сигурни ли сте, че искате да блокирате този потребител?');">
+                                                <form asp-action="Block" method="post" onsubmit="return confirm('Are you sure you want to block this user?');">
                                                     <input type="hidden" name="friendId" value="@friendship.FriendId" />
-                                                    <button type="submit" class="btn-icon-danger" title="Блокирай" style="background: rgba(255, 107, 107, 0.1); border-color: rgba(255, 107, 107, 0.3);">
+                                                    <button type="submit" class="btn-icon-danger" title="Block" style="background: rgba(255, 107, 107, 0.1); border-color: rgba(255, 107, 107, 0.3);">
                                                         🚫
                                                     </button>
                                                 </form>
                                             }
-                                            <form asp-action="Remove" method="post" onsubmit="return confirm('Сигурни ли сте, че искате да премахнете този приятел?');">
+                                            <form asp-action="Remove" method="post" onsubmit="return confirm('Are you sure you want to remove this friend?');">
                                                 <input type="hidden" name="friendId" value="@friendship.FriendId" />
-                                                <button type="submit" class="btn-icon-danger" title="Премахни">
+                                                <button type="submit" class="btn-icon-danger" title="Remove">
                                                     🗑️
                                                 </button>
                                             </form>
@@ -105,22 +105,22 @@
                                     <hr style="border-color: rgba(255,255,255,0.2);" />
 
                                     <div class="mt-auto">
-                                        <label class="form-label text-light mb-2" style="font-size: 0.9em;">Кои мои билети вижда този приятел (Моето споделяне):</label>
+                                        <label class="form-label text-light mb-2" style="font-size: 0.9em;">Which of my tickets can this friend see (My sharing):</label>
                                         <form asp-action="UpdateSharing" method="post" class="d-flex gx-2 mb-4">
                                             <input type="hidden" name="friendId" value="@friendship.FriendId" />
                                             <select name="setting" class="form-select form-select-sm glass-input me-2" style="max-width: 150px;">
-                                                <option value="All" selected="@(friendship.SharingSetting == Destined.Models.SharingSetting.All)" style="color: black;">Всички билети</option>
-                                                <option value="PublicOnly" selected="@(friendship.SharingSetting == Destined.Models.SharingSetting.PublicOnly)" style="color: black;">Само публични</option>
-                                                <option value="PrivateOnly" selected="@(friendship.SharingSetting == Destined.Models.SharingSetting.PrivateOnly)" style="color: black;">Само частни</option>
-                                                <option value="None" selected="@(friendship.SharingSetting == Destined.Models.SharingSetting.None)" style="color: black;">Нищо</option>
+                                                <option value="All" selected="@(friendship.SharingSetting == Destined.Models.SharingSetting.All)" style="color: black;">All tickets</option>
+                                                <option value="PublicOnly" selected="@(friendship.SharingSetting == Destined.Models.SharingSetting.PublicOnly)" style="color: black;">Public only</option>
+                                                <option value="PrivateOnly" selected="@(friendship.SharingSetting == Destined.Models.SharingSetting.PrivateOnly)" style="color: black;">Private only</option>
+                                                <option value="None" selected="@(friendship.SharingSetting == Destined.Models.SharingSetting.None)" style="color: black;">None</option>
                                             </select>
-                                            <button type="submit" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border-radius: 8px;">Запази</button>
+                                            <button type="submit" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border-radius: 8px;">Save</button>
                                         </form>
 
                                         <div class="d-flex flex-column gap-2 mt-3">
-                                            <a asp-controller="Tickets" asp-action="FriendTickets" asp-route-friendId="@friendship.FriendId" class="btn-secondary-glass w-100 text-center py-2">🎟️ Виж Билетите</a>
-                                            <a asp-controller="Tickets" asp-action="FriendMap" asp-route-friendId="@friendship.FriendId" class="btn-primary-glow w-100 text-center py-2" style="font-size: 0.95rem;">🗺️ Карта на приключенията</a>
-                                            <button type="button" class="btn-chat-toggle w-100 text-center py-2" onclick="toggleChat('@friendship.FriendId')">💬 Чат</button>
+                                            <a asp-controller="Tickets" asp-action="FriendTickets" asp-route-friendId="@friendship.FriendId" class="btn-secondary-glass w-100 text-center py-2">🎟️ View Tickets</a>
+                                            <a asp-controller="Tickets" asp-action="FriendMap" asp-route-friendId="@friendship.FriendId" class="btn-primary-glow w-100 text-center py-2" style="font-size: 0.95rem;">🗺️ Adventure Map</a>
+                                            <button type="button" class="btn-chat-toggle w-100 text-center py-2" onclick="toggleChat('@friendship.FriendId')">💬 Chat</button>
                                         </div>
 
                                         <div class="chat-container-wrapper mt-3" id="chat-container-@friendship.FriendId" style="display: none;">
@@ -128,7 +128,7 @@
                                                 <div class="text-center py-3"><div class="spinner-border spinner-border-sm text-info" role="status"></div></div>
                                             </div>
                                             <div class="chat-input-area d-flex gap-2 mt-2">
-                                                <input type="text" class="form-control glass-input chat-input-field" placeholder="Съобщение..." id="input-@friendship.FriendId" onkeypress="if(event.key === 'Enter') sendMessage('@friendship.FriendId')">
+                                                <input type="text" class="form-control glass-input chat-input-field" placeholder="Message..." id="input-@friendship.FriendId" onkeypress="if(event.key === 'Enter') sendMessage('@friendship.FriendId')">
                                                 <button class="btn-send-message" onclick="sendMessage('@friendship.FriendId')">➤</button>
                                             </div>
                                         </div>
@@ -250,8 +250,8 @@
 </style>
 
 <div id="chat-menu" class="chat-context-menu">
-    <button onclick="editMsgAction()">✏️ Редактирай</button>
-    <button class="btn-delete-msg" onclick="deleteMsgAction()">🗑️ Изтрий</button>
+    <button onclick="editMsgAction()">✏️ Edit</button>
+    <button class="btn-delete-msg" onclick="deleteMsgAction()">🗑️ Delete</button>
 </div>
 
 <script>
@@ -370,7 +370,7 @@
 
     function deleteMsgAction() {
         if (!activeMsgId) return;
-        if (!confirm('Сигурни ли сте, че искате да изтриете това съобщение?')) return;
+        if (!confirm('Are you sure you want to delete this message?')) return;
 
         fetch('/Chat/Delete', {
             method: 'POST',
@@ -391,7 +391,7 @@
 
     function editMsgAction() {
         if (!activeMsgId) return;
-        const newContent = prompt('Редактирай съобщението:', activeMsgContent);
+        const newContent = prompt('Edit message:', activeMsgContent);
         if (newContent === null || newContent === activeMsgContent) return;
 
         fetch('/Chat/Edit', {

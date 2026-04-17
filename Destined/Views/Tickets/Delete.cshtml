@@ -1,7 +1,7 @@
 @model Destined.Models.Ticket
 
 @{
-    ViewData["Title"] = "Изтриване на билет";
+    ViewData["Title"] = "Delete Ticket";
     ViewData["FullWidth"] = true;
 }
 
@@ -10,8 +10,8 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
         <div class="ticket-wrapper">
-            <h1 class="page-title">Изтриване на билет</h1>
-            <p style="text-align: center; color: #white; margin-bottom: 20px;">Сигурни ли сте, че искате да изтриете този билет?</p>
+            <h1 class="page-title">Delete Ticket</h1>
+            <p style="text-align: center; color: white; margin-bottom: 20px;">Are you sure you want to delete this ticket?</p>
 
             <form asp-action="Delete" method="post">
                 <input type="hidden" asp-for="Id" />
@@ -19,8 +19,8 @@
                 <div class="real-ticket">
                     <div class="ticket-left" style="background-color:@Model.LeftColor; --text-color:@Model.TextColor;">
                         <h2 style="color:@Model.TextColor;">@Model.From ➔ @Model.To</h2>
-                        <p><strong style="color:@Model.TextColor;">Дата и час:</strong> <span style="color:@Model.TextColor;">@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</span></p>
-                        <p><strong style="color:@Model.TextColor;">Пътници:</strong> <span style="color:@Model.TextColor;">@Model.NumberOfPassengers</span></p>
+                        <p><strong style="color:@Model.TextColor;">Date and Time:</strong> <span style="color:@Model.TextColor;">@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</span></p>
+                        <p><strong style="color:@Model.TextColor;">Passengers:</strong> <span style="color:@Model.TextColor;">@Model.NumberOfPassengers</span></p>
                     </div>
 
                     <div class="ticket-center">
@@ -30,8 +30,8 @@
                     <div class="ticket-right" style="background-color:@Model.RightColor; color:@Model.TextColor;">
                         <div class="barcode"></div>
                         <div class="actions">
-                            <button type="submit" class="btn btn-delete">Изтрий</button>
-                            <a asp-action="Index" class="btn btn-journal">Отказ</a>
+                            <button type="submit" class="btn btn-delete">Delete</button>
+                            <a asp-action="Index" class="btn btn-journal">Cancel</a>
                         </div>
                     </div>
                 </div>

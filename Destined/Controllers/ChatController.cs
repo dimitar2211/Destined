@@ -95,8 +95,7 @@ namespace Destined.Controllers
             if (message == null) return NotFound();
 
             // Only the receiver can like the message? 
-            // The user said: "когато се кликне два пъти върху чуждо съобщение да се харесва"
-            // Translation: "when a double click is made on someone else's message to be liked"
+            // when a double click is made on someone else's message to be liked
             
             if (message.ReceiverId != user.Id) return Forbid();
 

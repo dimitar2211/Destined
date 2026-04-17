@@ -1,7 +1,7 @@
 @model Destined.Models.Ticket
 
 @{
-    ViewData["Title"] = "Детайли на билет";
+    ViewData["Title"] = "Ticket Details";
     ViewData["FullWidth"] = true;
 }
 
@@ -10,16 +10,16 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
         <div class="ticket-wrapper">
-            <h1 class="page-title">Детайли на билет</h1>
+            <h1 class="page-title">Ticket Details</h1>
 
             <div class="real-ticket">
                 <div class="ticket-left" style="background-color:@Model.LeftColor; --text-color:@Model.TextColor;">
                     <h2 style="color:@Model.TextColor;">@Model.From ➔ @Model.To</h2>
-                    <p><strong style="color:@Model.TextColor;">Дата и час:</strong> <span style="color:@Model.TextColor;">@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</span></p>
-                    <p><strong style="color:@Model.TextColor;">Пътници:</strong> <span style="color:@Model.TextColor;">@Model.NumberOfPassengers</span></p>
+                    <p><strong style="color:@Model.TextColor;">Date and Time:</strong> <span style="color:@Model.TextColor;">@Model.DepartureTime.ToString("dd.MM.yyyy HH:mm")</span></p>
+                    <p><strong style="color:@Model.TextColor;">Passengers:</strong> <span style="color:@Model.TextColor;">@Model.NumberOfPassengers</span></p>
                     @if (!string.IsNullOrEmpty(Model.Country))
                     {
-                        <p><strong style="color:@Model.TextColor;">Държава:</strong> <span style="color:@Model.TextColor;">@Model.Country</span></p>
+                        <p><strong style="color:@Model.TextColor;">Country:</strong> <span style="color:@Model.TextColor;">@Model.Country</span></p>
                     }
                 </div>
 
@@ -30,16 +30,16 @@
                 <div class="ticket-right" style="background-color:@Model.RightColor; color:@Model.TextColor;">
                     <div class="barcode"></div>
                     <div class="actions">
-                        <a class="btn btn-journal" href="@Url.Action("Page", "Journal", new { ticketId = Model.Id, readOnly = true })">Прегледай дневник</a>
-                        <a class="btn btn-edit" asp-action="Edit" asp-route-id="@Model?.Id">Редактирай</a>
-                        <a class="btn btn-delete" asp-action="Delete" asp-route-id="@Model?.Id">Изтрий</a>
+                        <a class="btn btn-journal" href="@Url.Action("Page", "Journal", new { ticketId = Model.Id, readOnly = true })">View Journal</a>
+                        <a class="btn btn-edit" asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
+                        <a class="btn btn-delete" asp-action="Delete" asp-route-id="@Model?.Id">Delete</a>
                         @if (!string.IsNullOrEmpty(Context.Request.Query["returnUrl"]))
                         {
-                            <a href="@Context.Request.Query["returnUrl"]" class="btn btn-secondary">Назад</a>
+                            <a href="@Context.Request.Query["returnUrl"]" class="btn btn-secondary">Back</a>
                         }
                         else
                         {
-                            <a asp-action="Index" class="btn btn-secondary">Назад</a>
+                            <a asp-action="Index" class="btn btn-secondary">Back</a>
                         }
                     </div>
                 </div>

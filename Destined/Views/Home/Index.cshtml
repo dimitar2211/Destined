@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Начало";
+    ViewData["Title"] = "Home";
     ViewData["FullWidth"] = true;
 }
 
@@ -9,15 +9,15 @@
     
     <div class="hero-container">
         <div class="hero-content">
-            <div class="badge-new">✨ Твоята вселена от спомени</div>
+            <div class="badge-new">✨ Your universe of memories</div>
             <h1 class="hero-title">Some stories are <span class="gradient-text">Destined</span> to be told</h1>
             <p class="hero-subtitle">
-                Записвай мигове, които остават вечни. Твоят личен дневник за емоции, пътешествия и истории, които си струва да се помнят.
+                Record moments that stay eternal. Your personal diary for emotions, travels, and stories worth remembering.
             </p>
             
             <div class="cta-group">
-                <a href="/Tickets/Create" class="btn-primary-glow">Създай билет</a>
-                <a href="/Tickets/Index" class="btn-secondary-glass">Моите билети</a>
+                <a href="/Tickets/Create" class="btn-primary-glow">Create Ticket</a>
+                <a href="/Tickets/Index" class="btn-secondary-glass">My Tickets</a>
                 @if (User.IsInRole("Admin"))
                 {
                     <a href="/Reports/Index" class="btn-secondary-glass" style="border-color: #e53935; color: #ff8a80;">Admin Panel</a>
@@ -27,18 +27,18 @@
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">📸</div>
-                    <h3>Споделяй мигове</h3>
-                    <p>Запази снимки от любимите си места.</p>
+                    <h3>Share moments</h3>
+                    <p>Save photos from your favorite places.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">📝</div>
-                    <h3>Пиши история</h3>
-                    <p>Води личен дневник на преживяванията.</p>
+                    <h3>Write a story</h3>
+                    <p>Keep a personal diary of experiences.</p>
                 </div>
                 <div class="feature-card">
                     <div class="feature-icon">🌍</div>
-                    <h3>Обиколи света</h3>
-                    <p>Организирай всичко по държави и дати.</p>
+                    <h3>Travel the world</h3>
+                    <p>Organize everything by country and date.</p>
                 </div>
             </div>
         </div>
@@ -48,16 +48,16 @@
                 <div id="globe-container"></div>
                 <div class="orbit-circle"></div>
                 <div class="floating-card c1">
-                    <span>❤️</span> Любов
+                    <span>❤️</span> Love
                 </div>
                 <div class="floating-card c2">
-                    <span>✈️</span> Пътуване
+                    <span>✈️</span> Travel
                 </div>
                 <div class="floating-card c3">
-                    <span>🎉</span> Емоция
+                    <span>🎉</span> Emotion
                 </div>
             </div>
-            <p class="quote-text">„Спомените са безценни — пази ги с любов.“</p>
+            <p class="quote-text">"Memories are priceless — keep them with love."</p>
         </div>
     </div>
 </div>

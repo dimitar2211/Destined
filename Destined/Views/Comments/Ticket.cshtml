@@ -1,7 +1,7 @@
 @model List<Destined.Models.TicketComment>
 @{
     var ticket = ViewBag.Ticket as Destined.Models.Ticket;
-    ViewData["Title"] = "Коментари към билет";
+    ViewData["Title"] = "Ticket Comments";
     ViewData["FullWidth"] = true;
     var currentUserId = User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
     var isAdmin = User.IsInRole("Admin");
@@ -13,8 +13,8 @@
     <div id="page-content" style="position: relative; z-index: 10; padding: 40px 20px;">
         
         <div class="comment-wrapper">
-            <h2 class="page-title">Коментари</h2>
-            <h3 class="ticket-subtitle">за билет: @ticket.From ➔ @ticket.To</h3>
+            <h2 class="page-title">Comments</h2>
+            <h3 class="ticket-subtitle">for ticket: @ticket.From ➔ @ticket.To</h3>
 
             @* New Comment Form – only visible when the ticket owner has enabled commenting *@
             @if (ViewBag.AllowComments == true)
@@ -29,10 +29,10 @@
                     }
 
                     <div class="form-group">
-                        <textarea name="content" class="glass-input" rows="3" placeholder="Напиши коментар..."></textarea>
+                        <textarea name="content" class="glass-input" rows="3" placeholder="Write a comment..."></textarea>
                     </div>
                     <div style="text-align: right;">
-                        <button class="btn-action primary">Публикувай</button>
+                        <button class="btn-action primary">Post</button>
                     </div>
                 </form>
             </div>
@@ -40,7 +40,7 @@
             else
             {
                 <div class="no-comments" style="margin-bottom: 20px;">
-                    <p>Коментирането за този билет е изключено.</p>
+                    <p>Commenting for this ticket is disabled.</p>
                 </div>
             }
 
@@ -52,10 +52,10 @@
                 <form method="get">
                     <input type="hidden" name="ticketId" value="@ticket.Id" />
                     <select name="sort" class="glass-select" onchange="this.form.submit()">
-                        <option value="newest" selected="@(sort == "newest" ? "selected" : null)">Най-нови</option>
-                        <option value="oldest" selected="@(sort == "oldest" ? "selected" : null)">Най-стари</option>
-                        <option value="longest" selected="@(sort == "longest" ? "selected" : null)">Най-дълги</option>
-                        <option value="random" selected="@(sort == "random" ? "selected" : null)">Разбъркани</option>
+                        <option value="newest" selected="@(sort == "newest" ? "selected" : null)">Newest</option>
+                        <option value="oldest" selected="@(sort == "oldest" ? "selected" : null)">Oldest</option>
+                        <option value="longest" selected="@(sort == "longest" ? "selected" : null)">Longest</option>
+                        <option value="random" selected="@(sort == "random" ? "selected" : null)">Random</option>
                     </select>
                 </form>
             </div>
@@ -64,7 +64,7 @@
             @if (!Model.Any())
             {
                 <div class="no-comments">
-                    <p>Все още няма коментари. Бъди първият!</p>
+                    <p>No comments yet. Be the first one!</p>
                 </div>
             }
             else
@@ -101,7 +101,7 @@
 
                             <div class="comment-footer">
                                 <details data-id="@c.Id" class="reply-details">
-                                    <summary class="btn-link">Отговори (@(c.Replies?.Count ?? 0))</summary>
+                                    <summary class="btn-link">Replies (@(c.Replies?.Count ?? 0))</summary>
 
                                     <div class="reply-section">
                                         @if (ViewBag.AllowComments == true)
@@ -115,8 +115,8 @@
                                                 <input type="hidden" name="seed" value="@ViewBag.Seed" />
                                             }
                                             <div style="display: flex; gap: 10px;">
-                                                <textarea name="content" rows="1" class="glass-input small" placeholder="Твоят отговор..."></textarea>
-                                                <button class="btn-action secondary small">Прати</button>
+                                                <textarea name="content" rows="1" class="glass-input small" placeholder="Your reply..."></textarea>
+                                                <button class="btn-action secondary small">Send</button>
                                             </div>
                                         </form>
                                         }
@@ -154,7 +154,7 @@
                                                             {
                                                                 <input type="hidden" name="seed" value="@ViewBag.Seed" />
                                                             }
-                                                            <button class="btn-text-danger">Изтрий</button>
+                                                            <button class="btn-text-danger">Delete</button>
                                                         </form>
                                                     }
                                                 </div>
@@ -172,7 +172,7 @@
                                         {
                                             <input type="hidden" name="seed" value="@ViewBag.Seed" />
                                         }
-                                        <button class="btn-text-danger">Изтрий коментара</button>
+                                        <button class="btn-text-danger">Delete comment</button>
                                     </form>
                                 }
                             </div>
@@ -182,7 +182,7 @@
             }
             
             <div style="text-align: center; margin-top: 40px;">
-                <a asp-controller="Tickets" asp-action="PublicTickets" class="btn-back">Обратно към билетите</a>
+                <a asp-controller="Tickets" asp-action="PublicTickets" class="btn-back">Back to tickets</a>
             </div>
 
         </div>
