@@ -81,7 +81,6 @@ namespace Destined.Controllers
 
             ViewBag.ProfilePictures = profilePictures;
             ViewBag.DisplayUsernames = displayUsernames;
-            // -----------------------------
 
             ViewBag.Ticket = ticket;
             ViewBag.Sort = sort;

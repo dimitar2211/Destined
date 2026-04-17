@@ -53,10 +53,6 @@ namespace Destined.Controllers
             var ticket = await _context.Tickets.FindAsync(id);
             if (ticket != null)
             {
-                // Remove associated reports first? Or cascading delete?
-                // Assuming EF handles cascade or we just remove ticket.
-                // But wait, if we delete ticket, reports might hang if no cascade. 
-                // Let's remove reports for this ticket first to be safe.
                 var reports = _context.TicketReports.Where(r => r.TicketId == id);
                 _context.TicketReports.RemoveRange(reports);
 

@@ -118,9 +118,9 @@
                                         </form>
 
                                         <div class="d-flex flex-column gap-2 mt-3">
-                                            <a asp-controller="Tickets" asp-action="FriendTickets" asp-route-friendId="@friendship.FriendId" class="btn-secondary-glass w-100 text-center py-2">🎟️ View Tickets</a>
-                                            <a asp-controller="Tickets" asp-action="FriendMap" asp-route-friendId="@friendship.FriendId" class="btn-primary-glow w-100 text-center py-2" style="font-size: 0.95rem;">🗺️ Adventure Map</a>
-                                            <button type="button" class="btn-chat-toggle w-100 text-center py-2" onclick="toggleChat('@friendship.FriendId')">💬 Chat</button>
+                                            <a asp-controller="Tickets" asp-action="FriendTickets" asp-route-friendId="@friendship.FriendId" class="btn-secondary-glass w-100 text-center py-2">View Tickets</a>
+                                            <a asp-controller="Tickets" asp-action="FriendMap" asp-route-friendId="@friendship.FriendId" class="btn-primary-glow w-100 text-center py-2" style="font-size: 0.95rem;">Adventure Map</a>
+                                            <button type="button" class="btn-chat-toggle w-100 text-center py-2" onclick="toggleChat('@friendship.FriendId')">Chat</button>
                                         </div>
 
                                         <div class="chat-container-wrapper mt-3" id="chat-container-@friendship.FriendId" style="display: none;">
@@ -250,8 +250,8 @@
 </style>
 
 <div id="chat-menu" class="chat-context-menu">
-    <button onclick="editMsgAction()">✏️ Edit</button>
-    <button class="btn-delete-msg" onclick="deleteMsgAction()">🗑️ Delete</button>
+    <button onclick="editMsgAction()">Edit</button>
+    <button class="btn-delete-msg" onclick="deleteMsgAction()">Delete</button>
 </div>
 
 <script>

@@ -4,8 +4,6 @@
     ViewData["Title"] = "Adventure Map";
     ViewData["FullWidth"] = true;
     
-    // Group tickets by country for easier JS processing
-    // We will create a dictionary: CountryName -> List of Tickets
     var ticketsByCountry = Model
         .Where(t => !string.IsNullOrEmpty(t.Country))
         .GroupBy(t => t.Country)

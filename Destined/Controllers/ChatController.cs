@@ -93,9 +93,6 @@ namespace Destined.Controllers
 
             var message = await _context.ChatMessages.FindAsync(messageId);
             if (message == null) return NotFound();
-
-            // Only the receiver can like the message? 
-            // when a double click is made on someone else's message to be liked
             
             if (message.ReceiverId != user.Id) return Forbid();
 

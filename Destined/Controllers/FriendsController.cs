@@ -125,7 +125,6 @@ namespace Destined.Controllers
                 .ToListAsync();
 
             IdentityUser foundUser = null;
-            // Now filter by display_username claim or actual username
             foreach(var pf in potentialFriends)
             {
                 var claims = await _userManager.GetClaimsAsync(pf.User);
