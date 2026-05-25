@@ -7,11 +7,13 @@
 
 <partial name="_ThemeBackground" />
 
-<div class="admin-container">
-    <div class="admin-header">
-        <h1>Admin Panel</h1>
-        <p>Manage reported tickets and security</p>
-    </div>
+
+    <div id="page-content" style="position: relative; z-index: 10; padding: 100px 20px 40px 20px;">
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1>Admin <span class="gradient-text">Panel</span></h1>
+                <p>Manage reported tickets and community safety</p>
+            </div>
 
     <div class="glass-table-wrapper">
         @if (!Model.Any())
@@ -64,21 +66,20 @@
                                     @if (item.Ticket != null)
                                     {
                                         <a asp-controller="Tickets" asp-action="Details" asp-route-id="@item.TicketId" 
-                                           asp-route-returnUrl="@Url.Action("Index", "Reports")"
-                                           class="btn-text btn-view" title="Review">
+                                           class="btn-action btn-view" title="Review">
                                             Review
                                         </a>
                                         
                                         <form asp-action="DeleteTicket" asp-route-id="@item.TicketId" method="post" 
                                               onsubmit="return confirm('⚠️ WARNING: This will delete the ticket forever! Continue?');">
-                                            <button type="submit" class="btn-text btn-delete-ticket" title="Delete Ticket">
+                                            <button type="submit" class="btn-action btn-delete-ticket" title="Delete Ticket">
                                                 Delete
                                             </button>
                                         </form>
                                     }
 
                                     <form asp-action="Delete" asp-route-id="@item.Id" method="post">
-                                        <button type="submit" class="btn-text btn-dismiss" title="Dismiss Report">
+                                        <button type="submit" class="btn-action btn-dismiss" title="Dismiss Report">
                                             Dismiss
                                         </button>
                                     </form>
@@ -91,8 +92,6 @@
         }
     </div>
 
-    <div class="back-link-wrapper">
-        <a asp-controller="Home" asp-action="Index" class="btn-back">Back to Home</a>
     </div>
 </div>
 
@@ -100,10 +99,8 @@
     /* Layout */
     .admin-container {
         position: relative;
-        z-index: 10;
         max-width: 1200px;
-        margin: 40px auto;
-        padding: 0 20px;
+        margin: 0 auto;
         font-family: 'Outfit', sans-serif;
     }
 
@@ -113,11 +110,12 @@
         color: white;
     }
     .admin-header h1 {
-        font-size: 3rem;
+        font-size: 3.5rem;
         font-weight: 800;
         text-shadow: 0 5px 15px rgba(0,0,0,0.3);
         margin-bottom: 10px;
     }
+    .gradient-text { background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .admin-header p {
         font-size: 1.2rem;
         color: rgba(255,255,255,0.7);
@@ -211,11 +209,11 @@
         flex-wrap: wrap;
     }
 
-    .btn-text {
-        padding: 8px 16px;
-        border-radius: 20px; /* Pill shape */
+    .btn-action {
+        padding: 10px 20px;
+        border-radius: 50px;
         border: none;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         font-weight: 600;
         cursor: pointer;
         transition: 0.3s;
@@ -223,7 +221,9 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-width: 80px;
+        min-width: 90px;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
 
     .btn-view { background: rgba(33, 150, 243, 0.2); color: #64b5f6; border: 1px solid rgba(33, 150, 243, 0.3); }
@@ -240,24 +240,6 @@
     .empty-state h3 { font-size: 1.5rem; margin-bottom: 10px; }
     .empty-state p { color: rgba(255,255,255,0.5); }
 
-    /* Back Button */
-    .back-link-wrapper { margin-top: 40px; text-align: center; }
-    .btn-back {
-        display: inline-block;
-        padding: 12px 30px;
-        background: rgba(255,255,255,0.1);
-        color: white;
-        text-decoration: none;
-        border-radius: 30px;
-        font-weight: 600;
-        transition: 0.3s;
-        border: 1px solid rgba(255,255,255,0.2);
-    }
-    .btn-back:hover {
-        background: white;
-        color: #333;
-        transform: translateY(-2px);
-    }
 
     /* Prevent horizontal scroll from background animations or table */
     body {

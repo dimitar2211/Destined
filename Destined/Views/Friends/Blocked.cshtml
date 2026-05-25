@@ -14,9 +14,6 @@
         <div class="friends-wrapper">
             <h1 class="page-title">Blocked <span class="gradient-text">Users</span></h1>
 
-            <div class="actions-bar d-flex justify-content-center mb-4">
-                <a asp-action="Index" class="btn-back-glass">⬅ Back to Friends</a>
-            </div>
 
             @if (TempData["Success"] != null)
             {
@@ -80,12 +77,6 @@
     }
     .btn-primary-glow { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; box-shadow: 0 0 15px rgba(255, 65, 108, 0.5); }
     .btn-primary-glow:hover { transform: translateY(-3px); box-shadow: 0 0 25px rgba(255, 65, 108, 0.8); color: white; }
-    .btn-back-glass { 
-        padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; 
-        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; display: inline-block;
-        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    }
-    .btn-back-glass:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px) translateX(-5px); color: white; border: 1px solid rgba(255,255,255,0.4); }
 
     .friend-card {
         background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15);

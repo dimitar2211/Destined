@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -10,10 +10,23 @@
     <link rel="stylesheet" href="~/css/header.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        var isHomePage = ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && 
+                         ViewContext.RouteData.Values["action"]?.ToString() == "Index";
+    }
     <header class="destined-header">
         <div class="header-content">
-            <!-- Logo (Left) -->
-            <a class="header-logo" asp-area="" asp-controller="Home" asp-action="Index">
+            <div class="header-left-group">
+                @if (!isHomePage)
+                {
+                    <button type="button" class="btn-back" onclick="window.history.length > 1 ? window.history.back() : window.location.href = '@Url.Action("Index", "Home")'" title="Back">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 12H5M5 12L12 19M5 12L12 5" />
+                        </svg>
+                    </button>
+                }
+                <!-- Logo (Left) -->
+                <a class="header-logo" asp-area="" asp-controller="Home" asp-action="Index">
                 <div class="logo-icon-circle">
                     <svg viewBox="0 0 24 24" fill="none" class="logo-svg">
                         <path d="M21 16V14L13 9V3.5C13 2.67 12.33 2 11.5 2C10.67 2 10 2.67 10 3.5V9L2 14V16L10 13.5V19L8 20.5V22L11.5 21L15 22V20.5L13 19V13.5L21 16Z" fill="currentColor"/>
@@ -21,6 +34,7 @@
                 </div>
                 <span class="logo-text">DESTINED</span>
             </a>
+        </div>
 
             <!-- User Auth (Right) -->
             <div class="header-auth">

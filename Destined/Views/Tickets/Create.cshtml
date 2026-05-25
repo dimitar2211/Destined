@@ -10,10 +10,6 @@
 
     <div id="page-content" style="position: relative; z-index: 10; padding: 100px 20px 40px 20px;">
         <div class="ticket-wrapper">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <a asp-action="Index" class="btn-back-glass shadow-sm">⬅ Back to my tickets</a>
-            </div>
-
             <h1 class="page-title">New Ticket</h1>
 
             <form method="post" asp-action="Create">
@@ -528,11 +524,5 @@
         box-shadow: 0 6px 20px rgba(76, 175, 80, 0.6);
     }
 
-    .btn-back-glass { 
-        padding: 10px 24px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; 
-        background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; display: inline-block;
-        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    }
-    .btn-back-glass:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px) translateX(-5px); color: #fff; border: 1px solid rgba(255,255,255,0.4); }
 
 </style>
